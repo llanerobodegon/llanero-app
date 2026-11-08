@@ -39,3 +39,11 @@ Docs: https://docs.expo.dev/eas/index.md
 - If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
 - Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
 - Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
+
+## Architecture (MVVM)
+
+Follow `docs/architecture.md`. Flow: route (`src/app`) → View (`src/views`) → ViewModel (`src/viewmodels`) → Service (`src/services`) → Supabase. Only services touch Supabase; views never import services; routes only re-export their View. Each `src/*` folder has a README with its rules.
+
+## Git workflow (Gitflow)
+
+Follow `docs/gitflow.md`. Never commit directly to `main` or `develop`: start work with `git flow feature start <name>` from `develop`, and ship with `release/*` (bumps `app.json` version, tags `vX.Y.Z` on `main`). Hotfixes branch from `main`.
