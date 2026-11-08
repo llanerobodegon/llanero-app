@@ -1,0 +1,70 @@
+@import 'tailwindcss';
+@import 'uniwind';
+
+@import 'heroui-native/styles';
+
+:root {
+  --font-display:
+    Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,
+    Segoe UI Symbol, Noto Color Emoji;
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+  --font-rounded: 'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif;
+  --font-serif: Georgia, 'Times New Roman', serif;
+}
+
+/* ---------- Llanero brand palette ---------- */
+/* #FF6600 naranja (accent) · #790102 vino (accent-secondary) · #0A0A0A negro */
+@theme {
+  --brand-orange: #ff6600;
+  --brand-wine: #790102;
+  --brand-black: #0a0a0a;
+}
+
+@layer theme {
+  :root {
+    @variant light {
+      --foreground: var(--brand-black);
+      --default-foreground: var(--brand-black);
+      --field-foreground: var(--brand-black);
+      --segment-foreground: var(--brand-black);
+
+      /* Texto blanco sobre naranja (decisión de marca; contraste 2.9:1) */
+      --accent: var(--brand-orange);
+      --accent-foreground: var(--white);
+
+      --accent-secondary: var(--brand-wine);
+      --accent-secondary-foreground: var(--white);
+
+      --focus: var(--brand-orange);
+      --link: var(--brand-wine);
+    }
+
+    @variant dark {
+      --background: var(--brand-black);
+      --surface: oklch(0.2 0 0);
+      --surface-secondary: oklch(0.24 0 0);
+      --surface-tertiary: oklch(0.27 0 0);
+      --overlay: oklch(0.21 0 0);
+      --default: oklch(0.26 0 0);
+      --field-background: oklch(0.2 0 0);
+      --segment: oklch(0.36 0 0);
+      --border: oklch(0.28 0 0);
+
+      --accent: var(--brand-orange);
+      --accent-foreground: var(--white);
+
+      --accent-secondary: var(--brand-wine);
+      --accent-secondary-foreground: var(--white);
+
+      --focus: var(--brand-orange);
+      --link: var(--brand-orange);
+    }
+  }
+}
+
+@theme inline {
+  --color-accent-secondary: var(--accent-secondary);
+  --color-accent-secondary-foreground: var(--accent-secondary-foreground);
+  --color-accent-secondary-hover: color-mix(in oklab, var(--accent-secondary) 90%, var(--accent-secondary-foreground) 10%);
+}
