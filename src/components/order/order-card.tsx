@@ -1,7 +1,7 @@
 import { SymbolView } from 'expo-symbols';
 import { LinkButton, PressableFeedback, useThemeColor } from 'heroui-native';
 import { Text, View } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
+import Animated, { FadeIn, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
 import { TicketPerforation } from '@/components/ticket-perforation';
 import { formatRelativeDate, formatUSD } from '@/lib/format';
@@ -26,7 +26,11 @@ type OrderCardProps = {
  * el código de entrega, las líneas del pedido y el desglose del total.
  */
 export function OrderCard({ order, isExpanded, onToggle, onPressDetail }: OrderCardProps) {
-  const [foreground, background] = useThemeColor(['foreground', 'background']);
+  const [foreground, background, muted] = useThemeColor(['foreground', 'background', 'muted']);
+  // Chevron que gira hacia arriba al expandir: indica que el ticket se despliega.
+  const chevronStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: withTiming(isExpanded ? '180deg' : '0deg', { duration: 200 }) }],
+  }));
   const isActive = isActiveOrder(order.status);
   const isDelivery = order.deliveryType === 'delivery';
   const isCancelled = order.status === 'cancelled';
@@ -142,6 +146,18 @@ export function OrderCard({ order, isExpanded, onToggle, onPressDetail }: OrderC
             <LinkButton.Label className="text-accent">Ver detalle</LinkButton.Label>
           </LinkButton>
         ) : null}
+
+        <Animated.View
+          style={chevronStyle}
+          className="self-center"
+          importantForAccessibility="no-hide-descendants">
+          <SymbolView
+            name={{ ios: 'chevron.down', android: 'expand_more', web: 'expand_more' }}
+            size={14}
+            weight="semibold"
+            tintColor={muted}
+          />
+        </Animated.View>
       </View>
     </PressableFeedback>
   );
