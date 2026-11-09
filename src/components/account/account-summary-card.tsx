@@ -1,5 +1,4 @@
-import { SymbolView } from 'expo-symbols';
-import { PressableFeedback, Skeleton, useThemeColor } from 'heroui-native';
+import { PressableFeedback, Skeleton } from 'heroui-native';
 import { Text, View } from 'react-native';
 
 type AccountSummaryCardProps = {
@@ -19,8 +18,6 @@ export function AccountSummaryCard({
   isLoading = false,
   onPress,
 }: AccountSummaryCardProps) {
-  const [muted] = useThemeColor(['muted']);
-
   if (isLoading) {
     return <Skeleton className="h-24 w-full rounded-3xl" />;
   }
@@ -43,12 +40,6 @@ export function AccountSummaryCard({
           {email}
         </Text>
       </View>
-      <SymbolView
-        name={{ ios: 'chevron.right', android: 'chevron_right', web: 'chevron_right' }}
-        size={14}
-        weight="semibold"
-        tintColor={muted}
-      />
     </PressableFeedback>
   );
 }
