@@ -53,7 +53,10 @@ export function useAccountViewModel() {
     () => tap(() => router.push('/account/change-password')),
     [tap],
   );
-  const openNotifications = useCallback(() => tap(() => {}), [tap]);
+  const openNotifications = useCallback(
+    () => tap(() => router.push('/account/notifications')),
+    [tap],
+  );
   // TODO: abrir las páginas legales (expo-web-browser) cuando estén las URLs.
   const openTerms = useCallback(() => tap(() => {}), [tap]);
   const openPrivacy = useCallback(() => tap(() => {}), [tap]);
