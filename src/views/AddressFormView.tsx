@@ -39,7 +39,7 @@ export function AddressFormView({ addressId }: { addressId?: string }) {
           {Array.from({ length: 4 }, (_, index) => (
             <View key={index} className="gap-2">
               <Skeleton className="h-4 w-24 rounded-md" />
-              <Skeleton className="h-12 w-full rounded-2xl" />
+              <Skeleton className="h-12 w-full rounded-full" />
             </View>
           ))}
         </View>

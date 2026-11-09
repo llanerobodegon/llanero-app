@@ -88,14 +88,14 @@ export function OptionsSheet<T>({
         </Text>
         {description ? <Text className="text-sm text-muted">{description}</Text> : null}
       </View>
-      {/* Buscador a todo el ancho (como la tarjeta de opciones) y en forma de píldora */}
+      {/* Buscador a todo el ancho, como la tarjeta de opciones (la forma de píldora viene del tema) */}
       {searchPlaceholder ? (
         <SearchField value={query} onChange={setQuery} className="w-full">
           <SearchField.Group>
             <SearchField.SearchIcon />
             <SearchField.Input
               placeholder={searchPlaceholder}
-              className={`rounded-full ${NO_SHADOW} ${ACTION_FOCUS}`}
+              className={`${NO_SHADOW} ${ACTION_FOCUS}`}
               selectionColorClassName="accent-action"
               autoCorrect={false}
               returnKeyType="search"
