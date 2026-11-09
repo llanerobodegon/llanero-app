@@ -1,3 +1,5 @@
-import { NewAddressView } from '@/views/NewAddressView';
+import { AddressFormView } from '@/views/AddressFormView';
 
-export default NewAddressView;
+export default function NewAddressRoute() {
+  return <AddressFormView />;
+}

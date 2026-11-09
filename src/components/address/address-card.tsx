@@ -1,15 +1,31 @@
 import { SymbolView } from 'expo-symbols';
-import { Chip, useThemeColor } from 'heroui-native';
+import { Chip, PressableFeedback, useThemeColor } from 'heroui-native';
 import { Text, View } from 'react-native';
 
 import type { Address } from '@/models/address.model';
 
-/** Dirección guardada: ícono, nombre (con "Predeterminada" si aplica) y líneas de la dirección. */
-export function AddressCard({ address }: { address: Address }) {
-  const [foreground] = useThemeColor(['foreground']);
+type AddressCardProps = {
+  address: Address;
+  onPress: (address: Address) => void;
+};
+
+/**
+ * Dirección guardada, compacta: ícono, nombre (con "Predeterminada" si aplica), la dirección
+ * en una línea y un chevron que indica que se abre para editarla.
+ */
+export function AddressCard({ address, onPress }: AddressCardProps) {
+  const [foreground, muted] = useThemeColor(['foreground', 'muted']);
+  const summary = [address.addressLine1, address.addressLine2, address.city]
+    .filter(Boolean)
+    .join(', ');
 
   return (
-    <View className="flex-row items-start gap-3 rounded-3xl bg-surface p-4">
+    <PressableFeedback
+      onPress={() => onPress(address)}
+      accessibilityRole="button"
+      accessibilityLabel={`${address.label}${address.isDefault ? ', predeterminada' : ''}: ${summary}`}
+      accessibilityHint="Abre la dirección para editarla"
+      className="flex-row items-center gap-3 rounded-3xl bg-surface p-3">
       <View className="size-10 items-center justify-center rounded-full bg-default">
         <SymbolView
           name={{ ios: 'mappin.and.ellipse', android: 'location_on', web: 'location_on' }}
@@ -19,7 +35,7 @@ export function AddressCard({ address }: { address: Address }) {
       </View>
       <View className="flex-1 gap-0.5">
         <View className="flex-row items-center gap-2">
-          <Text className="shrink text-base font-semibold text-foreground" numberOfLines={1}>
+          <Text className="shrink text-sm font-semibold text-foreground" numberOfLines={1}>
             {address.label}
           </Text>
           {address.isDefault ? (
@@ -28,12 +44,16 @@ export function AddressCard({ address }: { address: Address }) {
             </Chip>
           ) : null}
         </View>
-        <Text className="text-sm text-muted">{address.addressLine1}</Text>
-        {address.addressLine2 ? (
-          <Text className="text-sm text-muted">{address.addressLine2}</Text>
-        ) : null}
-        <Text className="text-sm text-muted">{address.city}</Text>
+        <Text className="text-xs text-muted" numberOfLines={1}>
+          {summary}
+        </Text>
       </View>
-    </View>
+      <SymbolView
+        name={{ ios: 'chevron.right', android: 'chevron_right', web: 'chevron_right' }}
+        size={14}
+        weight="semibold"
+        tintColor={muted}
+      />
+    </PressableFeedback>
   );
 }

@@ -13,10 +13,12 @@ export interface Address {
   updatedAt: string;
 }
 
-/** Datos del formulario de nueva dirección. */
+/** Datos del formulario de dirección (crear y editar). */
 export interface CreateAddressData {
   label: string;
   addressLine1: string;
   addressLine2: string | null;
   city: string;
 }
+
+export type UpdateAddressData = CreateAddressData;

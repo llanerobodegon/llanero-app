@@ -39,6 +39,12 @@ export function useAddressesViewModel() {
     router.push('/account/addresses/new');
   }, []);
 
+  /** Abre la dirección para editarla, eliminarla o marcarla como predeterminada. */
+  const editAddress = useCallback((address: Address) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push({ pathname: '/account/addresses/[id]', params: { id: address.id } });
+  }, []);
+
   const goBack = useCallback(() => router.back(), []);
 
   return {
@@ -48,6 +54,7 @@ export function useAddressesViewModel() {
     error,
     retry,
     addAddress,
+    editAddress,
     goBack,
   };
 }

@@ -2,8 +2,8 @@ import {
   Button,
   Description,
   FieldError,
-  Input,
   Label,
+  Skeleton,
   Spinner,
   TextField,
   useThemeColor,
@@ -11,26 +11,62 @@ import {
 import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useActionForeground } from '@/hooks/use-action-foreground';
+import { AccountMenuItem, AccountMenuSection } from '@/components/account/account-menu';
+import { ConfirmDialog } from '@/components/confirm-dialog';
+import { EmptyState } from '@/components/empty-state';
+import { FormInput } from '@/components/form/form-input';
 import { SelectField } from '@/components/form/select-field';
 import { ScreenHeader } from '@/components/screen-header';
-import { CITIES, useNewAddressViewModel } from '@/viewmodels/useNewAddressViewModel';
+import { useActionForeground } from '@/hooks/use-action-foreground';
+import { CITIES, useAddressFormViewModel } from '@/viewmodels/useAddressFormViewModel';
 
-/** Quita la sombra (elevation) que HeroUI pone a los campos en Android; en iOS la quita el tema. */
-const NO_SHADOW = 'android:[elevation:0]';
-
-/** Formulario de nueva dirección: nombre, dirección 1 y 2, y ciudad. */
-export function NewAddressView() {
-  const vm = useNewAddressViewModel();
+/**
+ * Formulario de dirección: nombre, dirección 1 y 2, y ciudad. Sin `addressId` crea una nueva;
+ * con `addressId` la edita y ofrece marcarla como predeterminada o eliminarla.
+ */
+export function AddressFormView({ addressId }: { addressId?: string }) {
+  const vm = useAddressFormViewModel(addressId);
   const insets = useSafeAreaInsets();
   const [background] = useThemeColor(['background']);
   const actionForeground = useActionForeground();
+  const header = <ScreenHeader title={vm.title} onBack={vm.goBack} />;
+
+  if (vm.isLoading) {
+    return (
+      <View className="flex-1 bg-background">
+        {header}
+        <View className="gap-5 px-4 pt-4">
+          {Array.from({ length: 4 }, (_, index) => (
+            <View key={index} className="gap-2">
+              <Skeleton className="h-4 w-24 rounded-md" />
+              <Skeleton className="h-12 w-full rounded-2xl" />
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  }
+
+  if (vm.isNotFound) {
+    return (
+      <View className="flex-1 bg-background">
+        {header}
+        <EmptyState
+          icon={{ ios: 'mappin.slash', android: 'location_off' }}
+          title="No encontramos esta dirección"
+          description={vm.error ?? 'Puede que la hayas eliminado.'}
+          actionLabel="Volver"
+          onPressAction={vm.goBack}
+        />
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
       className="flex-1 bg-background"
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScreenHeader title="Nueva dirección" onBack={vm.goBack} />
+      {header}
 
       <ScrollView
         keyboardShouldPersistTaps="handled"
@@ -38,8 +74,7 @@ export function NewAddressView() {
         contentContainerClassName="gap-5 px-4 pt-4 pb-6">
         <TextField isRequired isInvalid={!!vm.errors.label}>
           <Label>Nombre</Label>
-          <Input
-            className={NO_SHADOW}
+          <FormInput
             value={vm.form.label}
             onChangeText={vm.setLabel}
             placeholder="Ej. Casa, Oficina, Casa de mamá"
@@ -51,8 +86,7 @@ export function NewAddressView() {
 
         <TextField isRequired isInvalid={!!vm.errors.addressLine1}>
           <Label>Dirección 1</Label>
-          <Input
-            className={NO_SHADOW}
+          <FormInput
             value={vm.form.addressLine1}
             onChangeText={vm.setAddressLine1}
             placeholder="Ej. Av. Lara con calle 5, Urb. del Este"
@@ -65,8 +99,7 @@ export function NewAddressView() {
 
         <TextField>
           <Label>Dirección 2</Label>
-          <Input
-            className={NO_SHADOW}
+          <FormInput
             value={vm.form.addressLine2}
             onChangeText={vm.setAddressLine2}
             placeholder="Ej. Casa 12, frente a la plaza"
@@ -90,6 +123,29 @@ export function NewAddressView() {
         </TextField>
 
         {vm.error ? <Text className="text-sm text-danger">{vm.error}</Text> : null}
+
+        {/* Opciones de una dirección existente */}
+        {vm.isEditing ? (
+          <View className="pt-2">
+            <AccountMenuSection>
+              {vm.isDefault ? null : (
+                <AccountMenuItem
+                  title="Usar como predeterminada"
+                  icon={{ ios: 'star', android: 'star' }}
+                  showChevron={false}
+                  onPress={vm.makeDefault}
+                />
+              )}
+              <AccountMenuItem
+                title="Eliminar dirección"
+                icon={{ ios: 'trash', android: 'delete' }}
+                tone="danger"
+                showChevron={false}
+                onPress={vm.requestDelete}
+              />
+            </AccountMenuSection>
+          </View>
+        ) : null}
       </ScrollView>
 
       {/* Guardar, fijo abajo (igual que en Información personal) */}
@@ -100,15 +156,29 @@ export function NewAddressView() {
           size="lg"
           // Sin capa de color al presionar sobre el color de acción.
           feedbackVariant="scale"
-          isDisabled={vm.isSaving}
+          isDisabled={!vm.canSave}
           onPress={vm.save}
           className="rounded-full bg-action">
           {vm.isSaving ? <Spinner size="sm" color={actionForeground} /> : null}
           <Button.Label className="text-action-foreground">
-            {vm.isSaving ? 'Guardando…' : 'Guardar dirección'}
+            {vm.isSaving ? 'Guardando…' : vm.saveLabel}
           </Button.Label>
         </Button>
       </View>
+
+      <ConfirmDialog
+        isOpen={vm.isDeleteConfirmOpen}
+        title="¿Eliminar esta dirección?"
+        description={
+          vm.isDefault
+            ? 'Es tu dirección predeterminada. Si tienes otras, la más reciente pasará a serlo.'
+            : 'Ya no podrás elegirla para tus pedidos.'
+        }
+        confirmLabel="Eliminar"
+        tone="danger"
+        onConfirm={vm.confirmDelete}
+        onCancel={vm.cancelDelete}
+      />
     </KeyboardAvoidingView>
   );
 }

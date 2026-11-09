@@ -1,7 +1,6 @@
 import {
   Button,
   FieldError,
-  Input,
   Label,
   Skeleton,
   Spinner,
@@ -12,6 +11,7 @@ import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-na
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useActionForeground } from '@/hooks/use-action-foreground';
+import { FormInput } from '@/components/form/form-input';
 import { SelectField } from '@/components/form/select-field';
 import { ScreenHeader } from '@/components/screen-header';
 import {
@@ -19,9 +19,6 @@ import {
   PHONE_CODES,
   usePersonalInfoViewModel,
 } from '@/viewmodels/usePersonalInfoViewModel';
-
-/** Quita la sombra (elevation) que HeroUI pone a los campos en Android; en iOS la quita el tema. */
-const NO_SHADOW = 'android:[elevation:0]';
 
 /** Ancho común de los desplegables de operadora y tipo de cédula, para que los campos se alineen. */
 const PREFIX_WIDTH = 104;
@@ -62,8 +59,7 @@ export function PersonalInfoView() {
         contentContainerClassName="gap-5 px-4 pt-4 pb-6">
         <TextField isRequired isInvalid={!!vm.errors.firstName}>
           <Label>Nombre</Label>
-          <Input
-            className={NO_SHADOW}
+          <FormInput
             value={vm.form.firstName}
             onChangeText={vm.setFirstName}
             placeholder="Tu nombre"
@@ -77,8 +73,7 @@ export function PersonalInfoView() {
 
         <TextField isRequired isInvalid={!!vm.errors.lastName}>
           <Label>Apellido</Label>
-          <Input
-            className={NO_SHADOW}
+          <FormInput
             value={vm.form.lastName}
             onChangeText={vm.setLastName}
             placeholder="Tu apellido"
@@ -100,8 +95,8 @@ export function PersonalInfoView() {
               accessibilityLabel="Código de operadora"
               width={PREFIX_WIDTH}
             />
-            <Input
-              className={`flex-1 ${NO_SHADOW}`}
+            <FormInput
+              className="flex-1"
               value={vm.form.phone}
               onChangeText={vm.setPhone}
               placeholder="1234567"
@@ -124,8 +119,8 @@ export function PersonalInfoView() {
               accessibilityLabel="Tipo de documento"
               width={PREFIX_WIDTH}
             />
-            <Input
-              className={`flex-1 ${NO_SHADOW}`}
+            <FormInput
+              className="flex-1"
               value={vm.form.idNumber}
               onChangeText={vm.setIdNumber}
               placeholder="12345678"

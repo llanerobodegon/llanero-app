@@ -23,7 +23,7 @@ export function AddressesView() {
       {vm.isLoading ? (
         <View className="gap-3 px-4 pt-4">
           {Array.from({ length: 2 }, (_, index) => (
-            <Skeleton key={index} className="h-24 w-full rounded-3xl" />
+            <Skeleton key={index} className="h-16 w-full rounded-3xl" />
           ))}
         </View>
       ) : vm.error ? (
@@ -47,8 +47,8 @@ export function AddressesView() {
           <FlatList
             data={vm.addresses}
             keyExtractor={(address) => address.id}
-            renderItem={({ item }) => <AddressCard address={item} />}
-            ItemSeparatorComponent={() => <View className="h-3" />}
+            renderItem={({ item }) => <AddressCard address={item} onPress={vm.editAddress} />}
+            ItemSeparatorComponent={() => <View className="h-2.5" />}
             showsVerticalScrollIndicator={false}
             contentContainerClassName="px-4 pt-4 pb-6"
           />

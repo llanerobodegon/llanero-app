@@ -38,6 +38,7 @@ export default function RootLayout() {
                   <Stack.Screen name="account/personal-info" />
                   <Stack.Screen name="account/addresses/index" />
                   <Stack.Screen name="account/addresses/new" />
+                  <Stack.Screen name="account/addresses/[id]" />
                 </Stack>
               </CartDrawerView>
             </ThemeProvider>
