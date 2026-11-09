@@ -142,6 +142,9 @@ export function useHomeViewModel() {
   const seeAllPromotions = useCallback(() => {}, []);
   const seeAllPopular = useCallback(() => {}, []);
   const seeAllMarket = useCallback(() => {}, []);
+  // TODO: navegar a la pantalla de categoría / listado de categorías cuando existan.
+  const openCategory = useCallback((_category: Category) => {}, []);
+  const seeAllCategories = useCallback(() => {}, []);
 
   return {
     warehouses,
@@ -156,6 +159,8 @@ export function useHomeViewModel() {
     isLoadingCategories,
     categoriesError,
     openFilters,
+    openCategory,
+    seeAllCategories,
 
     mainBanners: mainBanners.slides,
     isLoadingMainBanners: mainBanners.isLoading,

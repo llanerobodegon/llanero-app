@@ -2,6 +2,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BannerCarousel } from '@/components/banner-carousel';
+import { CategoriesSection } from '@/components/categories-section';
 import { CategoryFilterBar } from '@/components/category-filter-bar';
 import { HomeTopBar } from '@/components/home-top-bar';
 import { LocationsSection } from '@/components/locations-section';
@@ -46,6 +47,13 @@ export function HomeView() {
 
         <View style={styles.sections}>
           <BannerCarousel slides={vm.mainBanners} isLoading={vm.isLoadingMainBanners} />
+
+          <CategoriesSection
+            categories={vm.categories}
+            isLoading={vm.isLoadingCategories}
+            onPressSeeAll={vm.seeAllCategories}
+            onPressCategory={vm.openCategory}
+          />
 
           <ProductSection
             title="Promociones"
