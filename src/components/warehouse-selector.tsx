@@ -1,4 +1,5 @@
 import { BottomSheet, RNHostView } from '@expo/ui';
+import * as Haptics from 'expo-haptics';
 import { SymbolView } from 'expo-symbols';
 import { Chip, Separator, useThemeColor } from 'heroui-native';
 import { Fragment, useState } from 'react';
@@ -30,7 +31,13 @@ export function WarehouseSelector({
   const label = isLoading ? 'Cargando tiendas…' : (selectedWarehouse?.name ?? 'Elige una tienda');
   const isDisabled = isLoading || warehouses.length === 0;
 
+  const handleOpen = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setIsOpen(true);
+  };
+
   const handleSelect = (warehouse: Warehouse) => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     onSelect(warehouse);
     setIsOpen(false);
   };
@@ -42,7 +49,7 @@ export function WarehouseSelector({
         color="default"
         size="lg"
         disabled={isDisabled}
-        onPress={() => setIsOpen(true)}
+        onPress={handleOpen}
         accessibilityRole="button"
         accessibilityLabel={`Tienda: ${label}. Toca para cambiarla`}
         className="h-11 gap-1.5 bg-surface px-4 shadow-surface">
