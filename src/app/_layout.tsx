@@ -8,7 +8,9 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import AppTabs from '@/components/app-tabs';
+import { CartProvider } from '@/contexts/cart-context';
 import { WarehouseProvider } from '@/contexts/warehouse-context';
+import { CartDrawerView } from '@/views/CartDrawerView';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -21,10 +23,15 @@ export default function TabLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <HeroUINativeProvider>
         <WarehouseProvider>
-          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-            <AnimatedSplashOverlay />
-            <AppTabs />
-          </ThemeProvider>
+          <CartProvider>
+            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+              <AnimatedSplashOverlay />
+              {/* El carrito empuja toda la app (pestañas incluidas) hacia la izquierda */}
+              <CartDrawerView>
+                <AppTabs />
+              </CartDrawerView>
+            </ThemeProvider>
+          </CartProvider>
         </WarehouseProvider>
       </HeroUINativeProvider>
     </GestureHandlerRootView>
