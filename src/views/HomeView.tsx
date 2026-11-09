@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BannerCarousel } from '@/components/banner-carousel';
 import { CategoryFilterBar } from '@/components/category-filter-bar';
 import { HomeTopBar } from '@/components/home-top-bar';
+import { PaymentMethodsBanner } from '@/components/payment-methods-banner';
 import { ProductSection } from '@/components/product/product-section';
 import { WarehouseSelector } from '@/components/warehouse-selector';
 import { BottomTabInset, Spacing } from '@/constants/theme';
@@ -73,6 +74,10 @@ export function HomeView() {
             onPressProduct={vm.openProduct}
             onAddProduct={vm.addToCart}
           />
+
+          <View style={styles.paymentMethods}>
+            <PaymentMethodsBanner />
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -85,6 +90,9 @@ const styles = StyleSheet.create({
   },
   sections: {
     gap: Spacing.five,
+  },
+  paymentMethods: {
+    paddingHorizontal: Spacing.three,
   },
   filters: {
     paddingTop: Spacing.three,
