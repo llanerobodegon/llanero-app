@@ -10,3 +10,13 @@ export interface Warehouse {
   isActive: boolean;
   isOpen: boolean;
 }
+
+export interface Category {
+  id: string;
+  name: string;
+  imageUrl: string | null;
+  isActive: boolean;
+  createdBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+}

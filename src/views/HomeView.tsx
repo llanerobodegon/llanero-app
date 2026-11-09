@@ -1,5 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 
+import { CategoryFilterBar } from '@/components/category-filter-bar';
 import { HomeTopBar } from '@/components/home-top-bar';
 import { WarehouseSelector } from '@/components/warehouse-selector';
 import { ThemedText } from '@/components/themed-text';
@@ -25,6 +26,16 @@ export function HomeView() {
         onPressCart={() => {}}
       />
 
+      <View style={styles.filters}>
+        <CategoryFilterBar
+          categories={vm.categories}
+          selectedCategoryId={vm.selectedCategoryId}
+          onSelectCategory={vm.selectCategory}
+          onPressFilters={vm.openFilters}
+          isLoading={vm.isLoadingCategories}
+        />
+      </View>
+
       <View style={styles.content}>
         <ThemedText themeColor="textSecondary" style={styles.description}>
           Categorías, promociones y productos destacados.
@@ -37,6 +48,9 @@ export function HomeView() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  filters: {
+    paddingBottom: Spacing.three,
   },
   content: {
     flex: 1,
