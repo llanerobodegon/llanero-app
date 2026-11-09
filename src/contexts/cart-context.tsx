@@ -10,7 +10,7 @@ interface CartContextType {
   /** Total de unidades (suma de cantidades). */
   itemCount: number;
   subtotal: number;
-  addProduct: (product: Product, warehouseId: string) => void;
+  addProduct: (product: Product, warehouseId: string, quantity?: number) => void;
   increment: (productId: string) => void;
   decrement: (productId: string) => void;
   clear: () => void;
@@ -24,14 +24,14 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const EMPTY_CART: Cart = { warehouseId: null, items: [] };
 
-function toCartItem(product: Product): CartItem {
+function toCartItem(product: Product, quantity: number): CartItem {
   return {
     productId: product.id,
     name: product.name,
     description: product.description,
     imageUrl: product.imageUrls[0] ?? null,
     unitPrice: finalPrice(product.price, product.isOnDiscount, product.discountPrice),
-    quantity: 1,
+    quantity,
   };
 }
 
@@ -44,7 +44,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<Cart>(EMPTY_CART);
   const [isOpen, setIsOpen] = useState(false);
 
-  const addProduct = useCallback((product: Product, warehouseId: string) => {
+  const addProduct = useCallback((product: Product, warehouseId: string, quantity = 1) => {
     setCart((current) => {
       // El carrito pertenece a una sola tienda; si llega otra, empieza de cero.
       const items = current.warehouseId === warehouseId ? current.items : [];
@@ -53,9 +53,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
         warehouseId,
         items: existing
           ? items.map((item) =>
-              item.productId === product.id ? { ...item, quantity: item.quantity + 1 } : item,
+              item.productId === product.id
+                ? { ...item, quantity: item.quantity + quantity }
+                : item,
             )
-          : [...items, toCartItem(product)],
+          : [...items, toCartItem(product, quantity)],
       };
     });
   }, []);

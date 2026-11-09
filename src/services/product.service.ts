@@ -194,4 +194,17 @@ export const productService = {
   async getMarket(warehouseId: string): Promise<Product[]> {
     return toMockProducts(warehouseId, 'market', MOCK_MARKET);
   },
+
+  /**
+   * Un producto de la tienda por id, o `null` si no existe ahí.
+   * TODO: en Supabase, `warehouse_products` (warehouse_id, product_id) con join a `products`.
+   */
+  async getById(warehouseId: string, productId: string): Promise<Product | null> {
+    const all = [
+      ...toMockProducts(warehouseId, 'promo', MOCK_PROMOS),
+      ...toMockProducts(warehouseId, 'popular', MOCK_POPULAR),
+      ...toMockProducts(warehouseId, 'market', MOCK_MARKET),
+    ];
+    return all.find((product) => product.id === productId) ?? null;
+  },
 };

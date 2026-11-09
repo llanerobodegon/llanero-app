@@ -1,4 +1,5 @@
 import * as Haptics from 'expo-haptics';
+import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 
 import { useCartContext } from '@/contexts/cart-context';
@@ -180,8 +181,11 @@ export function useHomeViewModel() {
     },
     [cart, selectedWarehouseId],
   );
-  // TODO: navegar al detalle de producto y a los listados completos cuando existan.
-  const openProduct = useCallback((_product: Product) => {}, []);
+  /** Abre el detalle del producto (modal). */
+  const openProduct = useCallback((product: Product) => {
+    router.push({ pathname: '/product/[id]', params: { id: product.id } });
+  }, []);
+  // TODO: navegar a los listados completos ("Ver todo") cuando existan.
   const seeAllPromotions = useCallback(() => {}, []);
   const seeAllPopular = useCallback(() => {}, []);
   const seeAllMarket = useCallback(() => {}, []);
