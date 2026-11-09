@@ -58,7 +58,7 @@ export function WarehouseSelector({
           disabled={isDisabled}
           accessibilityRole="button"
           accessibilityLabel={`Tienda: ${label}. Toca para cambiarla`}
-          className="gap-1.5 self-center">
+          className="gap-1.5">
           <SymbolView
             name={{ ios: 'storefront', android: 'storefront', web: 'storefront' }}
             size={16}

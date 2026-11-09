@@ -13,16 +13,17 @@ export function HomeView() {
   return (
     <ThemedView style={styles.container}>
       {/* TODO: abrir el carrito cuando exista su pantalla */}
-      <HomeTopBar onPressCart={() => {}} />
-
-      <View style={styles.selector}>
-        <WarehouseSelector
-          warehouses={vm.warehouses}
-          selectedWarehouse={vm.selectedWarehouse}
-          onSelect={vm.selectWarehouse}
-          isLoading={vm.isLoadingWarehouses}
-        />
-      </View>
+      <HomeTopBar
+        leading={
+          <WarehouseSelector
+            warehouses={vm.warehouses}
+            selectedWarehouse={vm.selectedWarehouse}
+            onSelect={vm.selectWarehouse}
+            isLoading={vm.isLoadingWarehouses}
+          />
+        }
+        onPressCart={() => {}}
+      />
 
       <View style={styles.content}>
         <ThemedText themeColor="textSecondary" style={styles.description}>
@@ -36,10 +37,6 @@ export function HomeView() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  selector: {
-    paddingHorizontal: Spacing.three,
-    paddingBottom: Spacing.two,
   },
   content: {
     flex: 1,
