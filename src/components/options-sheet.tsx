@@ -2,12 +2,15 @@ import { BottomSheet, Column, RNHostView, ScrollView as NativeScrollView } from 
 import { SymbolView } from 'expo-symbols';
 import { SearchField, Separator, useThemeColor } from 'heroui-native';
 import { Fragment, type ReactNode, useMemo, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, Text, useWindowDimensions, View } from 'react-native';
 
 import { ACTION_FOCUS, NO_SHADOW } from '@/components/form/form-input';
 import { useActionForeground } from '@/hooks/use-action-foreground';
 
 /** Minúsculas y sin acentos, para buscar "credito" y encontrar "Crédito". */
+/** Margen lateral de la hoja; se fija igual en iOS y Android para calcular el ancho. */
+const SHEET_PADDING = 16;
+
 const normalize = (text: string) =>
   text
     .normalize('NFD')
@@ -62,6 +65,10 @@ export function OptionsSheet<T>({
   const [background] = useThemeColor(['background']);
   const actionForeground = useActionForeground();
   const [query, setQuery] = useState('');
+  // La hoja nativa no le impone ancho al contenido de React Native: sin un ancho fijo, un
+  // texto largo ensancha la tarjeta y se sale. Con él, el texto se corta con "…".
+  const { width: windowWidth } = useWindowDimensions();
+  const contentWidth = { width: windowWidth - SHEET_PADDING * 2 };
 
   const visibleOptions = useMemo(() => {
     const q = normalize(query);
@@ -124,7 +131,8 @@ export function OptionsSheet<T>({
               accessibilityLabel={getAccessibilityLabel(option)}
               accessibilityState={{ selected }}
               className="flex-row items-center gap-3 px-4 py-3.5 active:opacity-60">
-              <View className="flex-1 gap-0.5">{renderOption(option)}</View>
+              {/* min-w-0: deja que el texto se encoja y se corte en vez de empujar la fila */}
+              <View className="min-w-0 flex-1 gap-0.5">{renderOption(option)}</View>
               {selected ? (
                 // Check blanco dentro de un círculo del color de acción.
                 <View className="size-6 items-center justify-center rounded-full bg-action">
@@ -149,22 +157,27 @@ export function OptionsSheet<T>({
       isPresented={isOpen}
       onDismiss={close}
       containerColor={background}
+      contentPadding={{ top: SHEET_PADDING, left: SHEET_PADDING, right: SHEET_PADDING }}
       snapPoints={isScrollable ? ['half', 'full'] : undefined}>
       {isScrollable ? (
         // Scroll NATIVO (SwiftUI / Compose): la hoja lo reconoce y coordina el arrastre con el
         // scroll. Un ScrollView de React Native aquí compite con el gesto de la hoja.
         <Column spacing={12}>
-          <RNHostView matchContents={{ vertical: true }}>{header}</RNHostView>
+          <RNHostView matchContents={{ vertical: true }}>
+            <View style={contentWidth}>{header}</View>
+          </RNHostView>
           <NativeScrollView showsIndicators={false}>
             <RNHostView matchContents={{ vertical: true }}>
-              <View className="pb-8">{list}</View>
+              <View style={contentWidth} className="pb-8">
+                {list}
+              </View>
             </RNHostView>
           </NativeScrollView>
         </Column>
       ) : (
         // Sin snapPoints la hoja se ajusta al contenido.
         <RNHostView matchContents={{ vertical: true }}>
-          <View className="gap-3 pb-4">
+          <View style={contentWidth} className="gap-3 pb-4">
             {header}
             {list}
           </View>

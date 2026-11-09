@@ -1,4 +1,5 @@
 import * as Haptics from 'expo-haptics';
+import { router } from 'expo-router';
 import { useCallback, useState } from 'react';
 
 import { useCartContext } from '@/contexts/cart-context';
@@ -42,8 +43,13 @@ export function useCartViewModel() {
     setIsClearConfirmOpen(false);
   }, [cart]);
 
-  // TODO: navegar a la pantalla de pago cuando exista.
-  const checkout = useCallback(() => {}, []);
+  /** Cierra el carrito y abre el checkout. */
+  const checkout = useCallback(() => {
+    if (cart.items.length === 0) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    cart.close();
+    router.push('/checkout');
+  }, [cart]);
 
   return {
     items: cart.items,

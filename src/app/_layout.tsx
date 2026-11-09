@@ -34,6 +34,8 @@ export default function RootLayout() {
                   <Stack.Screen name="product/[id]" options={{ presentation: 'modal' }} />
                   {/* Detalle de pedido: misma hoja modal que el producto */}
                   <Stack.Screen name="order/[id]" options={{ presentation: 'modal' }} />
+                  {/* Checkout: push a pantalla completa desde el carrito */}
+                  <Stack.Screen name="checkout" />
                   {/* Pantallas internas de la cuenta: push con su propio encabezado (ScreenHeader) */}
                   <Stack.Screen name="account/personal-info" />
                   <Stack.Screen name="account/change-password" />
