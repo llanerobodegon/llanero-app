@@ -1,4 +1,6 @@
-import { Select, useThemeColor } from 'heroui-native';
+import { Select } from 'heroui-native';
+
+import { useActionForeground } from '@/hooks/use-action-foreground';
 
 type SelectFieldProps = {
   /** Opción elegida; `null` muestra el `placeholder`. */
@@ -18,7 +20,7 @@ type SelectFieldProps = {
 
 /**
  * Desplegable de la app: se ve como un campo más, abre una lista flotante y marca la opción
- * elegida con un check blanco sobre círculo negro.
+ * elegida con un check blanco sobre círculo del color de acción.
  */
 export function SelectField({
   value,
@@ -29,7 +31,7 @@ export function SelectField({
   width,
   isDisabled = false,
 }: SelectFieldProps) {
-  const [background] = useThemeColor(['background']);
+  const actionForeground = useActionForeground();
 
   return (
     <Select
@@ -51,10 +53,10 @@ export function SelectField({
           {options.map((option) => (
             <Select.Item key={option} value={option} label={option}>
               <Select.ItemLabel />
-              {/* Check blanco sobre círculo negro (el `foreground` de la marca) */}
+              {/* Check blanco sobre círculo del color de acción (vino en claro, naranja en oscuro) */}
               <Select.ItemIndicator
-                className="size-5 items-center justify-center rounded-full bg-foreground"
-                iconProps={{ size: 11, color: background }}
+                className="size-5 items-center justify-center rounded-full bg-action"
+                iconProps={{ size: 11, color: actionForeground }}
               />
             </Select.Item>
           ))}

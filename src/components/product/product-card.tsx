@@ -3,6 +3,7 @@ import { SymbolView } from 'expo-symbols';
 import { Button, Chip, useThemeColor } from 'heroui-native';
 import { Pressable, Text, View } from 'react-native';
 
+import { useActionForeground } from '@/hooks/use-action-foreground';
 import { discountPercent, formatUSD } from '@/lib/format';
 import type { Product } from '@/models/warehouse.model';
 
@@ -15,7 +16,8 @@ type ProductCardProps = {
 
 /** Tarjeta de producto: imagen, badge de descuento, nombre, presentación, precio y botón "+". */
 export function ProductCard({ product, width, onPress, onAdd }: ProductCardProps) {
-  const [background, muted] = useThemeColor(['background', 'muted']);
+  const [muted] = useThemeColor(['muted']);
+  const actionForeground = useActionForeground();
   const imageUrl = product.imageUrls[0];
   const hasDiscount = product.isOnDiscount && product.discountPrice !== null;
   const finalPrice = hasDiscount ? product.discountPrice! : product.price;
@@ -75,15 +77,15 @@ export function ProductCard({ product, width, onPress, onAdd }: ProductCardProps
         <Button
           isIconOnly
           size="sm"
-          // Sin capa de color al presionar: en `primary` sería naranja sobre el botón negro.
+          // Sin capa de color al presionar sobre el color de acción.
           feedbackVariant="scale"
           onPress={() => onAdd?.(product)}
           accessibilityLabel={`Agregar ${product.name} al carrito`}
-          className="rounded-full bg-foreground">
+          className="rounded-full bg-action">
           <SymbolView
             name={{ ios: 'plus', android: 'add', web: 'add' }}
             size={18}
-            tintColor={background}
+            tintColor={actionForeground}
           />
         </Button>
       </View>

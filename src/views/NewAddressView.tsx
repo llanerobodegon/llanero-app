@@ -11,6 +11,7 @@ import {
 import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useActionForeground } from '@/hooks/use-action-foreground';
 import { SelectField } from '@/components/form/select-field';
 import { ScreenHeader } from '@/components/screen-header';
 import { CITIES, useNewAddressViewModel } from '@/viewmodels/useNewAddressViewModel';
@@ -23,6 +24,7 @@ export function NewAddressView() {
   const vm = useNewAddressViewModel();
   const insets = useSafeAreaInsets();
   const [background] = useThemeColor(['background']);
+  const actionForeground = useActionForeground();
 
   return (
     <KeyboardAvoidingView
@@ -96,13 +98,13 @@ export function NewAddressView() {
         className="px-4 pt-3">
         <Button
           size="lg"
-          // Sin capa de color al presionar: en `primary` sería naranja sobre el botón negro.
+          // Sin capa de color al presionar sobre el color de acción.
           feedbackVariant="scale"
           isDisabled={vm.isSaving}
           onPress={vm.save}
-          className="rounded-full bg-foreground">
-          {vm.isSaving ? <Spinner size="sm" color={background} /> : null}
-          <Button.Label className="text-background">
+          className="rounded-full bg-action">
+          {vm.isSaving ? <Spinner size="sm" color={actionForeground} /> : null}
+          <Button.Label className="text-action-foreground">
             {vm.isSaving ? 'Guardando…' : 'Guardar dirección'}
           </Button.Label>
         </Button>

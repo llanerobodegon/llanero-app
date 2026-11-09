@@ -3,6 +3,7 @@ import { SymbolView } from 'expo-symbols';
 import { Button, useThemeColor } from 'heroui-native';
 import { Text, View } from 'react-native';
 
+import { useActionForeground } from '@/hooks/use-action-foreground';
 import { formatUSD } from '@/lib/format';
 import type { CartItem } from '@/models/cart.model';
 
@@ -14,7 +15,8 @@ type CartLineProps = {
 
 /** Línea del ticket: miniatura, nombre, presentación · precio unitario y control − cantidad +. */
 export function CartLine({ item, onIncrement, onDecrement }: CartLineProps) {
-  const [foreground, background, muted] = useThemeColor(['foreground', 'background', 'muted']);
+  const [foreground, muted] = useThemeColor(['foreground', 'muted']);
+  const actionForeground = useActionForeground();
   const detail = item.description
     ? `${item.description} · ${formatUSD(item.unitPrice)}`
     : formatUSD(item.unitPrice);
@@ -75,16 +77,16 @@ export function CartLine({ item, onIncrement, onDecrement }: CartLineProps) {
         <Button
           isIconOnly
           size="sm"
-          // Sin capa de color al presionar: en `primary` sería naranja sobre el botón negro.
+          // Sin capa de color al presionar sobre el color de acción.
           feedbackVariant="scale"
           onPress={() => onIncrement(item.productId)}
           accessibilityLabel={`Agregar una unidad de ${item.name}`}
-          className="size-7 rounded-full bg-foreground">
+          className="size-7 rounded-full bg-action">
           <SymbolView
             name={{ ios: 'plus', android: 'add', web: 'add' }}
             size={12}
             weight="bold"
-            tintColor={background}
+            tintColor={actionForeground}
           />
         </Button>
       </View>

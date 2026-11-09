@@ -74,12 +74,12 @@ function CartContent({ background }: { background: string }) {
 
       <Button
         size="lg"
-        // Sin capa de color al presionar: en `primary` sería naranja sobre el botón negro.
+        // Sin capa de color al presionar sobre el color de acción.
         feedbackVariant="scale"
         isDisabled={vm.isEmpty}
         onPress={vm.checkout}
-        className="mt-auto rounded-full bg-foreground">
-        <Button.Label className="text-background">
+        className="mt-auto rounded-full bg-action">
+        <Button.Label className="text-action-foreground">
           {vm.isEmpty ? 'Pagar' : `Pagar · ${formatUSD(vm.subtotal)}`}
         </Button.Label>
       </Button>

@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Platform, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useActionForeground } from '@/hooks/use-action-foreground';
 import { PromoNotice } from '@/components/product/promo-notice';
 import { QuantityStepper } from '@/components/product/quantity-stepper';
 import { formatUSD } from '@/lib/format';
@@ -23,6 +24,7 @@ export function ProductDetailView({ productId }: { productId: string }) {
     'muted',
     'danger',
   ]);
+  const actionForeground = useActionForeground();
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   // En iOS el modal es una hoja que no llega al borde superior; en Android ocupa la pantalla.
@@ -178,7 +180,7 @@ export function ProductDetailView({ productId }: { productId: string }) {
                       : `${description} `}
                     {isLongDescription ? (
                       <Text
-                        className="font-semibold text-foreground"
+                        className="font-semibold text-action"
                         onPress={() => setIsDescriptionExpanded((value) => !value)}
                         accessibilityRole="button">
                         {isDescriptionExpanded ? 'Leer menos' : 'Leer más'}
@@ -196,16 +198,16 @@ export function ProductDetailView({ productId }: { productId: string }) {
             className="px-4 pt-3">
             <Button
               size="lg"
-              // Sin capa de color al presionar: en `primary` sería naranja sobre el botón negro.
+              // Sin capa de color al presionar sobre el color de acción.
               feedbackVariant="scale"
               onPress={vm.addToCart}
-              className="rounded-full bg-foreground">
+              className="rounded-full bg-action">
               <SymbolView
                 name={{ ios: 'cart', android: 'shopping_cart', web: 'shopping_cart' }}
                 size={20}
-                tintColor={background}
+                tintColor={actionForeground}
               />
-              <Button.Label className="text-background">
+              <Button.Label className="text-action-foreground">
                 {`Agregar al carrito · ${formatUSD(vm.totalPrice)}`}
               </Button.Label>
             </Button>

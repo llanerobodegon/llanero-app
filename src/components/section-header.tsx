@@ -16,7 +16,7 @@ export function SectionHeader({ title, onPressSeeAll }: SectionHeaderProps) {
       </Text>
       {onPressSeeAll ? (
         <LinkButton onPress={onPressSeeAll} accessibilityLabel={`Ver todo: ${title}`}>
-          <LinkButton.Label className="text-accent">Ver todo</LinkButton.Label>
+          <LinkButton.Label className="text-action">Ver todo</LinkButton.Label>
         </LinkButton>
       ) : null}
     </View>

@@ -42,11 +42,11 @@ export function EmptyState({
       {actionLabel && onPressAction ? (
         <Button
           size="md"
-          // Sin capa de color al presionar: en `primary` sería naranja sobre el botón negro.
+          // Sin capa de color al presionar sobre el color de acción.
           feedbackVariant="scale"
           onPress={onPressAction}
-          className="mt-4 rounded-full bg-foreground px-6">
-          <Button.Label className="text-background">{actionLabel}</Button.Label>
+          className="mt-4 rounded-full bg-action px-6">
+          <Button.Label className="text-action-foreground">{actionLabel}</Button.Label>
         </Button>
       ) : null}
     </View>

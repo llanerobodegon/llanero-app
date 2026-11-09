@@ -39,6 +39,10 @@
       --focus: var(--brand-orange);
       --link: var(--brand-wine);
 
+      /* Botones de acción (Pagar, Guardar, +…) y enlaces (Ver todo, Leer más): vino en claro */
+      --action: var(--brand-wine);
+      --action-foreground: var(--white);
+
       /* Campos sin sombra (siguen en blanco sobre el fondo gris claro) */
       --field-shadow: 0 0 0 0 transparent inset;
     }
@@ -62,11 +66,18 @@
 
       --focus: var(--brand-orange);
       --link: var(--brand-orange);
+
+      /* Botones de acción y enlaces: naranja en oscuro (el vino no contrasta con el negro) */
+      --action: var(--brand-orange);
+      --action-foreground: var(--white);
     }
   }
 }
 
 @theme inline {
+  --color-action: var(--action);
+  --color-action-foreground: var(--action-foreground);
+
   --color-accent-secondary: var(--accent-secondary);
   --color-accent-secondary-foreground: var(--accent-secondary-foreground);
   --color-accent-secondary-hover: color-mix(in oklab, var(--accent-secondary) 90%, var(--accent-secondary-foreground) 10%);

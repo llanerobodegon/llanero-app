@@ -3,6 +3,7 @@ import { Button, Skeleton, useThemeColor } from 'heroui-native';
 import { FlatList, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useActionForeground } from '@/hooks/use-action-foreground';
 import { AddressCard } from '@/components/address/address-card';
 import { EmptyState } from '@/components/empty-state';
 import { ScreenHeader } from '@/components/screen-header';
@@ -13,6 +14,7 @@ export function AddressesView() {
   const vm = useAddressesViewModel();
   const insets = useSafeAreaInsets();
   const [background] = useThemeColor(['background']);
+  const actionForeground = useActionForeground();
 
   return (
     <View className="flex-1 bg-background">
@@ -57,17 +59,17 @@ export function AddressesView() {
             className="px-4 pt-3">
             <Button
               size="lg"
-              // Sin capa de color al presionar: en `primary` sería naranja sobre el botón negro.
+              // Sin capa de color al presionar sobre el color de acción.
               feedbackVariant="scale"
               onPress={vm.addAddress}
-              className="rounded-full bg-foreground">
+              className="rounded-full bg-action">
               <SymbolView
                 name={{ ios: 'plus', android: 'add', web: 'add' }}
                 size={16}
                 weight="semibold"
-                tintColor={background}
+                tintColor={actionForeground}
               />
-              <Button.Label className="text-background">Agregar dirección</Button.Label>
+              <Button.Label className="text-action-foreground">Agregar dirección</Button.Label>
             </Button>
           </View>
         </>

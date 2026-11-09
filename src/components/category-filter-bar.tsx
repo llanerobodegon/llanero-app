@@ -1,7 +1,8 @@
 import { SymbolView } from 'expo-symbols';
-import { Button, Chip, Skeleton, useThemeColor } from 'heroui-native';
+import { Button, Chip, Skeleton } from 'heroui-native';
 import { ScrollView } from 'react-native';
 
+import { useActionForeground } from '@/hooks/use-action-foreground';
 import type { Category } from '@/models/warehouse.model';
 
 const SKELETON_COUNT = 4;
@@ -22,7 +23,7 @@ export function CategoryFilterBar({
   onPressFilters,
   isLoading = false,
 }: CategoryFilterBarProps) {
-  const [background] = useThemeColor(['background']);
+  const actionForeground = useActionForeground();
 
   return (
     <ScrollView
@@ -32,15 +33,15 @@ export function CategoryFilterBar({
       <Button
         isIconOnly
         size="md"
-        // Sin capa de color al presionar: en `primary` sería naranja sobre el botón negro.
+        // Sin capa de color al presionar sobre el color de acción.
         feedbackVariant="scale"
         onPress={onPressFilters}
         accessibilityLabel="Filtros"
-        className="rounded-full bg-foreground">
+        className="rounded-full bg-action">
         <SymbolView
           name={{ ios: 'line.3.horizontal.decrease', android: 'filter_list', web: 'filter_list' }}
           size={20}
-          tintColor={background}
+          tintColor={actionForeground}
         />
       </Button>
 

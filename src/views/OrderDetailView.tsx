@@ -58,8 +58,8 @@ export function OrderDetailView({ orderId }: { orderId: string }) {
             size="md"
             feedbackVariant="scale"
             onPress={vm.retry}
-            className="rounded-full bg-foreground px-6">
-            <Button.Label className="text-background">Reintentar</Button.Label>
+            className="rounded-full bg-action px-6">
+            <Button.Label className="text-action-foreground">Reintentar</Button.Label>
           </Button>
         </View>
       ) : (

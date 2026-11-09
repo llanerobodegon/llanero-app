@@ -2,6 +2,8 @@ import { SymbolView } from 'expo-symbols';
 import { Button, useThemeColor } from 'heroui-native';
 import { Text, View } from 'react-native';
 
+import { useActionForeground } from '@/hooks/use-action-foreground';
+
 type QuantityStepperProps = {
   quantity: number;
   canDecrement: boolean;
@@ -18,7 +20,8 @@ export function QuantityStepper({
   onDecrement,
   onIncrement,
 }: QuantityStepperProps) {
-  const [foreground, background] = useThemeColor(['foreground', 'background']);
+  const [foreground] = useThemeColor(['foreground']);
+  const actionForeground = useActionForeground();
 
   return (
     <View className="flex-row items-center gap-3 rounded-full bg-surface p-1.5 shadow-surface">
@@ -43,17 +46,17 @@ export function QuantityStepper({
       </Text>
       <Button
         isIconOnly
-        // Sin capa de color al presionar: en `primary` sería naranja sobre el botón negro.
+        // Sin capa de color al presionar sobre el color de acción.
         feedbackVariant="scale"
         onPress={onIncrement}
         isDisabled={!canIncrement}
         accessibilityLabel="Agregar una unidad"
-        className="size-11 rounded-full bg-foreground">
+        className="size-11 rounded-full bg-action">
         <SymbolView
           name={{ ios: 'plus', android: 'add', web: 'add' }}
           size={16}
           weight="bold"
-          tintColor={background}
+          tintColor={actionForeground}
         />
       </Button>
     </View>
