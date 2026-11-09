@@ -73,3 +73,20 @@ export function formatDateTime(iso: string): string {
 export function formatTimeOfDay(iso: string): string {
   return formatTime(new Date(iso));
 }
+
+/**
+ * Correo parcialmente oculto: "mariagonzalez@gmail.com" → "mari***@gmail.com".
+ * Usuarios cortos muestran solo la primera letra: "ana@gmail.com" → "a***@gmail.com".
+ */
+export function maskEmail(email: string): string {
+  const at = email.indexOf('@');
+  if (at <= 0) return email;
+  const local = email.slice(0, at);
+  const visible = local.length > 4 ? local.slice(0, 4) : local.slice(0, 1);
+  return `${visible}***${email.slice(at)}`;
+}
+
+/** Iniciales para un avatar: ("María", "González") → "MG". */
+export function initials(firstName: string, lastName: string): string {
+  return `${firstName.trim().charAt(0)}${lastName.trim().charAt(0)}`.toUpperCase();
+}
