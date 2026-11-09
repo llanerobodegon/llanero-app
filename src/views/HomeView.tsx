@@ -53,6 +53,26 @@ export function HomeView() {
             onPressProduct={vm.openProduct}
             onAddProduct={vm.addToCart}
           />
+
+          <ProductSection
+            title="Populares"
+            products={vm.popular}
+            isLoading={vm.isLoadingPopular}
+            onPressSeeAll={vm.seeAllPopular}
+            onPressProduct={vm.openProduct}
+            onAddProduct={vm.addToCart}
+          />
+
+          <BannerCarousel slides={vm.secondaryBanners} isLoading={vm.isLoadingSecondaryBanners} />
+
+          <ProductSection
+            title="Mercado"
+            products={vm.market}
+            isLoading={vm.isLoadingMarket}
+            onPressSeeAll={vm.seeAllMarket}
+            onPressProduct={vm.openProduct}
+            onAddProduct={vm.addToCart}
+          />
         </View>
       </ScrollView>
     </View>

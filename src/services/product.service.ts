@@ -63,6 +63,100 @@ const MOCK_PROMOS: MockProduct[] = [
   },
 ];
 
+const MOCK_POPULAR: MockProduct[] = [
+  {
+    name: 'Cerveza Polar Pilsen',
+    description: 'Caja 36 x 222 ml',
+    price: 22,
+    isOnDiscount: false,
+    isPromo: false,
+    discountPrice: null,
+  },
+  {
+    name: 'Coca-Cola',
+    description: '2 L',
+    price: 2.4,
+    isOnDiscount: false,
+    isPromo: false,
+    discountPrice: null,
+  },
+  {
+    name: 'Hielo',
+    description: 'Bolsa 3 kg',
+    price: 1.5,
+    isOnDiscount: false,
+    isPromo: false,
+    discountPrice: null,
+  },
+  {
+    name: 'Doritos Mega Queso',
+    description: '150 g',
+    price: 2.9,
+    isOnDiscount: true,
+    isPromo: false,
+    discountPrice: 2.47,
+  },
+  {
+    name: 'Whisky Buchanan’s 12',
+    description: '750 ml',
+    price: 45,
+    isOnDiscount: false,
+    isPromo: false,
+    discountPrice: null,
+  },
+];
+
+const MOCK_MARKET: MockProduct[] = [
+  {
+    name: 'Arroz Mary Tradicional',
+    description: '1 kg',
+    price: 1.45,
+    isOnDiscount: false,
+    isPromo: false,
+    discountPrice: null,
+  },
+  {
+    name: 'Aceite Diana',
+    description: '1 L',
+    price: 3.2,
+    isOnDiscount: false,
+    isPromo: false,
+    discountPrice: null,
+  },
+  {
+    name: 'Pasta Capri Larga',
+    description: '1 kg',
+    price: 1.9,
+    isOnDiscount: true,
+    isPromo: false,
+    discountPrice: 1.71,
+  },
+  {
+    name: 'Azúcar Montalbán',
+    description: '1 kg',
+    price: 1.35,
+    isOnDiscount: false,
+    isPromo: false,
+    discountPrice: null,
+  },
+  {
+    name: 'Huevos',
+    description: 'Cartón 30 und.',
+    price: 5.5,
+    isOnDiscount: false,
+    isPromo: false,
+    discountPrice: null,
+  },
+  {
+    name: 'Leche Completa Campestre',
+    description: '1 L',
+    price: 1.95,
+    isOnDiscount: false,
+    isPromo: false,
+    discountPrice: null,
+  },
+];
+
 function toMockProducts(warehouseId: string, prefix: string, rows: MockProduct[]): Product[] {
   return rows.map((row, index) => ({
     ...row,
@@ -83,5 +177,21 @@ export const productService = {
   /** Productos en promoción (`warehouse_products.is_promo = true`) de la tienda. */
   async getPromotions(warehouseId: string): Promise<Product[]> {
     return toMockProducts(warehouseId, 'promo', MOCK_PROMOS);
+  },
+
+  /**
+   * Productos más vendidos de la tienda.
+   * TODO: definir con Supabase de dónde sale (p. ej. conteo en `order_items` de la tienda).
+   */
+  async getPopular(warehouseId: string): Promise<Product[]> {
+    return toMockProducts(warehouseId, 'popular', MOCK_POPULAR);
+  },
+
+  /**
+   * Productos de mercado (víveres básicos) de la tienda.
+   * TODO: definir con Supabase qué los identifica (p. ej. una categoría "Mercado").
+   */
+  async getMarket(warehouseId: string): Promise<Product[]> {
+    return toMockProducts(warehouseId, 'market', MOCK_MARKET);
   },
 };

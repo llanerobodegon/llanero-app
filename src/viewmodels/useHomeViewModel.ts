@@ -107,6 +107,7 @@ export function useHomeViewModel() {
   }, []);
 
   const mainBanners = useSliders(SliderPosition.main);
+  const secondaryBanners = useSliders(SliderPosition.secondary);
 
   const promotions = useWarehouseProducts(
     selectedWarehouseId,
@@ -114,6 +115,19 @@ export function useHomeViewModel() {
     productService.getPromotions,
     'Error al cargar las promociones',
   );
+  const popular = useWarehouseProducts(
+    selectedWarehouseId,
+    isLoading,
+    productService.getPopular,
+    'Error al cargar los productos populares',
+  );
+  const market = useWarehouseProducts(
+    selectedWarehouseId,
+    isLoading,
+    productService.getMarket,
+    'Error al cargar los productos de mercado',
+  );
+
   /** Elige una categoría; tocar la que ya está elegida la quita. */
   const selectCategory = useCallback((categoryId: string) => {
     setSelectedCategoryId((current) => (current === categoryId ? null : categoryId));
@@ -126,6 +140,8 @@ export function useHomeViewModel() {
   // TODO: navegar al detalle de producto y a los listados completos cuando existan.
   const openProduct = useCallback((_product: Product) => {}, []);
   const seeAllPromotions = useCallback(() => {}, []);
+  const seeAllPopular = useCallback(() => {}, []);
+  const seeAllMarket = useCallback(() => {}, []);
 
   return {
     warehouses,
@@ -144,13 +160,24 @@ export function useHomeViewModel() {
     mainBanners: mainBanners.slides,
     isLoadingMainBanners: mainBanners.isLoading,
     mainBannersError: mainBanners.error,
+    secondaryBanners: secondaryBanners.slides,
+    isLoadingSecondaryBanners: secondaryBanners.isLoading,
+    secondaryBannersError: secondaryBanners.error,
 
     promotions: promotions.products,
     isLoadingPromotions: promotions.isLoading,
     promotionsError: promotions.error,
+    popular: popular.products,
+    isLoadingPopular: popular.isLoading,
+    popularError: popular.error,
+    market: market.products,
+    isLoadingMarket: market.isLoading,
+    marketError: market.error,
 
     addToCart,
     openProduct,
     seeAllPromotions,
+    seeAllPopular,
+    seeAllMarket,
   };
 }
