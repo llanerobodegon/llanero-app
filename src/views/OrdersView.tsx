@@ -3,7 +3,7 @@ import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { OrderCard } from '@/components/order/order-card';
-import { OrdersEmpty } from '@/components/order/orders-empty';
+import { EmptyState } from '@/components/empty-state';
 import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useOrdersViewModel } from '@/viewmodels/useOrdersViewModel';
 
@@ -65,24 +65,24 @@ export function OrdersView() {
           }
           ListEmptyComponent={
             vm.error ? (
-              <OrdersEmpty
-                icon="warning"
+              <EmptyState
+                icon={{ ios: 'exclamationmark.triangle', android: 'warning' }}
                 title="No pudimos cargar tus pedidos"
                 description={vm.error}
                 actionLabel="Reintentar"
                 onPressAction={vm.retry}
               />
             ) : vm.tab === 'active' ? (
-              <OrdersEmpty
-                icon="bag"
+              <EmptyState
+                icon={{ ios: 'bag', android: 'shopping_bag' }}
                 title="No tienes pedidos en curso"
                 description="Cuando hagas un pedido, aquí podrás seguir su estado hasta que te llegue."
                 actionLabel="Ir a comprar"
                 onPressAction={vm.goShopping}
               />
             ) : (
-              <OrdersEmpty
-                icon="clock"
+              <EmptyState
+                icon={{ ios: 'clock.arrow.circlepath', android: 'history' }}
                 title="Aún no tienes pedidos anteriores"
                 description="Tus pedidos entregados y cancelados aparecerán aquí."
               />

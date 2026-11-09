@@ -1,42 +1,53 @@
 import { Select, useThemeColor } from 'heroui-native';
 
-type PrefixSelectProps = {
-  value: string;
+type SelectFieldProps = {
+  /** Opción elegida; `null` muestra el `placeholder`. */
+  value: string | null;
   options: readonly string[];
   onChange: (value: string) => void;
-  /** Lectores de pantalla: "Código de operadora", "Tipo de documento"… */
+  placeholder?: string;
+  /** Lectores de pantalla: "Código de operadora", "Ciudad"… */
   accessibilityLabel: string;
-  /** Ancho fijo del disparador, para alinearse con el campo de al lado. */
-  width: number;
+  /**
+   * Ancho fijo del disparador (desplegable delante de un campo, como la operadora del
+   * teléfono). Sin él, ocupa todo el ancho y la lista mide lo mismo que el campo.
+   */
+  width?: number;
   isDisabled?: boolean;
 };
 
 /**
- * Desplegable compacto que va delante de un campo de texto (operadora del teléfono,
- * tipo de cédula). Se ve como un campo más y abre una lista flotante.
+ * Desplegable de la app: se ve como un campo más, abre una lista flotante y marca la opción
+ * elegida con un check blanco sobre círculo negro.
  */
-export function PrefixSelect({
+export function SelectField({
   value,
   options,
   onChange,
+  placeholder = 'Selecciona',
   accessibilityLabel,
   width,
   isDisabled = false,
-}: PrefixSelectProps) {
+}: SelectFieldProps) {
   const [background] = useThemeColor(['background']);
 
   return (
     <Select
-      value={{ value, label: value }}
+      value={value ? { value, label: value } : undefined}
       onValueChange={(option) => option && onChange(option.value)}
       isDisabled={isDisabled}>
-      <Select.Trigger style={{ width }} accessibilityLabel={`${accessibilityLabel}: ${value}`}>
-        <Select.Value placeholder={value} />
+      <Select.Trigger
+        style={width ? { width } : undefined}
+        accessibilityLabel={`${accessibilityLabel}: ${value ?? placeholder}`}>
+        <Select.Value placeholder={placeholder} />
         <Select.TriggerIndicator />
       </Select.Trigger>
       <Select.Portal>
         <Select.Overlay />
-        <Select.Content presentation="popover" width={Math.max(width, 120)} placement="bottom">
+        <Select.Content
+          presentation="popover"
+          width={width ? Math.max(width, 120) : 'trigger'}
+          placement="bottom">
           {options.map((option) => (
             <Select.Item key={option} value={option} label={option}>
               <Select.ItemLabel />

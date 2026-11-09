@@ -11,7 +11,7 @@ import {
 import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { PrefixSelect } from '@/components/form/prefix-select';
+import { SelectField } from '@/components/form/select-field';
 import { ScreenHeader } from '@/components/screen-header';
 import {
   ID_TYPES,
@@ -61,7 +61,7 @@ export function PersonalInfoView() {
         <TextField isRequired isInvalid={!!vm.errors.firstName}>
           <Label>Nombre</Label>
           <Input
-              className={NO_SHADOW}
+            className={NO_SHADOW}
             value={vm.form.firstName}
             onChangeText={vm.setFirstName}
             placeholder="Tu nombre"
@@ -76,7 +76,7 @@ export function PersonalInfoView() {
         <TextField isRequired isInvalid={!!vm.errors.lastName}>
           <Label>Apellido</Label>
           <Input
-              className={NO_SHADOW}
+            className={NO_SHADOW}
             value={vm.form.lastName}
             onChangeText={vm.setLastName}
             placeholder="Tu apellido"
@@ -91,7 +91,7 @@ export function PersonalInfoView() {
         <TextField isRequired isInvalid={!!vm.errors.phone}>
           <Label>Teléfono</Label>
           <View className="flex-row gap-2">
-            <PrefixSelect
+            <SelectField
               value={vm.form.phoneCode}
               options={PHONE_CODES}
               onChange={vm.setPhoneCode}
@@ -115,7 +115,7 @@ export function PersonalInfoView() {
         <TextField isRequired isInvalid={!!vm.errors.idNumber}>
           <Label>Cédula de identidad</Label>
           <View className="flex-row gap-2">
-            <PrefixSelect
+            <SelectField
               value={vm.form.idType}
               options={ID_TYPES}
               onChange={vm.setIdType}

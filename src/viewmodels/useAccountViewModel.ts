@@ -44,7 +44,7 @@ export function useAccountViewModel() {
     () => tap(() => router.push('/account/personal-info')),
     [tap],
   );
-  const openAddresses = useCallback(() => tap(() => {}), [tap]);
+  const openAddresses = useCallback(() => tap(() => router.push('/account/addresses')), [tap]);
   const openPaymentMethods = useCallback(() => tap(() => {}), [tap]);
   const openChangePassword = useCallback(() => tap(() => {}), [tap]);
   const openNotifications = useCallback(() => tap(() => {}), [tap]);
