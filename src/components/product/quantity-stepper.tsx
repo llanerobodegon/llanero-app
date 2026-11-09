@@ -10,7 +10,7 @@ type QuantityStepperProps = {
   onIncrement: () => void;
 };
 
-/** Píldora blanca con − cantidad + (cantidad con dos dígitos: 01, 02…). */
+/** Píldora blanca con − cantidad +. */
 export function QuantityStepper({
   quantity,
   canDecrement,
@@ -39,7 +39,7 @@ export function QuantityStepper({
       <Text
         className="min-w-8 text-center text-lg font-semibold text-foreground"
         accessibilityLabel={`Cantidad: ${quantity}`}>
-        {String(quantity).padStart(2, '0')}
+        {quantity}
       </Text>
       <Button
         isIconOnly
