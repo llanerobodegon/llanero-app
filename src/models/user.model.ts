@@ -22,3 +22,13 @@ export interface User {
   createdAt: string;
   updatedAt: string;
 }
+
+/** Datos que el cliente puede editar en "Información personal". */
+export interface UpdateUserData {
+  firstName: string;
+  lastName: string;
+  phoneCode: PhoneCode | null;
+  phone: string | null;
+  idType: IdType | null;
+  idNumber: string | null;
+}

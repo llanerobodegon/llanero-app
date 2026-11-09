@@ -38,6 +38,9 @@
 
       --focus: var(--brand-orange);
       --link: var(--brand-wine);
+
+      /* Campos sin sombra (siguen en blanco sobre el fondo gris claro) */
+      --field-shadow: 0 0 0 0 transparent inset;
     }
 
     @variant dark {

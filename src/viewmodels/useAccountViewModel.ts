@@ -1,5 +1,6 @@
 import Constants from 'expo-constants';
 import * as Haptics from 'expo-haptics';
+import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 
 import { initials, maskEmail } from '@/lib/format';
@@ -38,8 +39,11 @@ export function useAccountViewModel() {
     action();
   }, []);
 
-  // TODO: navegar a cada pantalla cuando exista.
-  const openPersonalInfo = useCallback(() => tap(() => {}), [tap]);
+  // TODO: navegar a las demás pantallas cuando existan.
+  const openPersonalInfo = useCallback(
+    () => tap(() => router.push('/account/personal-info')),
+    [tap],
+  );
   const openAddresses = useCallback(() => tap(() => {}), [tap]);
   const openPaymentMethods = useCallback(() => tap(() => {}), [tap]);
   const openChangePassword = useCallback(() => tap(() => {}), [tap]);
