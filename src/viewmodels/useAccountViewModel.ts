@@ -1,8 +1,12 @@
 import Constants from 'expo-constants';
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { useCallback, useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 
+import { LegalLinks } from '@/constants/links';
+import { useActionColor } from '@/hooks/use-action-foreground';
 import { initials, maskEmail } from '@/lib/format';
 import type { User } from '@/models/user.model';
 import { userService } from '@/services/user.service';
@@ -39,7 +43,6 @@ export function useAccountViewModel() {
     action();
   }, []);
 
-  // TODO: navegar a las demás pantallas cuando existan.
   const openPersonalInfo = useCallback(
     () => tap(() => router.push('/account/personal-info')),
     [tap],
@@ -57,9 +60,24 @@ export function useAccountViewModel() {
     () => tap(() => router.push('/account/notifications')),
     [tap],
   );
-  // TODO: abrir las páginas legales (expo-web-browser) cuando estén las URLs.
-  const openTerms = useCallback(() => tap(() => {}), [tap]);
-  const openPrivacy = useCallback(() => tap(() => {}), [tap]);
+  // Páginas legales en el navegador dentro de la app (Safari en iOS, Custom Tabs en Android).
+  const actionColor = useActionColor();
+  const openInAppBrowser = useCallback(
+    (url: string) =>
+      tap(() => {
+        WebBrowser.openBrowserAsync(url, {
+          // iOS: botones del color de acción sobre la barra del sistema.
+          controlsColor: actionColor,
+          // Android: barra del color de acción (Custom Tabs pone los íconos en blanco).
+          toolbarColor: Platform.OS === 'android' ? actionColor : undefined,
+          dismissButtonStyle: 'close',
+          presentationStyle: WebBrowser.WebBrowserPresentationStyle.PAGE_SHEET,
+        }).catch(() => {});
+      }),
+    [actionColor, tap],
+  );
+  const openTerms = useCallback(() => openInAppBrowser(LegalLinks.terms), [openInAppBrowser]);
+  const openPrivacy = useCallback(() => openInAppBrowser(LegalLinks.privacy), [openInAppBrowser]);
 
   // Cerrar sesión y eliminar cuenta piden confirmación.
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
