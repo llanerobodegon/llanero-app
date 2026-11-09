@@ -59,7 +59,7 @@ function CartContent({ background }: { background: string }) {
         <CloseButton
           onPress={vm.close}
           accessibilityLabel="Cerrar carrito"
-          className="size-10 rounded-full bg-surface"
+          className="size-11 rounded-full bg-surface shadow-surface"
         />
       </View>
 
