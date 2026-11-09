@@ -10,7 +10,8 @@ const NO_SHADOW = 'android:[elevation:0]';
 const ACTION_FOCUS = 'ios:focus:outline-action android:focus:border-action';
 
 /**
- * Campo de texto de la app: el `Input` de HeroUI sin sombra y con el foco del color de acción.
+ * Campo de texto de la app: el `Input` de HeroUI sin sombra y con el foco, el cursor y la
+ * selección del color de acción.
  * Si el campo es inválido (prop o `TextField isInvalid`), conserva el rojo también con foco.
  */
 export function FormInput({ className, isInvalid: localIsInvalid, ...props }: InputProps) {
@@ -21,6 +22,8 @@ export function FormInput({ className, isInvalid: localIsInvalid, ...props }: In
     <Input
       {...props}
       isInvalid={localIsInvalid}
+      // Cursor y selección del color de acción (rojo si el campo tiene error).
+      selectionColorClassName={isInvalid ? 'accent-danger' : 'accent-action'}
       className={[NO_SHADOW, isInvalid ? '' : ACTION_FOCUS, className].filter(Boolean).join(' ')}
     />
   );
