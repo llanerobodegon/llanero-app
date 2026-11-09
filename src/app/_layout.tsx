@@ -36,6 +36,7 @@ export default function RootLayout() {
                   <Stack.Screen name="order/[id]" options={{ presentation: 'modal' }} />
                   {/* Pantallas internas de la cuenta: push con su propio encabezado (ScreenHeader) */}
                   <Stack.Screen name="account/personal-info" />
+                  <Stack.Screen name="account/change-password" />
                   <Stack.Screen name="account/addresses/index" />
                   <Stack.Screen name="account/addresses/new" />
                   <Stack.Screen name="account/addresses/[id]" />
