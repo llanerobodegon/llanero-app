@@ -14,7 +14,7 @@ type CategoryFilterBarProps = {
   isLoading?: boolean;
 };
 
-/** Fila horizontal: botón de filtros y un chip por categoría del catálogo. */
+/** Fila horizontal: botón de filtros y un chip por categoría. Todo mide h-12 (48 px). */
 export function CategoryFilterBar({
   categories,
   selectedCategoryId,
@@ -31,7 +31,7 @@ export function CategoryFilterBar({
       contentContainerClassName="items-center gap-2 px-4">
       <Button
         isIconOnly
-        size="lg"
+        size="md"
         onPress={onPressFilters}
         accessibilityLabel="Filtros"
         className="rounded-full bg-foreground">
@@ -44,7 +44,7 @@ export function CategoryFilterBar({
 
       {isLoading
         ? Array.from({ length: SKELETON_COUNT }, (_, index) => (
-            <Skeleton key={index} className="h-10 w-24 rounded-full" />
+            <Skeleton key={index} className="h-12 w-24 rounded-full" />
           ))
         : categories.map((category) => {
             const isSelected = category.id === selectedCategoryId;
@@ -57,7 +57,7 @@ export function CategoryFilterBar({
                 onPress={() => onSelectCategory(category.id)}
                 accessibilityRole="button"
                 accessibilityState={{ selected: isSelected }}
-                className="h-10 px-4">
+                className={isSelected ? 'h-12 px-5' : 'h-12 bg-surface px-5'}>
                 <Chip.Label>{category.name}</Chip.Label>
               </Chip>
             );
