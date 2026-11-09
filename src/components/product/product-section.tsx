@@ -1,8 +1,9 @@
-import { LinkButton, Skeleton } from 'heroui-native';
-import { FlatList, Text, useWindowDimensions, View } from 'react-native';
+import { Skeleton } from 'heroui-native';
+import { FlatList, useWindowDimensions, View } from 'react-native';
 
 import type { Product } from '@/models/warehouse.model';
 
+import { SectionHeader } from '../section-header';
 import { ProductCard } from './product-card';
 
 const SIDE_PADDING = 16;
@@ -39,16 +40,7 @@ export function ProductSection({
 
   return (
     <View className="gap-3">
-      <View className="flex-row items-center justify-between px-4">
-        <Text className="text-xl font-semibold text-foreground" accessibilityRole="header">
-          {title}
-        </Text>
-        {onPressSeeAll ? (
-          <LinkButton onPress={onPressSeeAll} accessibilityLabel={`Ver todo: ${title}`}>
-            <LinkButton.Label className="text-accent">Ver todo</LinkButton.Label>
-          </LinkButton>
-        ) : null}
-      </View>
+      <SectionHeader title={title} onPressSeeAll={onPressSeeAll} />
 
       {isLoading ? (
         <View className="flex-row gap-3 px-4">

@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BannerCarousel } from '@/components/banner-carousel';
 import { CategoryFilterBar } from '@/components/category-filter-bar';
 import { HomeTopBar } from '@/components/home-top-bar';
+import { LocationsSection } from '@/components/locations-section';
 import { PaymentMethodsBanner } from '@/components/payment-methods-banner';
 import { ProductSection } from '@/components/product/product-section';
 import { WarehouseSelector } from '@/components/warehouse-selector';
@@ -78,6 +79,8 @@ export function HomeView() {
           <View style={styles.paymentMethods}>
             <PaymentMethodsBanner />
           </View>
+
+          <LocationsSection warehouses={vm.warehouses} isLoading={vm.isLoadingWarehouses} />
         </View>
       </ScrollView>
     </View>
