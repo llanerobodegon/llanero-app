@@ -1,6 +1,5 @@
 import { Skeleton, Tabs, useThemeColor } from 'heroui-native';
-import { RefreshControl, Text, View } from 'react-native';
-import Animated, { LinearTransition } from 'react-native-reanimated';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { OrderCard } from '@/components/order/order-card';
@@ -44,20 +43,10 @@ export function OrdersView() {
           ))}
         </View>
       ) : (
-        <Animated.FlatList
+        <FlatList
           data={vm.error ? [] : vm.visibleOrders}
           keyExtractor={(order) => order.id}
-          // Las tarjetas de abajo se desplazan suavemente al expandir/contraer una.
-          itemLayoutAnimation={LinearTransition.duration(220)}
-          extraData={vm.expandedOrderId}
-          renderItem={({ item }) => (
-            <OrderCard
-              order={item}
-              isExpanded={vm.expandedOrderId === item.id}
-              onToggle={vm.toggleOrder}
-              onPressDetail={vm.openOrder}
-            />
-          )}
+          renderItem={({ item }) => <OrderCard order={item} onPress={vm.openOrder} />}
           ItemSeparatorComponent={() => <View className="h-2.5" />}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{

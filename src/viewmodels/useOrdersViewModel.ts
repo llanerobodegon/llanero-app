@@ -15,8 +15,6 @@ export function useOrdersViewModel() {
   const [error, setError] = useState<string | null>(null);
   // Pestaña elegida por el cliente; mientras no elija, se decide según haya pedidos en curso.
   const [selectedTab, setSelectedTab] = useState<OrdersTab | null>(null);
-  // Solo un pedido expandido a la vez.
-  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const requestId = useRef(0);
 
   const fetchOrders = useCallback(async () => {
@@ -65,17 +63,13 @@ export function useOrdersViewModel() {
   const selectTab = useCallback((value: string) => {
     Haptics.selectionAsync();
     setSelectedTab(value === 'history' ? 'history' : 'active');
-    setExpandedOrderId(null);
   }, []);
 
-  /** Expande un pedido (contrayendo el anterior) o lo contrae si ya estaba abierto. */
-  const toggleOrder = useCallback((order: Order) => {
-    Haptics.selectionAsync();
-    setExpandedOrderId((current) => (current === order.id ? null : order.id));
+  /** Abre el detalle del pedido (modal). */
+  const openOrder = useCallback((order: Order) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push({ pathname: '/order/[id]', params: { id: order.id } });
   }, []);
-
-  // TODO: abrir el detalle del pedido cuando exista la pantalla.
-  const openOrder = useCallback((_order: Order) => {}, []);
 
   /** Estado vacío: volver al Inicio a comprar. */
   const goShopping = useCallback(() => {
@@ -87,8 +81,6 @@ export function useOrdersViewModel() {
     selectTab,
     visibleOrders: tab === 'active' ? activeOrders : pastOrders,
     activeCount: activeOrders.length,
-    expandedOrderId,
-    toggleOrder,
     isLoading,
     isRefreshing,
     error,

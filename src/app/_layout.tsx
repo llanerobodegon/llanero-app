@@ -32,6 +32,8 @@ export default function RootLayout() {
                   <Stack.Screen name="(tabs)" />
                   {/* Detalle de producto: hoja modal por encima de las pestañas */}
                   <Stack.Screen name="product/[id]" options={{ presentation: 'modal' }} />
+                  {/* Detalle de pedido: misma hoja modal que el producto */}
+                  <Stack.Screen name="order/[id]" options={{ presentation: 'modal' }} />
                 </Stack>
               </CartDrawerView>
             </ThemeProvider>

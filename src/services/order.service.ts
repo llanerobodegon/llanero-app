@@ -1,6 +1,8 @@
 import type {
   DeliveryType,
   Order,
+  OrderDeliveryPerson,
+  OrderWarehouse,
   OrderStatus,
   PaymentMethodType,
   PaymentStatus,
@@ -8,13 +10,15 @@ import type {
 
 // TODO: reemplazar los mocks por Supabase cuando se conecte el cliente:
 //   supabase.from('orders')
-//     .select('*, warehouses (id, name), addresses (id, label, address_line_1, address_line_2, city),
+//     .select('*, warehouses (id, name, address, phone), addresses (id, label, address_line_1, address_line_2, city),
+//              delivery_person:users!orders_delivery_person_id_fkey (id, first_name, last_name, phone, phone_code),
 //              order_items (id, product_id, product_name, product_image_url, quantity,
 //                           unit_price_usd, unit_price_bs, total_usd, total_bs)')
 //     .eq('user_id', userId)
 //     .order('created_at', { ascending: false })
 // La política RLS "Customers can view their own orders" ya limita a los pedidos del usuario.
-// Los DECIMAL llegan como string: convertir con Number(). La firma no debe cambiar.
+// Ojo: para leer el repartidor, `users` necesita una política RLS que deje al cliente ver al
+// repartidor de sus pedidos (hoy solo existe para la web). Los DECIMAL llegan como string: convertir con Number(). La firma no debe cambiar.
 
 const EXCHANGE_RATE = 230.5;
 
@@ -22,7 +26,7 @@ type MockItem = { name: string; quantity: number; unitPriceUsd: number };
 
 type MockOrder = {
   number: number;
-  warehouse: string;
+  warehouse: OrderWarehouse;
   deliveryType: DeliveryType;
   status: OrderStatus;
   paymentStatus: PaymentStatus;
@@ -32,17 +36,41 @@ type MockOrder = {
   deliveryFeeUsd: number;
   items: MockItem[];
   cancellationReason?: string;
+  deliveryPerson?: OrderDeliveryPerson;
+};
+
+const MOCK_LAS_MERCEDES: OrderWarehouse = {
+  id: 'mock-warehouse-las-mercedes',
+  name: 'Llanero Bodegón Las Mercedes',
+  address: 'Calle París con Av. Río de Janeiro, Las Mercedes',
+  phone: '0424-1234567',
+};
+
+const MOCK_ALTAMIRA: OrderWarehouse = {
+  id: 'mock-warehouse-altamira',
+  name: 'Llanero Bodegón Altamira',
+  address: 'Av. San Juan Bosco, 2da transversal, Altamira',
+  phone: '0412-7654321',
+};
+
+const MOCK_DELIVERY_PERSON: OrderDeliveryPerson = {
+  id: 'mock-delivery-1',
+  firstName: 'Carlos',
+  lastName: 'Rodríguez',
+  phone: '1234567',
+  phoneCode: '0414',
 };
 
 const MOCK_ORDERS: MockOrder[] = [
   {
     number: 128,
-    warehouse: 'Llanero Bodegón Las Mercedes',
+    warehouse: MOCK_LAS_MERCEDES,
     deliveryType: 'delivery',
     status: 'on_delivery',
     paymentStatus: 'verified',
     paymentMethodType: 'pago_movil',
     minutesAgo: 25,
+    deliveryPerson: MOCK_DELIVERY_PERSON,
     deliveryFeeUsd: 2.5,
     items: [
       { name: 'Cerveza Polar Pilsen', quantity: 1, unitPriceUsd: 22 },
@@ -52,7 +80,7 @@ const MOCK_ORDERS: MockOrder[] = [
   },
   {
     number: 127,
-    warehouse: 'Llanero Bodegón Las Mercedes',
+    warehouse: MOCK_LAS_MERCEDES,
     deliveryType: 'pickup',
     status: 'pending',
     paymentStatus: 'pending',
@@ -66,12 +94,13 @@ const MOCK_ORDERS: MockOrder[] = [
   },
   {
     number: 119,
-    warehouse: 'Llanero Bodegón Altamira',
+    warehouse: MOCK_ALTAMIRA,
     deliveryType: 'delivery',
     status: 'completed',
     paymentStatus: 'verified',
     paymentMethodType: 'pago_movil',
     minutesAgo: 60 * 26,
+    deliveryPerson: MOCK_DELIVERY_PERSON,
     deliveryFeeUsd: 2.5,
     items: [
       { name: 'Harina PAN Blanca', quantity: 4, unitPriceUsd: 1.28 },
@@ -84,7 +113,7 @@ const MOCK_ORDERS: MockOrder[] = [
   },
   {
     number: 104,
-    warehouse: 'Llanero Bodegón Las Mercedes',
+    warehouse: MOCK_LAS_MERCEDES,
     deliveryType: 'pickup',
     status: 'cancelled',
     paymentStatus: 'rejected',
@@ -96,7 +125,7 @@ const MOCK_ORDERS: MockOrder[] = [
   },
   {
     number: 97,
-    warehouse: 'Llanero Bodegón Altamira',
+    warehouse: MOCK_ALTAMIRA,
     deliveryType: 'delivery',
     status: 'completed',
     paymentStatus: 'verified',
@@ -137,7 +166,7 @@ function toMockOrder(mock: MockOrder, now: number): Order {
   return {
     id,
     orderNumber: `ORD-${String(mock.number).padStart(5, '0')}`,
-    warehouse: { id: `mock-warehouse-${mock.warehouse}`, name: mock.warehouse },
+    warehouse: mock.warehouse,
     address:
       mock.deliveryType === 'delivery'
         ? {
@@ -148,6 +177,7 @@ function toMockOrder(mock: MockOrder, now: number): Order {
             city: 'Caracas',
           }
         : null,
+    deliveryPerson: mock.deliveryPerson ?? null,
     deliveryType: mock.deliveryType,
     deliveryCode: String(1000 + ((mock.number * 37) % 9000)),
     status: mock.status,
@@ -180,5 +210,14 @@ export const orderService = {
     return MOCK_ORDERS.map((mock) => toMockOrder(mock, now)).sort((a, b) =>
       b.createdAt.localeCompare(a.createdAt),
     );
+  },
+
+  /**
+   * Un pedido del usuario con sus líneas, o `null` si no existe (o no es suyo: RLS lo oculta).
+   * TODO: en Supabase, el mismo select de `getMine` con `.eq('id', orderId).maybeSingle()`.
+   */
+  async getById(orderId: string): Promise<Order | null> {
+    const orders = await orderService.getMine();
+    return orders.find((order) => order.id === orderId) ?? null;
   },
 };

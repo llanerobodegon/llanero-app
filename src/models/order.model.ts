@@ -22,6 +22,9 @@ export interface OrderItem {
 export interface OrderWarehouse {
   id: string;
   name: string;
+  address: string | null;
+  /** Texto libre (`warehouses.phone`, hasta 15 caracteres), p. ej. "0424-1234567". */
+  phone: string | null;
 }
 
 export interface OrderAddress {
@@ -32,11 +35,26 @@ export interface OrderAddress {
   city: string;
 }
 
+/**
+ * Repartidor asignado (`orders.delivery_person_id` → `users`). La web solo trae el nombre;
+ * aquí se suma el teléfono para escribirle por WhatsApp.
+ */
+export interface OrderDeliveryPerson {
+  id: string;
+  firstName: string;
+  lastName: string;
+  /** 7 dígitos, sin el código de operadora. */
+  phone: string | null;
+  /** Código de operadora: '0412', '0414', '0416', '0422', '0424' o '0426'. */
+  phoneCode: string | null;
+}
+
 export interface Order {
   id: string;
   orderNumber: string;
   warehouse: OrderWarehouse;
   address: OrderAddress | null;
+  deliveryPerson: OrderDeliveryPerson | null;
   deliveryType: DeliveryType;
   /** Código de 4 dígitos que el cliente le da al repartidor (o en tienda) al recibir. */
   deliveryCode: string;

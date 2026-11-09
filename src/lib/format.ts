@@ -51,3 +51,25 @@ export function formatRelativeDate(iso: string, now: Date = new Date()): string 
     })
     .replace('.', '');
 }
+
+/** Monto en bolívares con formato venezolano: 8285.3 → "Bs. 8.285,30". */
+export function formatBs(value: number): string {
+  return `Bs. ${value.toLocaleString('es-VE', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+/** Fecha y hora completas: "9 nov 2026, 3:45 p. m.". */
+export function formatDateTime(iso: string): string {
+  const date = new Date(iso);
+  const day = date
+    .toLocaleDateString('es-VE', { day: 'numeric', month: 'short', year: 'numeric' })
+    .replace('.', '');
+  return `${day}, ${formatTime(date)}`;
+}
+
+/** Solo la hora: "3:45 p. m.". */
+export function formatTimeOfDay(iso: string): string {
+  return formatTime(new Date(iso));
+}
