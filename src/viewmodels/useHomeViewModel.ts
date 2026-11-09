@@ -1,8 +1,10 @@
+import * as Haptics from 'expo-haptics';
 import { useCallback, useEffect, useState } from 'react';
 
+import { useCartContext } from '@/contexts/cart-context';
 import { useWarehouseContext } from '@/contexts/warehouse-context';
 import type { Slider } from '@/models/slider.model';
-import type { Category, Product } from '@/models/warehouse.model';
+import type { Category, Product, Warehouse } from '@/models/warehouse.model';
 import { categoryService } from '@/services/category.service';
 import { productService } from '@/services/product.service';
 import { SliderPosition, sliderService } from '@/services/slider.service';
@@ -81,6 +83,34 @@ export function useHomeViewModel() {
   const { warehouses, selectedWarehouse, selectWarehouse, isLoading, error } =
     useWarehouseContext();
   const selectedWarehouseId = selectedWarehouse?.id ?? null;
+  const cart = useCartContext();
+
+  // Tienda a la que el cliente quiere cambiar mientras confirma que se vaciará su carrito.
+  const [pendingWarehouse, setPendingWarehouse] = useState<Warehouse | null>(null);
+
+  /** Cambia de tienda; si el carrito tiene productos de otra, pide confirmación primero. */
+  const requestWarehouseChange = useCallback(
+    (warehouse: Warehouse) => {
+      if (warehouse.id === selectedWarehouseId) return;
+      const cartHasOtherStore =
+        cart.items.length > 0 && cart.warehouseId !== null && cart.warehouseId !== warehouse.id;
+      if (cartHasOtherStore) {
+        setPendingWarehouse(warehouse);
+      } else {
+        selectWarehouse(warehouse);
+      }
+    },
+    [cart.items.length, cart.warehouseId, selectedWarehouseId, selectWarehouse],
+  );
+
+  const confirmWarehouseChange = useCallback(() => {
+    if (!pendingWarehouse) return;
+    cart.clear();
+    selectWarehouse(pendingWarehouse);
+    setPendingWarehouse(null);
+  }, [cart, pendingWarehouse, selectWarehouse]);
+
+  const cancelWarehouseChange = useCallback(() => setPendingWarehouse(null), []);
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
@@ -135,8 +165,21 @@ export function useHomeViewModel() {
 
   // TODO: abrir la hoja de filtros cuando exista.
   const openFilters = useCallback(() => {}, []);
-  // TODO: conectar con el carrito cuando exista.
-  const addToCart = useCallback((_product: Product) => {}, []);
+  /** Botón del carrito en la barra superior. */
+  const openCart = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    cart.open();
+  }, [cart]);
+
+  /** "+" de una tarjeta: agrega sin abrir el carrito. */
+  const addToCart = useCallback(
+    (product: Product) => {
+      if (!selectedWarehouseId) return;
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      cart.addProduct(product, selectedWarehouseId);
+    },
+    [cart, selectedWarehouseId],
+  );
   // TODO: navegar al detalle de producto y a los listados completos cuando existan.
   const openProduct = useCallback((_product: Product) => {}, []);
   const seeAllPromotions = useCallback(() => {}, []);
@@ -149,7 +192,10 @@ export function useHomeViewModel() {
   return {
     warehouses,
     selectedWarehouse,
-    selectWarehouse,
+    selectWarehouse: requestWarehouseChange,
+    pendingWarehouse,
+    confirmWarehouseChange,
+    cancelWarehouseChange,
     isLoadingWarehouses: isLoading,
     warehousesError: error,
 
@@ -180,6 +226,8 @@ export function useHomeViewModel() {
     marketError: market.error,
 
     addToCart,
+    cartCount: cart.itemCount,
+    openCart,
     openProduct,
     seeAllPromotions,
     seeAllPopular,

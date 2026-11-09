@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BannerCarousel } from '@/components/banner-carousel';
 import { CategoriesSection } from '@/components/categories-section';
 import { CategoryFilterBar } from '@/components/category-filter-bar';
+import { ChangeWarehouseDialog } from '@/components/change-warehouse-dialog';
 import { HomeTopBar } from '@/components/home-top-bar';
 import { LocationsSection } from '@/components/locations-section';
 import { PaymentMethodsBanner } from '@/components/payment-methods-banner';
@@ -18,7 +19,6 @@ export function HomeView() {
 
   return (
     <View className="bg-background" style={styles.container}>
-      {/* TODO: abrir el carrito cuando exista su pantalla */}
       <HomeTopBar
         leading={
           <WarehouseSelector
@@ -28,7 +28,8 @@ export function HomeView() {
             isLoading={vm.isLoadingWarehouses}
           />
         }
-        onPressCart={() => {}}
+        cartCount={vm.cartCount}
+        onPressCart={vm.openCart}
       />
 
       <ScrollView
@@ -91,6 +92,14 @@ export function HomeView() {
           <LocationsSection warehouses={vm.warehouses} isLoading={vm.isLoadingWarehouses} />
         </View>
       </ScrollView>
+
+      <ChangeWarehouseDialog
+        isOpen={vm.pendingWarehouse !== null}
+        currentName={vm.selectedWarehouse?.name ?? ''}
+        nextName={vm.pendingWarehouse?.name ?? ''}
+        onConfirm={vm.confirmWarehouseChange}
+        onCancel={vm.cancelWarehouseChange}
+      />
     </View>
   );
 }

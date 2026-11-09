@@ -75,6 +75,8 @@ export function ProductCard({ product, width, onPress, onAdd }: ProductCardProps
         <Button
           isIconOnly
           size="sm"
+          // Sin capa de color al presionar: en `primary` sería naranja sobre el botón negro.
+          feedbackVariant="scale"
           onPress={() => onAdd?.(product)}
           accessibilityLabel={`Agregar ${product.name} al carrito`}
           className="rounded-full bg-foreground">

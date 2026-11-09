@@ -32,6 +32,8 @@ export function CategoryFilterBar({
       <Button
         isIconOnly
         size="md"
+        // Sin capa de color al presionar: en `primary` sería naranja sobre el botón negro.
+        feedbackVariant="scale"
         onPress={onPressFilters}
         accessibilityLabel="Filtros"
         className="rounded-full bg-foreground">
