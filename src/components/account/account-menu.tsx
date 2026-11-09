@@ -21,17 +21,15 @@ export function AccountMenuSection({ title, children }: AccountMenuSectionProps)
           {title}
         </Text>
       ) : null}
-      {/* La sombra va por fuera: `overflow-hidden` (para recortar el resaltado al presionar) la cortaría */}
-      <View className="rounded-3xl shadow-surface">
-        <ListGroup className="overflow-hidden rounded-3xl">
-          {items.map((item, index) => (
-            <Fragment key={index}>
-              {item}
-              {index < items.length - 1 ? <Separator className="ml-16 mr-4" /> : null}
-            </Fragment>
-          ))}
-        </ListGroup>
-      </View>
+      {/* Sin sombra: solo los botones la llevan (ListGroup es un Surface y la trae por defecto) */}
+      <ListGroup className="overflow-hidden rounded-3xl shadow-none">
+        {items.map((item, index) => (
+          <Fragment key={index}>
+            {item}
+            {index < items.length - 1 ? <Separator className="ml-16 mr-4" /> : null}
+          </Fragment>
+        ))}
+      </ListGroup>
     </View>
   );
 }

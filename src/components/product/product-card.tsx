@@ -26,7 +26,7 @@ export function ProductCard({ product, width, onPress, onAdd }: ProductCardProps
       accessibilityRole="button"
       accessibilityLabel={`${product.name}, ${formatUSD(finalPrice)}`}
       style={{ width }}
-      className="gap-3 rounded-3xl bg-surface p-3 shadow-surface">
+      className="gap-3 rounded-3xl bg-surface p-3">
       <View className="aspect-square items-center justify-center">
         {imageUrl ? (
           <Image

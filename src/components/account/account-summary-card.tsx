@@ -31,7 +31,7 @@ export function AccountSummaryCard({
       accessibilityRole="button"
       accessibilityLabel={`${fullName}, ${email}`}
       accessibilityHint="Abre tu información personal"
-      className="flex-row items-center gap-4 rounded-3xl bg-surface p-4 shadow-surface">
+      className="flex-row items-center gap-4 rounded-3xl bg-surface p-4">
       <View className="size-14 items-center justify-center rounded-full bg-accent">
         <Text className="text-lg font-bold text-accent-foreground">{initials}</Text>
       </View>

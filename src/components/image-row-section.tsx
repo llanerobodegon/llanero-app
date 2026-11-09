@@ -75,7 +75,7 @@ export function ImageRowSection<T extends ImageRowItem>({
               accessibilityRole={onPressItem ? 'button' : 'image'}
               accessibilityLabel={item.label}
               style={{ width: itemWidth }}
-              className={`aspect-[2/1] overflow-hidden rounded-2xl bg-surface shadow-surface ${isContain ? 'p-3' : ''}`}>
+              className={`aspect-[2/1] overflow-hidden rounded-2xl bg-surface ${isContain ? 'p-3' : ''}`}>
               {item.imageUrl ? (
                 <Image
                   source={item.imageUrl}
