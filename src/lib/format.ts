@@ -17,3 +17,37 @@ export function finalPrice(
 ): number {
   return isOnDiscount && discountPrice !== null ? discountPrice : price;
 }
+
+/** "3:45 p. m." */
+function formatTime(date: Date): string {
+  return date.toLocaleTimeString('es-VE', { hour: 'numeric', minute: '2-digit' });
+}
+
+/** Mismo día del calendario local. */
+function isSameDay(a: Date, b: Date): boolean {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+/**
+ * Fecha corta y relativa para listas: "Hoy, 3:45 p. m.", "Ayer, 9:10 a. m.", "8 nov"
+ * o "8 nov 2025" si es de otro año.
+ */
+export function formatRelativeDate(iso: string, now: Date = new Date()): string {
+  const date = new Date(iso);
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+
+  if (isSameDay(date, now)) return `Hoy, ${formatTime(date)}`;
+  if (isSameDay(date, yesterday)) return `Ayer, ${formatTime(date)}`;
+  return date
+    .toLocaleDateString('es-VE', {
+      day: 'numeric',
+      month: 'short',
+      year: date.getFullYear() === now.getFullYear() ? undefined : 'numeric',
+    })
+    .replace('.', '');
+}

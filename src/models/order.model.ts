@@ -1,0 +1,63 @@
+// Mismos nombres que llanero-web/src/services/orders.service.ts (tablas `orders` y `order_items`).
+// Solo los campos que ve el cliente: sin datos del cliente, notas internas ni cuenta bancaria.
+
+export type OrderStatus = 'pending' | 'confirmed' | 'on_delivery' | 'completed' | 'cancelled';
+export type PaymentStatus = 'pending' | 'verified' | 'rejected';
+export type DeliveryType = 'pickup' | 'delivery';
+export type PaymentMethodType = 'pago_movil' | 'transferencia' | 'zelle' | 'banesco_panama';
+
+/** Línea del pedido: "foto" del producto al momento de comprar. */
+export interface OrderItem {
+  id: string;
+  productId: string;
+  productName: string;
+  productImageUrl: string | null;
+  quantity: number;
+  unitPriceUsd: number;
+  unitPriceBs: number;
+  totalUsd: number;
+  totalBs: number;
+}
+
+export interface OrderWarehouse {
+  id: string;
+  name: string;
+}
+
+export interface OrderAddress {
+  id: string;
+  label: string | null;
+  address1: string;
+  address2: string | null;
+  city: string;
+}
+
+export interface Order {
+  id: string;
+  orderNumber: string;
+  warehouse: OrderWarehouse;
+  address: OrderAddress | null;
+  deliveryType: DeliveryType;
+  /** Código de 4 dígitos que el cliente le da al repartidor (o en tienda) al recibir. */
+  deliveryCode: string;
+  status: OrderStatus;
+  paymentStatus: PaymentStatus;
+  paymentMethodType: PaymentMethodType;
+  paymentBank: string | null;
+  paymentReference: string | null;
+  subtotalUsd: number;
+  subtotalBs: number;
+  deliveryFeeUsd: number;
+  deliveryFeeBs: number;
+  totalUsd: number;
+  totalBs: number;
+  exchangeRate: number;
+  customerNotes: string | null;
+  confirmedAt: string | null;
+  deliveredAt: string | null;
+  cancelledAt: string | null;
+  cancellationReason: string | null;
+  createdAt: string;
+  updatedAt: string;
+  items: OrderItem[];
+}

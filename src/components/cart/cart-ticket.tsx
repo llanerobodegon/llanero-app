@@ -6,7 +6,7 @@ import type { CartItem } from '@/models/cart.model';
 
 import { CartEmpty } from './cart-empty';
 import { CartLine } from './cart-line';
-import { TicketPerforation } from './ticket-perforation';
+import { TicketPerforation } from '../ticket-perforation';
 
 const INSET = 16;
 
