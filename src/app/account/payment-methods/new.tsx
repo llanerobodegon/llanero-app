@@ -1,3 +1,5 @@
 import { PaymentMethodFormView } from '@/views/PaymentMethodFormView';
 
-export default PaymentMethodFormView;
+export default function NewPaymentMethodRoute() {
+  return <PaymentMethodFormView />;
+}

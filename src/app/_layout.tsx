@@ -41,6 +41,7 @@ export default function RootLayout() {
                   <Stack.Screen name="account/addresses/[id]" />
                   <Stack.Screen name="account/payment-methods/index" />
                   <Stack.Screen name="account/payment-methods/new" />
+                  <Stack.Screen name="account/payment-methods/[id]" />
                 </Stack>
               </CartDrawerView>
             </ThemeProvider>

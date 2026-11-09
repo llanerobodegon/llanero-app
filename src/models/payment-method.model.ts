@@ -33,3 +33,5 @@ export interface CreatePaymentMethodData {
   documentType: IdType;
   documentNumber: string;
 }
+
+export type UpdatePaymentMethodData = CreatePaymentMethodData;

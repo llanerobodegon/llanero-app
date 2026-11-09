@@ -39,9 +39,10 @@ export function usePaymentMethodsViewModel() {
     router.push('/account/payment-methods/new');
   }, []);
 
-  // TODO: abrir el método en modo edición cuando exista.
-  const editPaymentMethod = useCallback((_method: SavedPaymentMethod) => {
+  /** Abre el método para editarlo, eliminarlo o marcarlo como predeterminado. */
+  const editPaymentMethod = useCallback((method: SavedPaymentMethod) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push({ pathname: '/account/payment-methods/[id]', params: { id: method.id } });
   }, []);
 
   const goBack = useCallback(() => router.back(), []);
