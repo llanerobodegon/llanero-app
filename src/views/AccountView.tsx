@@ -4,7 +4,7 @@ import { ScrollView, Text, useColorScheme, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AccountMenuItem, AccountMenuSection } from '@/components/account/account-menu';
-import { AccountSummaryCard } from '@/components/account/account-summary-card';
+import { AccountGreeting } from '@/components/account/account-greeting';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useAccountViewModel } from '@/viewmodels/useAccountViewModel';
@@ -35,12 +35,11 @@ export function AccountView() {
             <Text className="text-sm text-danger">{vm.error}</Text>
           </View>
         ) : (
-          <AccountSummaryCard
-            fullName={vm.fullName}
+          <AccountGreeting
+            firstName={vm.firstName}
             email={vm.maskedEmail}
             initials={vm.initials}
             isLoading={vm.isLoading}
-            onPress={vm.openPersonalInfo}
           />
         )}
 

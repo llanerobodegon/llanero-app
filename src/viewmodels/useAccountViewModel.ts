@@ -100,7 +100,7 @@ export function useAccountViewModel() {
     user,
     isLoading,
     error,
-    fullName: user ? `${user.firstName} ${user.lastName}`.trim() : '',
+    firstName: user?.firstName.trim() ?? '',
     maskedEmail: user ? maskEmail(user.email) : '',
     initials: user ? initials(user.firstName, user.lastName) : '',
     appVersion,
