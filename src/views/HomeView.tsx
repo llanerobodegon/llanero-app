@@ -3,8 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { CategoryFilterBar } from '@/components/category-filter-bar';
 import { HomeTopBar } from '@/components/home-top-bar';
 import { WarehouseSelector } from '@/components/warehouse-selector';
-import { ThemedText } from '@/components/themed-text';
-import { BottomTabInset, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
 import { useHomeViewModel } from '@/viewmodels/useHomeViewModel';
 
 export function HomeView() {
@@ -34,12 +33,6 @@ export function HomeView() {
           isLoading={vm.isLoadingCategories}
         />
       </View>
-
-      <View style={styles.content}>
-        <ThemedText themeColor="textSecondary" style={styles.description}>
-          Categorías, promociones y productos destacados.
-        </ThemedText>
-      </View>
     </View>
   );
 }
@@ -51,15 +44,5 @@ const styles = StyleSheet.create({
   filters: {
     paddingTop: Spacing.three,
     paddingBottom: Spacing.three,
-  },
-  content: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: Spacing.four,
-    paddingBottom: BottomTabInset + Spacing.three,
-  },
-  description: {
-    textAlign: 'center',
   },
 });
