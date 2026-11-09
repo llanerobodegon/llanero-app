@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BannerCarousel } from '@/components/banner-carousel';
 import { CategoryFilterBar } from '@/components/category-filter-bar';
 import { HomeTopBar } from '@/components/home-top-bar';
+import { ProductSection } from '@/components/product/product-section';
 import { WarehouseSelector } from '@/components/warehouse-selector';
 import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useHomeViewModel } from '@/viewmodels/useHomeViewModel';
@@ -43,6 +44,15 @@ export function HomeView() {
 
         <View style={styles.sections}>
           <BannerCarousel slides={vm.mainBanners} isLoading={vm.isLoadingMainBanners} />
+
+          <ProductSection
+            title="Promociones"
+            products={vm.promotions}
+            isLoading={vm.isLoadingPromotions}
+            onPressSeeAll={vm.seeAllPromotions}
+            onPressProduct={vm.openProduct}
+            onAddProduct={vm.addToCart}
+          />
         </View>
       </ScrollView>
     </View>

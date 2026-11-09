@@ -2,8 +2,9 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { useWarehouseContext } from '@/contexts/warehouse-context';
 import type { Slider } from '@/models/slider.model';
-import type { Category } from '@/models/warehouse.model';
+import type { Category, Product } from '@/models/warehouse.model';
 import { categoryService } from '@/services/category.service';
+import { productService } from '@/services/product.service';
 import { SliderPosition, sliderService } from '@/services/slider.service';
 
 const errorMessage = (err: unknown, fallback: string) =>
@@ -34,6 +35,46 @@ function useSliders(position: number) {
   }, [position]);
 
   return { slides, isLoading, error };
+}
+
+/**
+ * Carga una lista de productos de la tienda elegida y la recarga al cambiar de tienda.
+ * Guarda de qué tienda es el resultado para saber si está al día sin poner `isLoading`
+ * a mano dentro del efecto. `fetchProducts` debe ser estable (un método del servicio).
+ */
+function useWarehouseProducts(
+  warehouseId: string | null,
+  isLoadingWarehouses: boolean,
+  fetchProducts: (warehouseId: string) => Promise<Product[]>,
+  fallbackError: string,
+) {
+  const [state, setState] = useState<{
+    warehouseId: string | null;
+    products: Product[];
+    error: string | null;
+  }>({ warehouseId: null, products: [], error: null });
+
+  useEffect(() => {
+    if (!warehouseId) return;
+    let isActive = true;
+    fetchProducts(warehouseId)
+      .then((products) => isActive && setState({ warehouseId, products, error: null }))
+      .catch(
+        (err) =>
+          isActive &&
+          setState({ warehouseId, products: [], error: errorMessage(err, fallbackError) }),
+      );
+    return () => {
+      isActive = false;
+    };
+  }, [warehouseId, fetchProducts, fallbackError]);
+
+  const isCurrent = state.warehouseId === warehouseId;
+  return {
+    products: isCurrent ? state.products : [],
+    isLoading: !isCurrent && (isLoadingWarehouses || warehouseId !== null),
+    error: isCurrent ? state.error : null,
+  };
 }
 
 export function useHomeViewModel() {
@@ -67,6 +108,12 @@ export function useHomeViewModel() {
 
   const mainBanners = useSliders(SliderPosition.main);
 
+  const promotions = useWarehouseProducts(
+    selectedWarehouseId,
+    isLoading,
+    productService.getPromotions,
+    'Error al cargar las promociones',
+  );
   /** Elige una categoría; tocar la que ya está elegida la quita. */
   const selectCategory = useCallback((categoryId: string) => {
     setSelectedCategoryId((current) => (current === categoryId ? null : categoryId));
@@ -74,6 +121,11 @@ export function useHomeViewModel() {
 
   // TODO: abrir la hoja de filtros cuando exista.
   const openFilters = useCallback(() => {}, []);
+  // TODO: conectar con el carrito cuando exista.
+  const addToCart = useCallback((_product: Product) => {}, []);
+  // TODO: navegar al detalle de producto y a los listados completos cuando existan.
+  const openProduct = useCallback((_product: Product) => {}, []);
+  const seeAllPromotions = useCallback(() => {}, []);
 
   return {
     warehouses,
@@ -92,5 +144,13 @@ export function useHomeViewModel() {
     mainBanners: mainBanners.slides,
     isLoadingMainBanners: mainBanners.isLoading,
     mainBannersError: mainBanners.error,
+
+    promotions: promotions.products,
+    isLoadingPromotions: promotions.isLoading,
+    promotionsError: promotions.error,
+
+    addToCart,
+    openProduct,
+    seeAllPromotions,
   };
 }
