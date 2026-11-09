@@ -4,10 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { IdType, PhoneCode, User } from '@/models/user.model';
 import { userService } from '@/services/user.service';
-
-/** Códigos de operadora en el orden en que se muestran en el selector. */
-export const PHONE_CODES: PhoneCode[] = ['0414', '0424', '0412', '0422', '0416', '0426'];
-export const ID_TYPES: IdType[] = ['V', 'E'];
+import { PHONE_CODES } from '@/lib/venezuela';
 
 type Form = {
   firstName: string;

@@ -1,13 +1,13 @@
 import { Input, type InputProps, useTextField } from 'heroui-native';
 
 /** Sin la sombra (elevation) que HeroUI pone a los campos en Android; en iOS la quita el tema. */
-const NO_SHADOW = 'android:[elevation:0]';
+export const NO_SHADOW = 'android:[elevation:0]';
 
 /**
  * Borde de foco con el color de acción (vino en claro, naranja en oscuro) en vez del naranja
  * de HeroUI. iOS usa `outline` y Android `border`, igual que el Input original.
  */
-const ACTION_FOCUS = 'ios:focus:outline-action android:focus:border-action';
+export const ACTION_FOCUS = 'ios:focus:outline-action android:focus:border-action';
 
 /**
  * Campo de texto de la app: el `Input` de HeroUI sin sombra y con el foco, el cursor y la

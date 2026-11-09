@@ -45,7 +45,10 @@ export function useAccountViewModel() {
     [tap],
   );
   const openAddresses = useCallback(() => tap(() => router.push('/account/addresses')), [tap]);
-  const openPaymentMethods = useCallback(() => tap(() => {}), [tap]);
+  const openPaymentMethods = useCallback(
+    () => tap(() => router.push('/account/payment-methods')),
+    [tap],
+  );
   const openChangePassword = useCallback(() => tap(() => {}), [tap]);
   const openNotifications = useCallback(() => tap(() => {}), [tap]);
   // TODO: abrir las páginas legales (expo-web-browser) cuando estén las URLs.

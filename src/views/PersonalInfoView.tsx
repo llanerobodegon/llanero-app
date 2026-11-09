@@ -14,11 +14,8 @@ import { useActionForeground } from '@/hooks/use-action-foreground';
 import { FormInput } from '@/components/form/form-input';
 import { SelectField } from '@/components/form/select-field';
 import { ScreenHeader } from '@/components/screen-header';
-import {
-  ID_TYPES,
-  PHONE_CODES,
-  usePersonalInfoViewModel,
-} from '@/viewmodels/usePersonalInfoViewModel';
+import { ID_TYPES, PHONE_CODES } from '@/lib/venezuela';
+import { usePersonalInfoViewModel } from '@/viewmodels/usePersonalInfoViewModel';
 
 /** Ancho común de los desplegables de operadora y tipo de cédula, para que los campos se alineen. */
 const PREFIX_WIDTH = 104;
