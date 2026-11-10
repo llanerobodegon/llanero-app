@@ -4,6 +4,7 @@ import type {
   CreateOrderData,
   DeliveryType,
   Order,
+  OrderDeliveryPerson,
   OrderItem,
   OrderStatus,
   PaymentMethodType,
@@ -68,9 +69,8 @@ function transformOrder(row: OrderWithRelations): Order {
           city: row.addresses.city,
         }
       : null,
-    // TODO: el cliente no puede leer `users` de otros (RLS), así que el repartidor no llega.
-    // Hace falta una vista o política en llanero-web que exponga nombre y teléfono del
-    // repartidor asignado a los pedidos del cliente.
+    // El cliente no puede leer `users` de otros (RLS): el repartidor se completa en `getById`
+    // con la función `get_order_delivery_person`.
     deliveryPerson: null,
     deliveryType: row.delivery_type as DeliveryType,
     deliveryCode: row.delivery_code,
@@ -96,6 +96,25 @@ function transformOrder(row: OrderWithRelations): Order {
     items: [...(row.order_items ?? [])]
       .sort((a, b) => (a.created_at ?? '').localeCompare(b.created_at ?? ''))
       .map(transformItem),
+  };
+}
+
+/**
+ * Repartidor asignado a un pedido del cliente (nombre y teléfono), con la función
+ * `get_order_delivery_person`. Si falla, el detalle se muestra igual sin repartidor.
+ */
+async function getDeliveryPerson(orderId: string): Promise<OrderDeliveryPerson | null> {
+  const { data: rows, error } = await supabase.rpc('get_order_delivery_person', {
+    p_order_id: orderId,
+  });
+  const row = rows?.[0];
+  if (error || !row) return null;
+  return {
+    id: row.id,
+    firstName: normalizeCase(row.first_name ?? ''),
+    lastName: normalizeCase(row.last_name ?? ''),
+    phoneCode: row.phone_code,
+    phone: row.phone,
   };
 }
 
@@ -165,7 +184,12 @@ export const orderService = {
       .returns<OrderWithRelations[]>()
       .maybeSingle();
     if (error) throw new Error('No pudimos cargar el pedido');
-    return data ? transformOrder(data) : null;
+    if (!data) return null;
+    const order = transformOrder(data);
+    if (data.delivery_person_id) {
+      order.deliveryPerson = await getDeliveryPerson(orderId);
+    }
+    return order;
   },
 
   /** Avisa cuando se crea o cambia cualquier pedido del usuario (estado, pago, repartidor…). */

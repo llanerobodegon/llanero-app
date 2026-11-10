@@ -911,6 +911,16 @@ export type Database = {
         }[]
       }
       get_customer_ids_for_delivery: { Args: never; Returns: string[] }
+      get_order_delivery_person: {
+        Args: { p_order_id: string }
+        Returns: {
+          first_name: string
+          id: string
+          last_name: string
+          phone: string
+          phone_code: string
+        }[]
+      }
       is_address_of_manager_warehouse: {
         Args: { addr_id: string }
         Returns: boolean
