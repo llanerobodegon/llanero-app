@@ -41,27 +41,27 @@ export function ProductCard({
       accessibilityLabel={`${product.name}, ${formatUSD(finalPrice)}`}
       style={{ width }}
       className="gap-3 rounded-3xl bg-surface p-3">
-      <View className="aspect-square items-center justify-center">
-        {imageUrl ? (
-          <Image
-            source={imageUrl}
-            contentFit="contain"
-            transition={200}
-            style={{ width: '100%', height: '100%' }}
-          />
-        ) : (
-          // TODO: quitar el placeholder cuando los productos vengan de Supabase con imagen.
-          <View className="size-full items-center justify-center rounded-2xl bg-default">
+      <View className="aspect-square">
+        {/* Imagen recortada con bordes redondeados (misma proporción en todas las tarjetas) */}
+        <View className="size-full items-center justify-center overflow-hidden rounded-2xl bg-default">
+          {imageUrl ? (
+            <Image
+              source={imageUrl}
+              contentFit="cover"
+              transition={200}
+              style={{ width: '100%', height: '100%' }}
+            />
+          ) : (
             <SymbolView
               name={{ ios: 'photo', android: 'image', web: 'image' }}
               size={28}
               tintColor={muted}
             />
-          </View>
-        )}
+          )}
+        </View>
 
         {hasDiscount ? (
-          <Chip size="sm" variant="primary" color="accent" className="absolute left-0 top-0">
+          <Chip size="sm" variant="primary" color="accent" className="absolute left-2 top-2">
             {`${discountPercent(product.price, product.discountPrice!)}%`}
           </Chip>
         ) : null}
