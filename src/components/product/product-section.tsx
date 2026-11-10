@@ -19,6 +19,10 @@ type ProductSectionProps = {
   onPressSeeAll?: () => void;
   onPressProduct?: (product: Product) => void;
   onAddProduct?: (product: Product) => void;
+  /** Unidades de un producto en el carrito (0 si no está). */
+  getCartQuantity?: (productId: string) => number;
+  onIncrementProduct?: (product: Product) => void;
+  onDecrementProduct?: (product: Product) => void;
 };
 
 /**
@@ -32,6 +36,9 @@ export function ProductSection({
   onPressSeeAll,
   onPressProduct,
   onAddProduct,
+  getCartQuantity,
+  onIncrementProduct,
+  onDecrementProduct,
 }: ProductSectionProps) {
   const { width: screenWidth } = useWindowDimensions();
   const cardWidth = (screenWidth - SIDE_PADDING - GAP * 2) / VISIBLE_CARDS;
@@ -53,6 +60,8 @@ export function ProductSection({
           data={products}
           keyExtractor={(product) => product.id}
           horizontal
+          // Re-pinta las tarjetas cuando cambian las cantidades del carrito.
+          extraData={getCartQuantity}
           showsHorizontalScrollIndicator={false}
           // Padding vertical para que la sombra de las tarjetas no se corte.
           contentContainerStyle={{
@@ -66,6 +75,9 @@ export function ProductSection({
               width={cardWidth}
               onPress={onPressProduct}
               onAdd={onAddProduct}
+              quantity={getCartQuantity?.(item.id) ?? 0}
+              onIncrement={onIncrementProduct}
+              onDecrement={onDecrementProduct}
             />
           )}
         />

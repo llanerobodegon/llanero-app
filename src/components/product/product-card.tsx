@@ -12,11 +12,23 @@ type ProductCardProps = {
   width: number;
   onPress?: (product: Product) => void;
   onAdd?: (product: Product) => void;
+  /** Unidades de este producto en el carrito; con 1 o más se muestra el selector de cantidad. */
+  quantity?: number;
+  onIncrement?: (product: Product) => void;
+  onDecrement?: (product: Product) => void;
 };
 
 /** Tarjeta de producto: imagen, badge de descuento, nombre, presentación, precio y botón "+". */
-export function ProductCard({ product, width, onPress, onAdd }: ProductCardProps) {
-  const [muted] = useThemeColor(['muted']);
+export function ProductCard({
+  product,
+  width,
+  onPress,
+  onAdd,
+  quantity = 0,
+  onIncrement,
+  onDecrement,
+}: ProductCardProps) {
+  const [muted, foreground] = useThemeColor(['muted', 'foreground']);
   const actionForeground = useActionForeground();
   const imageUrl = product.imageUrls[0];
   const hasDiscount = product.isOnDiscount && product.discountPrice !== null;
@@ -59,36 +71,92 @@ export function ProductCard({ product, width, onPress, onAdd }: ProductCardProps
         <Text className="text-base font-medium text-foreground" numberOfLines={1}>
           {product.name}
         </Text>
-        {product.description ? (
-          <Text className="text-sm text-muted" numberOfLines={1}>
-            {product.description}
-          </Text>
-        ) : null}
+        {/* Siempre ocupa su línea (vacía si no hay descripción) para que las tarjetas midan igual */}
+        <Text className="text-sm text-muted" numberOfLines={1}>
+          {product.description ?? ' '}
+        </Text>
       </View>
 
-      <View className="flex-row items-end justify-between gap-2 pl-1">
-        <View className="shrink">
-          {hasDiscount ? (
-            <Text className="text-xs text-muted line-through">{formatUSD(product.price)}</Text>
-          ) : null}
-          <Text className="text-lg font-bold text-foreground">{formatUSD(finalPrice)}</Text>
+      {/* Precio: la línea del precio tachado se reserva siempre, haya descuento o no */}
+      <View className="pl-1">
+        <Text
+          className="text-xs text-muted line-through"
+          style={hasDiscount ? undefined : { opacity: 0 }}
+          importantForAccessibility={hasDiscount ? 'auto' : 'no-hide-descendants'}
+          accessibilityElementsHidden={!hasDiscount}>
+          {formatUSD(product.price)}
+        </Text>
+        <Text className="text-lg font-bold text-foreground">{formatUSD(finalPrice)}</Text>
+      </View>
+
+      {/* Fila de acción, misma altura (h-10) con o sin producto en el carrito, para que todas
+          las tarjetas midan igual: el "+" o el selector de cantidad. */}
+      {quantity === 0 ? (
+        // Solo el "+", alineado a la derecha en la misma posición que el "+" del selector.
+        <View className="h-10 flex-row items-center justify-end p-1">
+          <Button
+            isIconOnly
+            size="sm"
+            // Sin capa de color al presionar sobre el color de acción.
+            feedbackVariant="scale"
+            onPress={() => onAdd?.(product)}
+            accessibilityLabel={`Agregar ${product.name} al carrito`}
+            className="size-8 rounded-full bg-action">
+            <SymbolView
+              name={{ ios: 'plus', android: 'add', web: 'add' }}
+              size={14}
+              weight="semibold"
+              tintColor={actionForeground}
+            />
+          </Button>
         </View>
-
-        <Button
-          isIconOnly
-          size="sm"
-          // Sin capa de color al presionar sobre el color de acción.
-          feedbackVariant="scale"
-          onPress={() => onAdd?.(product)}
-          accessibilityLabel={`Agregar ${product.name} al carrito`}
-          className="rounded-full bg-action">
-          <SymbolView
-            name={{ ios: 'plus', android: 'add', web: 'add' }}
-            size={18}
-            tintColor={actionForeground}
-          />
-        </Button>
-      </View>
+      ) : (
+        <View className="h-10 flex-row items-center justify-between rounded-full bg-default p-1">
+          <Button
+            isIconOnly
+            size="sm"
+            variant="tertiary"
+            onPress={() => onDecrement?.(product)}
+            accessibilityLabel={
+              quantity === 1
+                ? `Quitar ${product.name} del carrito`
+                : `Quitar una unidad de ${product.name}`
+            }
+            className="size-8 rounded-full bg-surface">
+            <SymbolView
+              name={
+                quantity === 1
+                  ? { ios: 'xmark', android: 'close', web: 'close' }
+                  : { ios: 'minus', android: 'remove', web: 'remove' }
+              }
+              size={14}
+              weight="semibold"
+              tintColor={foreground}
+            />
+          </Button>
+          <Text
+            className="text-base font-bold text-foreground"
+            style={{ fontVariant: ['tabular-nums'] }}
+            accessibilityLabel={`${quantity} en el carrito`}>
+            {quantity}
+          </Text>
+          <Button
+            isIconOnly
+            size="sm"
+            // Sin capa de color al presionar sobre el color de acción.
+            feedbackVariant="scale"
+            onPress={() => onIncrement?.(product)}
+            accessibilityLabel={`Agregar una unidad de ${product.name}`}
+            className="size-8 rounded-full bg-action">
+            <SymbolView
+              name={{ ios: 'plus', android: 'add', web: 'add' }}
+              size={14}
+              weight="semibold"
+              tintColor={actionForeground}
+            />
+          </Button>
+        </View>
+      )}
     </Pressable>
   );
 }

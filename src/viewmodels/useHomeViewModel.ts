@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useCartContext } from '@/contexts/cart-context';
 import { useWarehouseContext } from '@/contexts/warehouse-context';
@@ -181,6 +181,34 @@ export function useHomeViewModel() {
     },
     [cart, selectedWarehouseId],
   );
+  // Cantidades del carrito por producto, para que las tarjetas muestren el selector.
+  // Solo cuentan si el carrito es de la tienda elegida.
+  const cartQuantities = useMemo(() => {
+    const map = new Map<string, number>();
+    if (cart.warehouseId === selectedWarehouseId) {
+      for (const item of cart.items) map.set(item.productId, item.quantity);
+    }
+    return map;
+  }, [cart.items, cart.warehouseId, selectedWarehouseId]);
+  const getCartQuantity = useCallback(
+    (productId: string) => cartQuantities.get(productId) ?? 0,
+    [cartQuantities],
+  );
+  const incrementProduct = useCallback(
+    (product: Product) => {
+      Haptics.selectionAsync();
+      cart.increment(product.id);
+    },
+    [cart],
+  );
+  const decrementProduct = useCallback(
+    (product: Product) => {
+      Haptics.selectionAsync();
+      cart.decrement(product.id);
+    },
+    [cart],
+  );
+
   /** Abre el detalle del producto (modal). */
   const openProduct = useCallback((product: Product) => {
     router.push({ pathname: '/product/[id]', params: { id: product.id } });
@@ -230,6 +258,9 @@ export function useHomeViewModel() {
     marketError: market.error,
 
     addToCart,
+    getCartQuantity,
+    incrementProduct,
+    decrementProduct,
     cartCount: cart.itemCount,
     openCart,
     openProduct,

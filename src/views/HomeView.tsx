@@ -63,6 +63,9 @@ export function HomeView() {
             onPressSeeAll={vm.seeAllPromotions}
             onPressProduct={vm.openProduct}
             onAddProduct={vm.addToCart}
+            getCartQuantity={vm.getCartQuantity}
+            onIncrementProduct={vm.incrementProduct}
+            onDecrementProduct={vm.decrementProduct}
           />
 
           <ProductSection
@@ -72,6 +75,9 @@ export function HomeView() {
             onPressSeeAll={vm.seeAllPopular}
             onPressProduct={vm.openProduct}
             onAddProduct={vm.addToCart}
+            getCartQuantity={vm.getCartQuantity}
+            onIncrementProduct={vm.incrementProduct}
+            onDecrementProduct={vm.decrementProduct}
           />
 
           <BannerCarousel slides={vm.secondaryBanners} isLoading={vm.isLoadingSecondaryBanners} />
@@ -83,6 +89,9 @@ export function HomeView() {
             onPressSeeAll={vm.seeAllMarket}
             onPressProduct={vm.openProduct}
             onAddProduct={vm.addToCart}
+            getCartQuantity={vm.getCartQuantity}
+            onIncrementProduct={vm.incrementProduct}
+            onDecrementProduct={vm.decrementProduct}
           />
 
           <View style={styles.paymentMethods}>
