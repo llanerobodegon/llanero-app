@@ -1,3 +1,4 @@
+import { Image } from 'expo-image';
 import { SymbolView } from 'expo-symbols';
 import {
   Button,
@@ -235,6 +236,70 @@ export function CheckoutPaymentView({
           </Description>
         </TextField>
 
+        {/* Comprobante de pago (opcional): ayuda a la tienda a verificar el pago más rápido */}
+        <View className="gap-2">
+          <SectionTitle>Comprobante de pago (opcional)</SectionTitle>
+          {vm.proof ? (
+            <View className="flex-row items-center gap-3 rounded-3xl bg-surface p-3">
+              <Image
+                source={vm.proof.uri}
+                contentFit="cover"
+                style={{ width: 56, height: 56, borderRadius: 12 }}
+                accessibilityLabel="Comprobante adjunto"
+              />
+              <View className="min-w-0 flex-1 gap-0.5">
+                <Text className="text-sm font-semibold text-foreground">Comprobante adjunto</Text>
+                <Text className="text-xs text-muted">Se enviará con tu pedido.</Text>
+              </View>
+              <Pressable
+                onPress={vm.pickProof}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel="Cambiar comprobante"
+                className="active:opacity-60">
+                <Text className="text-sm font-semibold text-action">Cambiar</Text>
+              </Pressable>
+              <Pressable
+                onPress={vm.removeProof}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel="Quitar comprobante"
+                className="size-8 items-center justify-center rounded-full bg-default active:opacity-60">
+                <SymbolView
+                  name={{ ios: 'xmark', android: 'close', web: 'close' }}
+                  size={12}
+                  weight="semibold"
+                  tintColor={foreground}
+                />
+              </Pressable>
+            </View>
+          ) : (
+            <PressableFeedback
+              onPress={vm.pickProof}
+              accessibilityRole="button"
+              accessibilityLabel="Adjuntar comprobante de pago"
+              className="flex-row items-center gap-3 rounded-3xl border-2 border-dashed border-default bg-surface p-3">
+              <View className="size-10 items-center justify-center rounded-full bg-default">
+                <SymbolView
+                  name={{
+                    ios: 'photo.badge.plus',
+                    android: 'add_photo_alternate',
+                    web: 'add_photo_alternate',
+                  }}
+                  size={18}
+                  tintColor={foreground}
+                />
+              </View>
+              <View className="flex-1 gap-0.5">
+                <Text className="text-sm font-semibold text-foreground">Adjuntar comprobante</Text>
+                <Text className="text-xs text-muted">
+                  Una captura del pago ayuda a la tienda a verificarlo más rápido.
+                </Text>
+              </View>
+            </PressableFeedback>
+          )}
+        </View>
+
         {vm.placeError ? <Text className="text-sm text-danger">{vm.placeError}</Text> : null}
       </ScrollView>
 
@@ -264,7 +329,7 @@ export function CheckoutPaymentView({
           className="rounded-full bg-action">
           {vm.isPlacing ? <Spinner size="sm" color={actionForeground} /> : null}
           <Button.Label className="text-action-foreground">
-            {vm.isPlacing ? 'Enviando pedido…' : 'Realizar pedido'}
+            {vm.isPlacing ? vm.placingLabel : 'Realizar pedido'}
           </Button.Label>
         </Button>
       </View>

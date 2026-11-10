@@ -61,6 +61,14 @@
           "color": "#790102",
           "defaultChannel": "default"
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Llanero usa tus fotos para adjuntar el comprobante de tu pago.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
       ]
     ],
     "experiments": {

@@ -105,4 +105,6 @@ export interface CreateOrderData {
   exchangeRate: number;
   items: CreateOrderItemData[];
   customerNotes?: string | null;
+  /** URL pública del comprobante ya subido (opcional). */
+  paymentProofUrl?: string | null;
 }

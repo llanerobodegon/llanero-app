@@ -1,4 +1,5 @@
 import * as Clipboard from 'expo-clipboard';
+import * as ImagePicker from 'expo-image-picker';
 import * as Haptics from 'expo-haptics';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -21,6 +22,7 @@ import { bankAccountService } from '@/services/bank-account.service';
 import { exchangeRateService } from '@/services/exchange-rate.service';
 import { orderService } from '@/services/order.service';
 import { paymentMethodService } from '@/services/payment-method.service';
+import { paymentProofService } from '@/services/payment-proof.service';
 
 /** Cuánto se muestra el check de "copiado". */
 const COPIED_FEEDBACK_MS = 1500;
@@ -182,7 +184,26 @@ export function useCheckoutPaymentViewModel({ deliveryType, addressId }: Params)
     [isBolivares],
   );
 
+  // Comprobante de pago (opcional): se elige aquí y se sube al realizar el pedido.
+  const [proof, setProof] = useState<{ uri: string; mimeType: string } | null>(null);
+  const pickProof = useCallback(async () => {
+    Haptics.selectionAsync();
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      quality: 0.7,
+    });
+    if (result.canceled || !result.assets?.[0]) return;
+    const asset = result.assets[0];
+    setProof({ uri: asset.uri, mimeType: asset.mimeType ?? 'image/jpeg' });
+  }, []);
+  const removeProof = useCallback(() => {
+    Haptics.selectionAsync();
+    setProof(null);
+  }, []);
+
   const [isPlacing, setIsPlacing] = useState(false);
+  // Etapa del envío, para el texto del botón: subiendo el comprobante o creando el pedido.
+  const [placingStep, setPlacingStep] = useState<'proof' | 'order'>('order');
   const [placeError, setPlaceError] = useState<string | null>(null);
   const canPlaceOrder =
     !!warehouse &&
@@ -202,6 +223,13 @@ export function useCheckoutPaymentViewModel({ deliveryType, addressId }: Params)
     }
     try {
       setIsPlacing(true);
+      // Primero el comprobante (si hay); si falla, no se crea el pedido.
+      let paymentProofUrl: string | null = null;
+      if (proof) {
+        setPlacingStep('proof');
+        paymentProofUrl = await paymentProofService.upload(proof.uri, proof.mimeType);
+      }
+      setPlacingStep('order');
       setPlaceError(null);
       const order = await orderService.create({
         warehouseId: warehouse.id,
@@ -213,6 +241,7 @@ export function useCheckoutPaymentViewModel({ deliveryType, addressId }: Params)
         paymentReference: reference,
         exchangeRate,
         items: cart.items.map((item) => ({ productId: item.productId, quantity: item.quantity })),
+        paymentProofUrl,
       });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       cart.clear();
@@ -227,6 +256,7 @@ export function useCheckoutPaymentViewModel({ deliveryType, addressId }: Params)
   }, [
     address,
     canPlaceOrder,
+    proof,
     cart,
     deliveryType,
     exchangeRate,
@@ -274,7 +304,11 @@ export function useCheckoutPaymentViewModel({ deliveryType, addressId }: Params)
     totalBs: exchangeRate ? totalUsd * exchangeRate : null,
     canPlaceOrder,
     isPlacing,
+    placingLabel: placingStep === 'proof' ? 'Subiendo comprobante…' : 'Enviando pedido…',
     placeError,
+    proof,
+    pickProof,
+    removeProof,
     placeOrder,
     goBack,
   };

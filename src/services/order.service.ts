@@ -197,6 +197,7 @@ export const orderService = {
       p_exchange_rate: data.exchangeRate,
       p_items: data.items.map((item) => ({ product_id: item.productId, quantity: item.quantity })),
       ...(data.customerNotes ? { p_customer_notes: data.customerNotes } : {}),
+      ...(data.paymentProofUrl ? { p_payment_proof_url: data.paymentProofUrl } : {}),
     });
     if (error) {
       // Los errores de validación de la función (código P0001) traen el mensaje en español.
