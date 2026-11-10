@@ -1,38 +1,58 @@
-import type { UpdateUserData, User } from '@/models/user.model';
+import { supabase } from '@/lib/supabase';
+import type { IdType, PhoneCode, UpdateUserData, User } from '@/models/user.model';
 
-// TODO: reemplazar el mock por Supabase cuando exista la sesión:
-//   const { data: { user } } = await supabase.auth.getUser();
-//   supabase.from('users').select('*').eq('id', user.id).single()
-// La firma no debe cambiar.
+/** Fila de `users` (snake_case) → modelo. */
+function transformUser(row: Record<string, unknown>): User {
+  return {
+    id: row.id as string,
+    roleId: Number(row.role_id),
+    firstName: (row.first_name as string) ?? '',
+    lastName: (row.last_name as string) ?? '',
+    email: row.email as string,
+    phoneCode: (row.phone_code as PhoneCode | null) ?? null,
+    phone: (row.phone as string | null) ?? null,
+    idType: (row.id_type as IdType | null) ?? null,
+    idNumber: (row.id_number as string | null) ?? null,
+    isActive: (row.is_active as boolean) ?? true,
+    createdAt: row.created_at as string,
+    updatedAt: row.updated_at as string,
+  };
+}
 
-let mockUser: User = {
-  id: 'mock-user-1',
-  roleId: 1,
-  firstName: 'María',
-  lastName: 'González',
-  email: 'mariagonzalez@gmail.com',
-  phoneCode: '0414',
-  phone: '1234567',
-  idType: 'V',
-  idNumber: '12345678',
-  isActive: true,
-  createdAt: '2026-11-01T00:00:00.000Z',
-  updatedAt: '2026-11-01T00:00:00.000Z',
-};
+/** Id del usuario con sesión, o error si la sesión expiró. */
+async function currentUserId(): Promise<string> {
+  const { data } = await supabase.auth.getSession();
+  const id = data.session?.user.id;
+  if (!id) throw new Error('Tu sesión expiró; vuelve a iniciar sesión');
+  return id;
+}
 
 export const userService = {
-  /** Perfil del usuario con sesión iniciada. */
+  /** Perfil del usuario con sesión (fila de `users`; RLS: cada uno ve solo el suyo). */
   async getCurrent(): Promise<User> {
-    return mockUser;
+    const id = await currentUserId();
+    const { data, error } = await supabase.from('users').select('*').eq('id', id).single();
+    if (error) throw new Error('No pudimos cargar tu perfil');
+    return transformUser(data);
   },
 
-  /**
-   * Actualiza el perfil del usuario y devuelve el resultado.
-   * TODO: en Supabase, `users.update({ first_name, last_name, phone_code, phone, id_type,
-   * id_number }).eq('id', userId).select().single()`.
-   */
+  /** Actualiza el perfil del usuario con sesión y devuelve el resultado. */
   async update(data: UpdateUserData): Promise<User> {
-    mockUser = { ...mockUser, ...data, updatedAt: new Date().toISOString() };
-    return mockUser;
+    const id = await currentUserId();
+    const { data: row, error } = await supabase
+      .from('users')
+      .update({
+        first_name: data.firstName,
+        last_name: data.lastName,
+        phone_code: data.phoneCode,
+        phone: data.phone,
+        id_type: data.idType,
+        id_number: data.idNumber,
+      })
+      .eq('id', id)
+      .select('*')
+      .single();
+    if (error) throw new Error('No pudimos guardar tus datos');
+    return transformUser(row);
   },
 };

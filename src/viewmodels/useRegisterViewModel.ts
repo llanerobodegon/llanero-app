@@ -2,6 +2,7 @@ import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { useAuthContext } from '@/contexts/auth-context';
 import { isPasswordValid } from '@/lib/password';
 import { authService } from '@/services/auth.service';
 
@@ -47,6 +48,9 @@ function validatePassword(form: Form): FormErrors {
  */
 export function useRegisterViewModel() {
   const [step, setStep] = useState(0);
+  const { isSignedIn } = useAuthContext();
+  // Código verificado: falta que la sesión llegue al contexto para abrir la bienvenida.
+  const [isVerified, setIsVerified] = useState(false);
   const [form, setForm] = useState<Form>({
     firstName: '',
     lastName: '',
@@ -102,9 +106,9 @@ export function useRegisterViewModel() {
         setError(null);
         await authService.verifySignUpCode(email, code);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        // Cierra el ingreso (bienvenida, registro): "atrás" no vuelve aquí.
-        if (router.canDismiss()) router.dismissAll();
-        router.replace({ pathname: '/auth/registered', params: { name: form.firstName.trim() } });
+        // La bienvenida está entre las rutas con sesión: se abre cuando la sesión llega al
+        // contexto (efecto de abajo), no aquí, para no chocar con las rutas protegidas.
+        setIsVerified(true);
       } catch (err) {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         setError(err instanceof Error ? err.message : 'No pudimos verificar el código');
@@ -113,8 +117,16 @@ export function useRegisterViewModel() {
         setIsSubmitting(false);
       }
     },
-    [email, form.firstName],
+    [email],
   );
+
+  // Cuenta verificada y sesión ya en el contexto: abre la bienvenida del registro.
+  const firstName = form.firstName.trim();
+  useEffect(() => {
+    if (isVerified && isSignedIn) {
+      router.replace({ pathname: '/auth/registered', params: { name: firstName } });
+    }
+  }, [firstName, isSignedIn, isVerified]);
 
   /** Botón principal: avanza de paso (en el 2 crea la cuenta y envía el código). */
   const next = useCallback(async () => {

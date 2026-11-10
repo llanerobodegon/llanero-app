@@ -1,14 +1,29 @@
 {
   "expo": {
-    "name": "llanero",
-    "slug": "llanero",
+    "name": "Llanero Bodegón",
+    "slug": "llanero-app",
+    "owner": "llanerobodegon",
     "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "llanero",
+    "scheme": "llaneroapp",
     "userInterfaceStyle": "automatic",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/0895c24a-debd-4ff9-a48a-4642c77f8e8f"
+    },
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.llanerobodegon.llaneroapp",
+      "supportsTablet": true,
+      "infoPlist": {
+        "CFBundleDisplayName": "Llanero"
+      },
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -17,7 +32,11 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.llanerobodegon.llanero",
+      "permissions": [
+        "android.permission.POST_NOTIFICATIONS"
+      ]
     },
     "web": {
       "output": "server",
@@ -32,11 +51,24 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
+      ],
+      "expo-sqlite",
+      [
+        "expo-notifications",
+        {
+          "color": "#790102",
+          "defaultChannel": "default"
+        }
       ]
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "0895c24a-debd-4ff9-a48a-4642c77f8e8f"
+      }
     }
   }
 }

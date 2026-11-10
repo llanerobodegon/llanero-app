@@ -8,6 +8,7 @@ import { useInAppBrowser } from '@/hooks/use-in-app-browser';
 import { initials, maskEmail } from '@/lib/format';
 import type { User } from '@/models/user.model';
 import { authService } from '@/services/auth.service';
+import { notificationSettingsService } from '@/services/notification-settings.service';
 import { userService } from '@/services/user.service';
 
 type PendingAction = 'logout' | 'delete' | null;
@@ -75,7 +76,7 @@ export function useAccountViewModel() {
   const requestLogout = useCallback(() => tap(() => setPendingAction('logout')), [tap]);
   const requestDeleteAccount = useCallback(() => tap(() => setPendingAction('delete')), [tap]);
   const cancelPendingAction = useCallback(() => setPendingAction(null), []);
-  /** Cierra sesión (o elimina la cuenta) y deja solo el inicio de sesión en la navegación. */
+  /** Cierra sesión (o elimina la cuenta); el layout raíz vuelve a la bienvenida. */
   const confirmPendingAction = useCallback(async () => {
     const action = pendingAction;
     setPendingAction(null);
@@ -84,12 +85,12 @@ export function useAccountViewModel() {
         await authService.deleteAccount();
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       } else {
+        // Este teléfono deja de recibir los avisos de la cuenta.
+        await notificationSettingsService.clearDeviceToken();
         await authService.signOut();
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
-      // `dismissAll` + `replace`: sin pantallas debajo, "atrás" no vuelve a la cuenta.
-      if (router.canDismiss()) router.dismissAll();
-      router.replace('/auth');
+      // Sin sesión, las rutas protegidas del layout raíz llevan solas a la bienvenida.
     } catch (err) {
       setError(
         err instanceof Error

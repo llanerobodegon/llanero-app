@@ -43,16 +43,16 @@ export function ForgotPasswordView({ initialEmail }: { initialEmail: string }) {
             Contraseña actualizada
           </Text>
           <Text className="text-center text-base text-muted">
-            Ya puedes iniciar sesión con tu contraseña nueva.
+            Listo, ya entraste con tu contraseña nueva.
           </Text>
         </View>
         <Button
           size="lg"
           // Sin capa de color al presionar sobre el color de acción.
           feedbackVariant="scale"
-          onPress={vm.goToSignIn}
+          onPress={vm.goToApp}
           className="rounded-full bg-action">
-          <Button.Label className="text-action-foreground">Iniciar sesión</Button.Label>
+          <Button.Label className="text-action-foreground">Ir a Explorar</Button.Label>
         </Button>
       </View>
     );

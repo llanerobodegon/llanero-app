@@ -17,7 +17,7 @@ type FormErrors = Partial<Record<keyof Form, string>>;
 
 /**
  * Recuperar contraseña en 3 pasos dentro de una pantalla: correo (se envía el código), código
- * de verificación y contraseña nueva. Al terminar muestra la confirmación (`isDone`).
+ * de verificación (inicia sesión) y contraseña nueva. Al terminar muestra la confirmación.
  */
 export function useForgotPasswordViewModel(initialEmail = '') {
   const [step, setStep] = useState(0);
@@ -156,10 +156,13 @@ export function useForgotPasswordViewModel(initialEmail = '') {
     else router.back();
   }, [isDone, step]);
 
-  /** Confirmación: vuelve al formulario de ingreso para entrar con la contraseña nueva. */
-  const goToSignIn = useCallback(() => {
+  /**
+   * Confirmación: verificar el código ya inició la sesión, así que se entra directo a la app
+   * (las pantallas de ingreso de debajo ya no están disponibles).
+   */
+  const goToApp = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.back();
+    router.replace('/');
   }, []);
 
   const canContinue =
@@ -197,6 +200,6 @@ export function useForgotPasswordViewModel(initialEmail = '') {
     resendIn,
     next,
     back,
-    goToSignIn,
+    goToApp,
   };
 }

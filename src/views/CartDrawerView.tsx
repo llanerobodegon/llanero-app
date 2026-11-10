@@ -13,7 +13,14 @@ import { useCartViewModel } from '@/viewmodels/useCartViewModel';
  * Drawer del carrito: entra por la derecha y empuja la app (`drawerType="slide"`).
  * Envuelve toda la app (incluidas las pestañas) desde `src/app/_layout.tsx`.
  */
-export function CartDrawerView({ children }: { children: ReactNode }) {
+export function CartDrawerView({
+  children,
+  isEnabled = true,
+}: {
+  children: ReactNode;
+  /** `false` sin sesión: no se puede abrir el carrito deslizando. */
+  isEnabled?: boolean;
+}) {
   const vm = useCartViewModel();
   const [background] = useThemeColor(['background']);
 
@@ -24,6 +31,7 @@ export function CartDrawerView({ children }: { children: ReactNode }) {
       onClose={vm.close}
       drawerPosition="right"
       drawerType="slide"
+      swipeEnabled={isEnabled}
       drawerStyle={{ width: '86%', backgroundColor: background }}
       renderDrawerContent={() => <CartContent background={background} />}>
       {children}

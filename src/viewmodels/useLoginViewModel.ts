@@ -36,7 +36,7 @@ export function useLoginViewModel() {
 
   const errors = useMemo(() => validate(form), [form]);
 
-  /** Inicia sesión y entra a la app, sin dejar el login debajo. */
+  /** Inicia sesión; el layout raíz cambia a la app al detectar la sesión. */
   const signIn = useCallback(async () => {
     setHasSubmitted(true);
     if (Object.keys(errors).length > 0) {
@@ -48,9 +48,7 @@ export function useLoginViewModel() {
       setError(null);
       await authService.signIn(form.email.trim().toLowerCase(), form.password);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      // Cierra la bienvenida y el formulario: "atrás" desde el Inicio no vuelve al ingreso.
-      if (router.canDismiss()) router.dismissAll();
-      router.replace('/');
+      // Al haber sesión, las rutas protegidas del layout raíz llevan solas a la app.
     } catch (err) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       setError(err instanceof Error ? err.message : 'No pudimos iniciar tu sesión');
