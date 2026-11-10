@@ -44,6 +44,8 @@ export interface PaymentDetail {
   value: string;
   /** El monto se destaca en la tarjeta. */
   isAmount?: boolean;
+  /** Texto de apoyo bajo el valor (no se copia): "Equivale a $27.00". */
+  hint?: string;
 }
 
 /** Datos que el cliente necesita para pagar con la opción elegida. */
@@ -58,6 +60,8 @@ export function getPaymentDetails(
     label: 'Monto',
     value: option.currency === 'BS' ? formatBs(totalUsd * exchangeRate) : formatUSD(totalUsd),
     isAmount: true,
+    // En bolívares, cuánto es en dólares al cambio del día.
+    hint: option.currency === 'BS' ? `Equivale a ${formatUSD(totalUsd)}` : undefined,
   };
   const rows: (PaymentDetail | null)[] =
     option.type === 'pago_movil'
@@ -91,5 +95,11 @@ export function getPaymentDetails(
 
 /** Todos los datos en texto, para "Copiar todo". */
 export function paymentDetailsToText(option: PaymentOption, details: PaymentDetail[]): string {
-  return [option.label, ...details.map((detail) => `${detail.label}: ${detail.value}`)].join('\n');
+  return [
+    option.label,
+    ...details.map(
+      (detail) =>
+        `${detail.label}: ${detail.value}${detail.hint ? ` (${detail.hint.toLowerCase()})` : ''}`,
+    ),
+  ].join('\n');
 }

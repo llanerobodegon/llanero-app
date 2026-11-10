@@ -77,6 +77,7 @@ export function PaymentDetailsCard({
                   style={{ fontVariant: ['tabular-nums'] }}>
                   {detail.value}
                 </Text>
+                {detail.hint ? <Text className="text-xs text-muted">{detail.hint}</Text> : null}
               </View>
               <Pressable
                 onPress={() => onCopy(detail)}
