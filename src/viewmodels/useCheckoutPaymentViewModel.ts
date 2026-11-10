@@ -204,36 +204,15 @@ export function useCheckoutPaymentViewModel({ deliveryType, addressId }: Params)
       setIsPlacing(true);
       setPlaceError(null);
       const order = await orderService.create({
-        warehouse: {
-          id: warehouse.id,
-          name: warehouse.name,
-          address: warehouse.address,
-          phone: warehouse.phone,
-        },
-        address:
-          isDelivery && address
-            ? {
-                id: address.id,
-                label: address.label,
-                address1: address.addressLine1,
-                address2: address.addressLine2,
-                city: address.city,
-              }
-            : null,
+        warehouseId: warehouse.id,
         deliveryType,
+        addressId: isDelivery ? (address?.id ?? null) : null,
         paymentMethodType: selectedOption.type,
         bankAccountId: selectedOption.account.id,
         paymentBank: isBolivares ? (selectedPayer?.bank ?? null) : null,
         paymentReference: reference,
-        deliveryFeeUsd: deliveryFee,
         exchangeRate,
-        items: cart.items.map((item) => ({
-          productId: item.productId,
-          productName: item.name,
-          productImageUrl: item.imageUrl,
-          quantity: item.quantity,
-          unitPriceUsd: item.unitPrice,
-        })),
+        items: cart.items.map((item) => ({ productId: item.productId, quantity: item.quantity })),
       });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       cart.clear();
@@ -249,7 +228,6 @@ export function useCheckoutPaymentViewModel({ deliveryType, addressId }: Params)
     address,
     canPlaceOrder,
     cart,
-    deliveryFee,
     deliveryType,
     exchangeRate,
     isBolivares,

@@ -80,27 +80,29 @@ export interface Order {
   items: OrderItem[];
 }
 
-/** Línea del pedido al crearlo: lo que había en el carrito. */
+/** Producto y cantidad al crear el pedido (el precio lo calcula la base). */
 export interface CreateOrderItemData {
   productId: string;
-  productName: string;
-  productImageUrl: string | null;
   quantity: number;
-  unitPriceUsd: number;
 }
 
-/** Datos para crear un pedido desde el checkout. */
+/**
+ * Datos para crear un pedido desde el checkout. La función `create_order` de la base calcula
+ * precios, descuentos, costo de delivery y totales; la app no los envía.
+ */
 export interface CreateOrderData {
-  warehouse: OrderWarehouse;
-  address: OrderAddress | null;
+  warehouseId: string;
   deliveryType: DeliveryType;
+  /** Solo con delivery. */
+  addressId: string | null;
   paymentMethodType: PaymentMethodType;
   /** Cuenta de la tienda a la que se pagó (`orders.bank_account_id`). */
   bankAccountId: string;
   /** Banco desde donde pagó el cliente. */
   paymentBank: string | null;
   paymentReference: string;
-  deliveryFeeUsd: number;
+  /** Bolívares por dólar usados para los montos en Bs. */
   exchangeRate: number;
   items: CreateOrderItemData[];
+  customerNotes?: string | null;
 }

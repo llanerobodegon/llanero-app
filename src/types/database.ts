@@ -886,6 +886,22 @@ export type Database = {
         Args: { user_email: string }
         Returns: boolean
       }
+      create_order: {
+        Args: {
+          p_address_id: string
+          p_bank_account_id: string
+          p_customer_notes?: string
+          p_delivery_type: string
+          p_exchange_rate: number
+          p_items: Json
+          p_payment_bank: string
+          p_payment_method_type: string
+          p_payment_proof_url?: string
+          p_payment_reference: string
+          p_warehouse_id: string
+        }
+        Returns: string
+      }
       delete_current_user: { Args: never; Returns: undefined }
       get_address_ids_for_delivery: { Args: never; Returns: string[] }
       get_admin_push_tokens: {
