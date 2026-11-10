@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useCallback, useState } from 'react';
 
 import { useCartContext } from '@/contexts/cart-context';
+import { useWarehouseContext } from '@/contexts/warehouse-context';
 
 export function useCartViewModel() {
   const cart = useCartContext();
@@ -43,13 +44,24 @@ export function useCartViewModel() {
     setIsClearConfirmOpen(false);
   }, [cart]);
 
-  /** Cierra el carrito y abre el checkout. */
+  // Tienda del carrito: si está cerrada se puede armar el pedido, pero no pagarlo.
+  const { warehouses } = useWarehouseContext();
+  const cartWarehouse = warehouses.find((w) => w.id === cart.warehouseId) ?? null;
+  const [isClosedNoticeOpen, setIsClosedNoticeOpen] = useState(false);
+  const closeClosedNotice = useCallback(() => setIsClosedNoticeOpen(false), []);
+
+  /** Cierra el carrito y abre el checkout; con la tienda cerrada, avisa y no continúa. */
   const checkout = useCallback(() => {
     if (cart.items.length === 0) return;
+    if (cartWarehouse && !cartWarehouse.isOpen) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      setIsClosedNoticeOpen(true);
+      return;
+    }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     cart.close();
     router.push('/checkout');
-  }, [cart]);
+  }, [cart, cartWarehouse]);
 
   return {
     items: cart.items,
@@ -66,6 +78,9 @@ export function useCartViewModel() {
     increment,
     decrement,
     checkout,
+    isClosedNoticeOpen,
+    closeClosedNotice,
+    closedWarehouseName: cartWarehouse?.name ?? 'La tienda',
     isClearConfirmOpen,
     requestClear,
     cancelClear,

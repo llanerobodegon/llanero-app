@@ -92,6 +92,17 @@ function CartContent({ background }: { background: string }) {
         </Button.Label>
       </Button>
 
+      {/* Tienda cerrada: se puede armar el pedido, pero no pagarlo */}
+      <ConfirmDialog
+        isOpen={vm.isClosedNoticeOpen}
+        title={`${vm.closedWarehouseName} está cerrada`}
+        description="Puedes seguir armando tu pedido, pero podrás pagarlo cuando la tienda abra."
+        confirmLabel="Entendido"
+        hideCancel
+        onConfirm={vm.closeClosedNotice}
+        onCancel={vm.closeClosedNotice}
+      />
+
       <ConfirmDialog
         isOpen={vm.isClearConfirmOpen}
         title="¿Vaciar el carrito?"

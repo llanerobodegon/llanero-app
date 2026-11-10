@@ -15,11 +15,13 @@ type ConfirmDialogProps = {
   loadingLabel?: string;
   /** Error de la acción: se muestra dentro del diálogo (y se puede reintentar). */
   errorMessage?: string | null;
+  /** Solo el botón principal (avisos informativos con "Entendido"). */
+  hideCancel?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 };
 
-/** Diálogo de confirmación (HeroUI) con botón de cancelar y de confirmar. */
+/** Diálogo de confirmación (HeroUI) con botón de cancelar y de confirmar (o solo un aviso). */
 export function ConfirmDialog({
   isOpen,
   title,
@@ -30,6 +32,7 @@ export function ConfirmDialog({
   isLoading = false,
   loadingLabel,
   errorMessage,
+  hideCancel = false,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -58,9 +61,11 @@ export function ConfirmDialog({
             ) : null}
           </View>
           <View className="flex-row justify-end gap-3">
-            <Button variant="ghost" size="sm" isDisabled={isLoading} onPress={onCancel}>
-              {cancelLabel}
-            </Button>
+            {hideCancel ? null : (
+              <Button variant="ghost" size="sm" isDisabled={isLoading} onPress={onCancel}>
+                {cancelLabel}
+              </Button>
+            )}
             <Button
               variant={tone === 'danger' ? 'danger' : 'primary'}
               size="sm"
