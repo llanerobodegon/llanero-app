@@ -23,7 +23,8 @@
       },
       "config": {
         "usesNonExemptEncryption": false
-      }
+      },
+      "buildNumber": "39"
     },
     "android": {
       "adaptiveIcon": {
@@ -36,7 +37,8 @@
       "package": "com.llanerobodegon.llanero",
       "permissions": [
         "android.permission.POST_NOTIFICATIONS"
-      ]
+      ],
+      "versionCode": 6
     },
     "web": {
       "output": "server",
