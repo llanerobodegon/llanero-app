@@ -122,6 +122,9 @@ export function AccountView() {
         title="¿Cerrar sesión?"
         description="Tendrás que volver a iniciar sesión para hacer pedidos."
         confirmLabel="Cerrar sesión"
+        isLoading={vm.isProcessing}
+        loadingLabel="Cerrando…"
+        errorMessage={vm.actionError}
         onConfirm={vm.confirmPendingAction}
         onCancel={vm.cancelPendingAction}
       />
@@ -131,6 +134,9 @@ export function AccountView() {
         description="Se borrarán tus datos y direcciones. Esta acción no se puede deshacer."
         confirmLabel="Eliminar"
         tone="danger"
+        isLoading={vm.isProcessing}
+        loadingLabel="Eliminando…"
+        errorMessage={vm.actionError}
         onConfirm={vm.confirmPendingAction}
         onCancel={vm.cancelPendingAction}
       />

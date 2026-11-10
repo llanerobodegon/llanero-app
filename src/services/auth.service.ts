@@ -145,14 +145,24 @@ export const authService = {
   },
 
   /**
-   * Elimina la cuenta.
-   * TODO: borrar un usuario de Auth requiere la service role, así que hace falta una Edge
-   * Function (p. ej. `delete-account`) que valide el JWT y llame a auth.admin.deleteUser.
-   * Hasta entonces avisa en lugar de fingir que se borró.
+   * Elimina la cuenta con la Edge Function `delete-account` (borrar usuarios requiere la
+   * service role). Sin pedidos la borra; con pedidos la anonimiza y bloquea el acceso, porque
+   * el historial de pedidos se conserva. Después cierra la sesión en este teléfono.
    */
   async deleteAccount(): Promise<void> {
-    throw new Error(
-      'Todavía no se puede eliminar la cuenta desde la app. Escríbenos y la eliminamos por ti.',
-    );
+    const { error } = await supabase.functions.invoke('delete-account', { method: 'POST' });
+    if (error) {
+      // El cuerpo del error trae el mensaje en español de la función, si lo hay.
+      let message = 'No pudimos eliminar tu cuenta. Inténtalo de nuevo';
+      try {
+        const body = await (error as { context?: Response }).context?.json();
+        if (body?.error) message = body.error;
+      } catch {
+        // Sin cuerpo: se usa el mensaje genérico.
+      }
+      throw new Error(message);
+    }
+    // La cuenta ya no existe (o quedó bloqueada): solo falta borrar la sesión local.
+    await supabase.auth.signOut({ scope: 'local' });
   },
 };

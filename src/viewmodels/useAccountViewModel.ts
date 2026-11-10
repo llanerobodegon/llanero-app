@@ -71,15 +71,39 @@ export function useAccountViewModel() {
     [openInAppBrowser, tap],
   );
 
-  // Cerrar sesión y eliminar cuenta piden confirmación.
+  // Cerrar sesión y eliminar cuenta piden confirmación. El diálogo queda abierto mientras la
+  // acción está en curso (con indicador de carga) y muestra el error si falla.
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
-  const requestLogout = useCallback(() => tap(() => setPendingAction('logout')), [tap]);
-  const requestDeleteAccount = useCallback(() => tap(() => setPendingAction('delete')), [tap]);
-  const cancelPendingAction = useCallback(() => setPendingAction(null), []);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const requestLogout = useCallback(
+    () =>
+      tap(() => {
+        setActionError(null);
+        setPendingAction('logout');
+      }),
+    [tap],
+  );
+  const requestDeleteAccount = useCallback(
+    () =>
+      tap(() => {
+        setActionError(null);
+        setPendingAction('delete');
+      }),
+    [tap],
+  );
+  const cancelPendingAction = useCallback(() => {
+    if (isProcessing) return;
+    setPendingAction(null);
+    setActionError(null);
+  }, [isProcessing]);
+
   /** Cierra sesión (o elimina la cuenta); el layout raíz vuelve a la bienvenida. */
   const confirmPendingAction = useCallback(async () => {
     const action = pendingAction;
-    setPendingAction(null);
+    if (!action || isProcessing) return;
+    setIsProcessing(true);
+    setActionError(null);
     try {
       if (action === 'delete') {
         await authService.deleteAccount();
@@ -91,16 +115,20 @@ export function useAccountViewModel() {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
       // Sin sesión, las rutas protegidas del layout raíz llevan solas a la bienvenida.
+      setPendingAction(null);
     } catch (err) {
-      setError(
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      setActionError(
         err instanceof Error
           ? err.message
           : action === 'delete'
             ? 'No pudimos eliminar tu cuenta'
             : 'No pudimos cerrar tu sesión',
       );
+    } finally {
+      setIsProcessing(false);
     }
-  }, [pendingAction]);
+  }, [isProcessing, pendingAction]);
 
   const appVersion = Constants.expoConfig?.version ?? '';
 
@@ -122,6 +150,8 @@ export function useAccountViewModel() {
     openPrivacy,
 
     pendingAction,
+    isProcessing,
+    actionError,
     requestLogout,
     requestDeleteAccount,
     cancelPendingAction,

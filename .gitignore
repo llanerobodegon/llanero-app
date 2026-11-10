@@ -41,3 +41,6 @@ example
 # generated native folders
 /ios
 /android
+
+# Estado local del CLI de Supabase
+supabase/.temp/
