@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { normalizeCase } from '@/lib/text';
 import type { Category, Subcategory } from '@/models/warehouse.model';
 import type { Database } from '@/types/database';
 
@@ -8,7 +9,7 @@ type SubcategoryRow = Database['public']['Tables']['subcategories']['Row'];
 function transformCategory(row: CategoryRow): Category {
   return {
     id: row.id,
-    name: row.name,
+    name: normalizeCase(row.name),
     imageUrl: row.image_url,
     isActive: row.is_active ?? true,
     createdBy: row.created_by,
@@ -21,7 +22,7 @@ function transformSubcategory(row: SubcategoryRow): Subcategory {
   return {
     id: row.id,
     categoryId: row.category_id,
-    name: row.name,
+    name: normalizeCase(row.name),
     imageUrl: row.image_url,
     isActive: row.is_active ?? true,
     createdBy: row.created_by,

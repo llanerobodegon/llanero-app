@@ -89,11 +89,12 @@ export function useHomeViewModel() {
 
   // Tienda a la que el cliente quiere cambiar mientras confirma que se vaciará su carrito.
   const [pendingWarehouse, setPendingWarehouse] = useState<Warehouse | null>(null);
+  // Tienda cerrada que el cliente eligió, mientras confirma si la quiere igual.
+  const [closedWarehouse, setClosedWarehouse] = useState<Warehouse | null>(null);
 
-  /** Cambia de tienda; si el carrito tiene productos de otra, pide confirmación primero. */
-  const requestWarehouseChange = useCallback(
+  /** Paso final: si el carrito tiene productos de otra tienda, pide confirmar que se vaciará. */
+  const applyWarehouseChange = useCallback(
     (warehouse: Warehouse) => {
-      if (warehouse.id === selectedWarehouseId) return;
       const cartHasOtherStore =
         cart.items.length > 0 && cart.warehouseId !== null && cart.warehouseId !== warehouse.id;
       if (cartHasOtherStore) {
@@ -102,8 +103,31 @@ export function useHomeViewModel() {
         selectWarehouse(warehouse);
       }
     },
-    [cart.items.length, cart.warehouseId, selectedWarehouseId, selectWarehouse],
+    [cart.items.length, cart.warehouseId, selectWarehouse],
   );
+
+  /** Cambia de tienda: avisa primero si está cerrada y luego si se vaciará el carrito. */
+  const requestWarehouseChange = useCallback(
+    (warehouse: Warehouse) => {
+      if (warehouse.id === selectedWarehouseId) return;
+      if (!warehouse.isOpen) {
+        setClosedWarehouse(warehouse);
+        return;
+      }
+      applyWarehouseChange(warehouse);
+    },
+    [applyWarehouseChange, selectedWarehouseId],
+  );
+
+  /** "Elegir igual" en el aviso de tienda cerrada. */
+  const confirmClosedWarehouse = useCallback(() => {
+    if (!closedWarehouse) return;
+    const warehouse = closedWarehouse;
+    setClosedWarehouse(null);
+    applyWarehouseChange(warehouse);
+  }, [applyWarehouseChange, closedWarehouse]);
+
+  const cancelClosedWarehouse = useCallback(() => setClosedWarehouse(null), []);
 
   const confirmWarehouseChange = useCallback(() => {
     if (!pendingWarehouse) return;
@@ -185,6 +209,9 @@ export function useHomeViewModel() {
     pendingWarehouse,
     confirmWarehouseChange,
     cancelWarehouseChange,
+    closedWarehouse,
+    confirmClosedWarehouse,
+    cancelClosedWarehouse,
     isLoadingWarehouses: isLoading,
     warehousesError: error,
 

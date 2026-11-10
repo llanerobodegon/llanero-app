@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { normalizeCase } from '@/lib/text';
 import type { Warehouse } from '@/models/warehouse.model';
 import type { Database } from '@/types/database';
 
@@ -8,8 +9,9 @@ type WarehouseRow = Database['public']['Tables']['warehouses']['Row'];
 function transformWarehouse(row: WarehouseRow): Warehouse {
   return {
     id: row.id,
-    name: row.name,
-    address: row.address,
+    // El admin a veces los carga en MAYÚSCULAS: se muestran en formato título.
+    name: normalizeCase(row.name),
+    address: normalizeCase(row.address),
     phone: row.phone,
     logoUrl: row.logo_url,
     deliveryFee: Number(row.delivery_fee) || 0,
@@ -19,15 +21,14 @@ function transformWarehouse(row: WarehouseRow): Warehouse {
 }
 
 export const warehouseService = {
-  /** Tiendas activas que el cliente puede elegir, ordenadas por nombre (RLS: requiere sesión). */
+  /** Tiendas activas que el cliente puede elegir: abiertas primero y por nombre (RLS: requiere sesión). */
   async getActive(): Promise<Warehouse[]> {
-    const { data, error } = await supabase
-      .from('warehouses')
-      .select('*')
-      .eq('is_active', true)
-      .order('name');
+    const { data, error } = await supabase.from('warehouses').select('*').eq('is_active', true);
     if (error) throw new Error('No pudimos cargar las tiendas');
-    return data.map(transformWarehouse);
+    // Abiertas primero; dentro de cada grupo, por nombre (ya normalizado).
+    return data
+      .map(transformWarehouse)
+      .sort((a, b) => Number(b.isOpen) - Number(a.isOpen) || a.name.localeCompare(b.name, 'es'));
   },
 
   /** Tienda que el cliente eligió la última vez (`users.preferred_warehouse_id`), si hay. */

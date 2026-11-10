@@ -72,25 +72,27 @@ export function WarehouseSelector({
         description="El catálogo y los precios dependen de la tienda."
         options={warehouses}
         keyExtractor={(warehouse) => warehouse.id}
+        // Con muchas tiendas: media pantalla, se puede subir y la lista tiene scroll nativo
+        // (igual que la hoja de bancos). Con pocas, la hoja se ajusta al contenido.
+        isScrollable={warehouses.length > 6}
         isSelected={(warehouse) => warehouse.id === selectedWarehouse?.id}
         onSelect={handleSelect}
         getAccessibilityLabel={(warehouse) =>
-          `${warehouse.name}${warehouse.isOpen ? '' : ', cerrada'}`
+          `${warehouse.name}, ${warehouse.isOpen ? 'abierta' : 'cerrada'}`
         }
         renderOption={(warehouse) => (
           <>
             <View className="flex-row items-center gap-2">
+              {/* Punto verde = abierta, rojo = cerrada */}
+              <View
+                className={`size-2 rounded-full ${warehouse.isOpen ? 'bg-success' : 'bg-danger'}`}
+              />
               <Text className="shrink text-base font-medium text-foreground" numberOfLines={1}>
                 {warehouse.name}
               </Text>
-              {!warehouse.isOpen ? (
-                <Chip size="sm" variant="soft" color="warning">
-                  Cerrada
-                </Chip>
-              ) : null}
             </View>
             {warehouse.address ? (
-              <Text className="text-sm text-muted" numberOfLines={1}>
+              <Text className="pl-4 text-sm text-muted" numberOfLines={1}>
                 {warehouse.address}
               </Text>
             ) : null}

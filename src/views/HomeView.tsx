@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BannerCarousel } from '@/components/banner-carousel';
 import { CategoriesSection } from '@/components/categories-section';
 import { ChangeWarehouseDialog } from '@/components/change-warehouse-dialog';
+import { ConfirmDialog } from '@/components/confirm-dialog';
 import { HomeTopBar } from '@/components/home-top-bar';
 import { LocationsSection } from '@/components/locations-section';
 import { PaymentMethodsBanner } from '@/components/payment-methods-banner';
@@ -107,6 +108,16 @@ export function HomeView() {
           <LocationsSection warehouses={vm.warehouses} isLoading={vm.isLoadingWarehouses} />
         </View>
       </ScrollView>
+
+      {/* Tienda cerrada: avisa antes de elegirla */}
+      <ConfirmDialog
+        isOpen={vm.closedWarehouse !== null}
+        title={`${vm.closedWarehouse?.name ?? 'Esta tienda'} está cerrada`}
+        description="Puedes ver sus productos, pero no podrás recibir tu pedido hasta que abra."
+        confirmLabel="Elegir igual"
+        onConfirm={vm.confirmClosedWarehouse}
+        onCancel={vm.cancelClosedWarehouse}
+      />
 
       <ChangeWarehouseDialog
         isOpen={vm.pendingWarehouse !== null}

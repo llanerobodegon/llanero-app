@@ -131,7 +131,10 @@ export function OptionsSheet<T>({
                     tintColor={actionForeground}
                   />
                 </View>
-              ) : null}
+              ) : (
+                // Opción sin elegir: círculo vacío del mismo tamaño (como un radio).
+                <View className="size-6 rounded-full border-2 border-default" />
+              )}
             </Pressable>
             {index < visibleOptions.length - 1 ? <Separator className="mx-4" /> : null}
           </Fragment>
