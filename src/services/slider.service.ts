@@ -1,4 +1,8 @@
+import { supabase } from '@/lib/supabase';
 import type { Slider } from '@/models/slider.model';
+import type { Database } from '@/types/database';
+
+type SliderRow = Database['public']['Tables']['sliders']['Row'];
 
 /** Posiciones de slider que define la tabla `sliders`. */
 export const SliderPosition = {
@@ -6,30 +10,38 @@ export const SliderPosition = {
   secondary: 2,
 } as const;
 
-// TODO: reemplazar por la consulta a Supabase (`sliders` con is_active = true y la posición
-// pedida, ordenados por slot) cuando se conecte el cliente. La firma no debe cambiar.
-// `imageUrl` vacío = el componente muestra un placeholder.
-const MOCK_DATE = '2026-11-01T00:00:00.000Z';
-const MOCK_SLIDERS: Slider[] = [SliderPosition.main, SliderPosition.secondary].flatMap((position) =>
-  [1, 2, 3].map((slot) => ({
-    id: `mock-slider-${position}-${slot}`,
-    name: position === SliderPosition.main ? `Banner ${slot}` : `Banner secundario ${slot}`,
-    position,
-    slot,
-    imageUrl: '',
-    linkUrl: null,
-    isActive: true,
-    createdBy: null,
-    createdAt: MOCK_DATE,
-    updatedAt: MOCK_DATE,
-  })),
-);
+function transformSlider(row: SliderRow): Slider {
+  return {
+    id: row.id,
+    name: row.name,
+    position: row.position,
+    slot: row.slot,
+    imageUrl: row.image_url,
+    linkUrl: row.link_url,
+    isActive: row.is_active ?? true,
+    createdBy: row.created_by,
+    createdAt: row.created_at ?? '',
+    updatedAt: row.updated_at ?? '',
+  };
+}
 
 export const sliderService = {
-  /** Slides activos de una posición, ordenados por slot. */
+  /**
+   * Slides activos de una posición, ordenados por slot. Si la posición está apagada en
+   * `slider_settings` (desde la web), no devuelve ninguno.
+   */
   async getActiveByPosition(position: number): Promise<Slider[]> {
-    return MOCK_SLIDERS.filter((s) => s.isActive && s.position === position).sort(
-      (a, b) => a.slot - b.slot,
-    );
+    const [{ data: setting }, { data, error }] = await Promise.all([
+      supabase.from('slider_settings').select('is_enabled').eq('position', position).maybeSingle(),
+      supabase
+        .from('sliders')
+        .select('*')
+        .eq('is_active', true)
+        .eq('position', position)
+        .order('slot'),
+    ]);
+    if (error) throw new Error('No pudimos cargar los banners');
+    if (setting && setting.is_enabled === false) return [];
+    return data.map(transformSlider);
   },
 };

@@ -4,6 +4,8 @@ import 'expo-sqlite/localStorage/install';
 import { createClient } from '@supabase/supabase-js';
 import { AppState, Platform } from 'react-native';
 
+import type { Database } from '@/types/database';
+
 /**
  * Cliente de Supabase de la app (proyecto "Llanero App", compartido con llanero-web).
  * Solo lo importan los `services/` (ver docs/architecture.md).
@@ -21,7 +23,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+// Tipado con el esquema real (src/types/database.ts, generado con
+// `supabase gen types typescript --project-id uejjlbxgtlpqukuhusmt --schema public`).
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     storage: localStorage,
     autoRefreshToken: true,

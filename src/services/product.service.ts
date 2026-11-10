@@ -1,5 +1,4 @@
 import type { Product } from '@/models/warehouse.model';
-import { MOCK_SUBCATEGORIES } from '@/services/category.service';
 
 // TODO: reemplazar los mocks por consultas a Supabase cuando se conecte el cliente. Todas parten
 // de `warehouse_products` filtrado por warehouse_id = tienda elegida e is_available = true, con
@@ -158,30 +157,6 @@ const MOCK_MARKET: MockProduct[] = [
   },
 ];
 
-/** Subcategoría de cada producto de prueba, por nombre. */
-const MOCK_SUBCATEGORY_BY_PRODUCT: Record<string, string> = {
-  'Harina PAN Blanca': 'Harinas y granos',
-  'Café Fama de América': 'Café',
-  'Queso Blanco Llanero': 'Quesos',
-  'Malta Polar': 'Refrescos',
-  'Ron Santa Teresa 1796': 'Rones',
-  'Pepito Original': 'Papitas y galletas',
-  'Cerveza Polar Pilsen': 'Cervezas',
-  'Coca-Cola': 'Refrescos',
-  Hielo: 'Hielo',
-  'Doritos Mega Queso': 'Papitas y galletas',
-  'Whisky Buchanan’s 12': 'Whiskys',
-  'Arroz Mary Tradicional': 'Harinas y granos',
-  'Aceite Diana': 'Aceites y azúcar',
-  'Pasta Capri Larga': 'Harinas y granos',
-  'Azúcar Montalbán': 'Aceites y azúcar',
-  Huevos: 'Leche y huevos',
-  'Leche Completa Campestre': 'Leche y huevos',
-};
-
-const subcategoryIdFor = (name: string) =>
-  MOCK_SUBCATEGORIES.find((s) => s.name === MOCK_SUBCATEGORY_BY_PRODUCT[name])?.id ?? null;
-
 /** Minúsculas y sin acentos, para buscar "cafe" y encontrar "Café". */
 const normalize = (text: string) =>
   text
@@ -195,7 +170,8 @@ function toMockProducts(warehouseId: string, prefix: string, rows: MockProduct[]
     ...row,
     id: `${warehouseId}-${prefix}-${index + 1}`,
     categoryId: 'mock-category-1',
-    subcategoryId: subcategoryIdFor(row.name),
+    // Los productos de prueba no tienen subcategoría; llegan reales en el paso de productos.
+    subcategoryId: null,
     imageUrls: [],
     barcode: null,
     sku: null,

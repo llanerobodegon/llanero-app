@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 
+import { useAuthContext } from '@/contexts/auth-context';
 import type { Warehouse } from '@/models/warehouse.model';
 import { warehouseService } from '@/services/warehouse.service';
 
@@ -14,58 +15,107 @@ interface WarehouseContextType {
 
 const WarehouseContext = createContext<WarehouseContextType | undefined>(undefined);
 
-/** Tienda seleccionada por el cliente. Todo el catálogo se filtra por ella. */
+/**
+ * Elige la tienda inicial: la que el cliente usó la última vez si sigue disponible; si no, la
+ * primera abierta; si no, la primera.
+ */
+function pickWarehouse(
+  data: Warehouse[],
+  currentId: string | null,
+  preferredId: string | null,
+): Warehouse | null {
+  return (
+    data.find((w) => w.id === currentId) ??
+    data.find((w) => w.id === preferredId) ??
+    data.find((w) => w.isOpen) ??
+    data[0] ??
+    null
+  );
+}
+
+/**
+ * Tienda seleccionada por el cliente. Todo el catálogo se filtra por ella.
+ * Las tiendas solo se pueden leer con sesión (RLS), así que se cargan al iniciar sesión y se
+ * vacían al cerrarla. La elección se guarda en `users.preferred_warehouse_id`.
+ */
 export function WarehouseProvider({ children }: { children: ReactNode }) {
-  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
-  const [selectedWarehouse, setSelectedWarehouse] = useState<Warehouse | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { userId } = useAuthContext();
 
-  const applyWarehouses = useCallback((data: Warehouse[]) => {
-    setWarehouses(data);
-    setError(null);
-    // Conserva la selección si sigue existiendo; si no, elige la primera abierta.
-    setSelectedWarehouse(
-      (current) =>
-        data.find((w) => w.id === current?.id) ?? data.find((w) => w.isOpen) ?? data[0] ?? null,
-    );
-  }, []);
+  // Resultado guardado junto al usuario al que pertenece: así, al cambiar de cuenta o cerrar
+  // sesión, lo anterior deja de valer sin limpiar el estado a mano.
+  const [result, setResult] = useState<{
+    userId: string | null;
+    warehouses: Warehouse[];
+    error: string | null;
+  }>({ userId: null, warehouses: [], error: null });
+  const [selection, setSelection] = useState<{
+    userId: string | null;
+    warehouse: Warehouse | null;
+  }>({ userId: null, warehouse: null });
 
-  const handleError = useCallback((err: unknown) => {
-    setError(err instanceof Error ? err.message : 'Error al cargar las tiendas');
-  }, []);
+  const isCurrent = userId !== null && result.userId === userId;
+  const warehouses = isCurrent ? result.warehouses : [];
+  const selectedWarehouse = selection.userId === userId ? selection.warehouse : null;
 
+  /** Pide tiendas y tienda preferida; aplica el resultado solo si sigue siendo el usuario actual. */
+  const fetchFor = useCallback(
+    (forUserId: string, isStillWanted: () => boolean) =>
+      Promise.all([warehouseService.getActive(), warehouseService.getPreferredId()])
+        .then(([data, preferredId]) => {
+          if (!isStillWanted()) return;
+          setResult({ userId: forUserId, warehouses: data, error: null });
+          setSelection((current) => ({
+            userId: forUserId,
+            warehouse: pickWarehouse(
+              data,
+              current.userId === forUserId ? (current.warehouse?.id ?? null) : null,
+              preferredId,
+            ),
+          }));
+        })
+        .catch((err) => {
+          if (!isStillWanted()) return;
+          setResult({
+            userId: forUserId,
+            warehouses: [],
+            error: err instanceof Error ? err.message : 'Error al cargar las tiendas',
+          });
+        }),
+    [],
+  );
+
+  // Carga al iniciar sesión (o cambiar de cuenta).
   useEffect(() => {
+    if (!userId) return;
     let isActive = true;
-    warehouseService
-      .getActive()
-      .then((data) => isActive && applyWarehouses(data))
-      .catch((err) => isActive && handleError(err))
-      .finally(() => isActive && setIsLoading(false));
+    fetchFor(userId, () => isActive);
     return () => {
       isActive = false;
     };
-  }, [applyWarehouses, handleError]);
+  }, [fetchFor, userId]);
 
   const refreshWarehouses = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      applyWarehouses(await warehouseService.getActive());
-    } catch (err) {
-      handleError(err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [applyWarehouses, handleError]);
+    if (userId) await fetchFor(userId, () => true);
+  }, [fetchFor, userId]);
+
+  /** Cambia de tienda y la recuerda para la próxima vez. */
+  const selectWarehouse = useCallback(
+    (warehouse: Warehouse) => {
+      setSelection({ userId, warehouse });
+      warehouseService.setPreferred(warehouse.id).catch(() => {});
+    },
+    [userId],
+  );
 
   return (
     <WarehouseContext.Provider
       value={{
         warehouses,
         selectedWarehouse,
-        selectWarehouse: setSelectedWarehouse,
-        isLoading,
-        error,
+        selectWarehouse,
+        // Sin sesión no hay nada que cargar; con sesión, hasta que llegue el resultado.
+        isLoading: !isCurrent,
+        error: isCurrent ? result.error : null,
         refreshWarehouses,
       }}>
       {children}

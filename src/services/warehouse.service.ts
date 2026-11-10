@@ -1,45 +1,53 @@
+import { supabase } from '@/lib/supabase';
 import type { Warehouse } from '@/models/warehouse.model';
+import type { Database } from '@/types/database';
 
-// TODO: reemplazar por la consulta a Supabase (`warehouses` con is_active = true)
-// cuando se conecte el cliente. La firma de los métodos no debe cambiar.
-const MOCK_WAREHOUSES: Warehouse[] = [
-  {
-    id: 'mock-1',
-    name: 'Bodegón Centro',
-    address: 'Av. Principal, Centro',
-    phone: null,
-    logoUrl: null,
-    deliveryFee: 2,
-    isActive: true,
-    isOpen: true,
-  },
-  {
-    id: 'mock-2',
-    name: 'Bodegón Norte',
-    address: 'C.C. Las Palmas, Local 4',
-    phone: null,
-    logoUrl: null,
-    deliveryFee: 3,
-    isActive: true,
-    isOpen: true,
-  },
-  {
-    id: 'mock-3',
-    name: 'Bodegón Este',
-    address: 'Calle 5 con Av. Bolívar',
-    phone: null,
-    logoUrl: null,
-    deliveryFee: 2.5,
-    isActive: true,
-    isOpen: false,
-  },
-];
+type WarehouseRow = Database['public']['Tables']['warehouses']['Row'];
+
+/** Fila de `warehouses` → modelo. */
+function transformWarehouse(row: WarehouseRow): Warehouse {
+  return {
+    id: row.id,
+    name: row.name,
+    address: row.address,
+    phone: row.phone,
+    logoUrl: row.logo_url,
+    deliveryFee: Number(row.delivery_fee) || 0,
+    isActive: row.is_active ?? true,
+    isOpen: row.is_open ?? true,
+  };
+}
 
 export const warehouseService = {
-  /** Tiendas activas que el cliente puede elegir, ordenadas por nombre. */
+  /** Tiendas activas que el cliente puede elegir, ordenadas por nombre (RLS: requiere sesión). */
   async getActive(): Promise<Warehouse[]> {
-    return MOCK_WAREHOUSES.filter((w) => w.isActive).sort((a, b) =>
-      a.name.localeCompare(b.name),
-    );
+    const { data, error } = await supabase
+      .from('warehouses')
+      .select('*')
+      .eq('is_active', true)
+      .order('name');
+    if (error) throw new Error('No pudimos cargar las tiendas');
+    return data.map(transformWarehouse);
+  },
+
+  /** Tienda que el cliente eligió la última vez (`users.preferred_warehouse_id`), si hay. */
+  async getPreferredId(): Promise<string | null> {
+    const { data: session } = await supabase.auth.getSession();
+    const userId = session.session?.user.id;
+    if (!userId) return null;
+    const { data } = await supabase
+      .from('users')
+      .select('preferred_warehouse_id')
+      .eq('id', userId)
+      .maybeSingle();
+    return data?.preferred_warehouse_id ?? null;
+  },
+
+  /** Guarda la tienda elegida para la próxima vez. Si falla, no interrumpe al cliente. */
+  async setPreferred(warehouseId: string): Promise<void> {
+    const { data: session } = await supabase.auth.getSession();
+    const userId = session.session?.user.id;
+    if (!userId) return;
+    await supabase.from('users').update({ preferred_warehouse_id: warehouseId }).eq('id', userId);
   },
 };
