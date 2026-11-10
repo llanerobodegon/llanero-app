@@ -34,8 +34,8 @@ export interface Subcategory {
 }
 
 /**
- * Producto del catálogo. Precio, descuento y promo dependen de la tienda
- * (`warehouse_products`); el servicio los entrega ya resueltos para la tienda elegida.
+ * Producto del catálogo. Precio, descuento y promo son del producto (iguales en todas las
+ * tiendas); `warehouse_products` solo dice en qué tiendas está disponible.
  */
 export interface Product {
   id: string;

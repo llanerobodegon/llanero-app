@@ -1,6 +1,6 @@
 /**
  * Línea del carrito: una "foto" del producto suficiente para pintar el ticket sin consultar.
- * `unitPrice` es el precio final (con descuento si aplica) en la tienda del carrito.
+ * `unitPrice` es el precio final (con descuento si aplica) al agregarlo.
  */
 export interface CartItem {
   productId: string;

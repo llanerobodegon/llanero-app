@@ -69,7 +69,7 @@ export function WarehouseSelector({
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         title="Elige tu tienda"
-        description="El catálogo y los precios dependen de la tienda."
+        description="Cada tienda tiene su propio catálogo de productos."
         options={warehouses}
         keyExtractor={(warehouse) => warehouse.id}
         // Con muchas tiendas: media pantalla, se puede subir y la lista tiene scroll nativo

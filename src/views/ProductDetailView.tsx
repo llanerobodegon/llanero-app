@@ -67,28 +67,29 @@ export function ProductDetailView({ productId }: { productId: string }) {
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 24 }}>
-            {/* Imagen con el selector de cantidad montado sobre su borde inferior */}
-            <View className="items-center">
-              <View className="h-64 w-full items-center justify-center px-12">
+            {/* Imagen en un marco cuadrado con bordes redondeados (misma proporción en todos los
+                productos), al 75 % del ancho, y el selector de cantidad debajo */}
+            <View className="items-center px-4">
+              <View className="aspect-square w-3/4 items-center justify-center overflow-hidden rounded-3xl bg-surface">
                 {product.imageUrls[0] ? (
                   <Image
                     source={product.imageUrls[0]}
-                    contentFit="contain"
+                    // Llena el marco: todas las fotos se ven con la misma proporción.
+                    contentFit="cover"
                     transition={200}
                     style={{ width: '100%', height: '100%' }}
+                    accessibilityLabel={product.name}
                   />
                 ) : (
-                  // TODO: quitar el placeholder cuando los productos vengan con imagen.
-                  <View className="size-48 items-center justify-center rounded-3xl bg-default">
-                    <SymbolView
-                      name={{ ios: 'photo', android: 'image', web: 'image' }}
-                      size={40}
-                      tintColor={muted}
-                    />
-                  </View>
+                  <SymbolView
+                    name={{ ios: 'photo', android: 'image', web: 'image' }}
+                    size={44}
+                    tintColor={muted}
+                  />
                 )}
               </View>
-              <View className="-mt-2">
+              {/* Selector de cantidad debajo de la imagen, sin montarse sobre ella */}
+              <View className="mt-4">
                 <QuantityStepper
                   quantity={vm.quantity}
                   canDecrement={vm.canDecrement}
