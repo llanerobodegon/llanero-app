@@ -16,8 +16,8 @@ export default function AppTabs() {
       tintColor={activeColor}
       labelStyle={{ selected: { color: activeColor } }}>
       <NativeTabs.Trigger name="index">
-        <NativeTabs.Trigger.Label>Inicio</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf={{ default: 'house', selected: 'house.fill' }} md="home" />
+        <NativeTabs.Trigger.Label>Explorar</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: 'safari', selected: 'safari.fill' }} md="explore" />
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="orders">
