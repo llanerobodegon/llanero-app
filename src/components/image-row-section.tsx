@@ -19,8 +19,10 @@ export type ImageRowItem = {
 type ImageRowSectionProps<T extends ImageRowItem> = {
   title: string;
   items: T[];
-  /** Ancho de cada imagen; el alto sale de la proporción 2:1. */
+  /** Ancho de cada imagen; el alto sale de `aspectRatio`. */
   itemWidth: number;
+  /** Proporción ancho / alto de cada imagen (por defecto 2:1). */
+  aspectRatio?: number;
   /** `cover` para banners, `contain` para logos. */
   contentFit?: ImageContentFit;
   /** Muestra `label` en el placeholder cuando no hay imagen. */
@@ -29,11 +31,12 @@ type ImageRowSectionProps<T extends ImageRowItem> = {
   onPressItem?: (item: T) => void;
 };
 
-/** Sección del Inicio: título y fila horizontal de imágenes 2:1 (banners o logos). */
+/** Sección del Inicio: título y fila horizontal de imágenes (banners, logos, ubicaciones). */
 export function ImageRowSection<T extends ImageRowItem>({
   title,
   items,
   itemWidth,
+  aspectRatio = 2,
   contentFit = 'cover',
   showLabelInPlaceholder = false,
   isLoading = false,
@@ -53,8 +56,8 @@ export function ImageRowSection<T extends ImageRowItem>({
           {Array.from({ length: SKELETON_COUNT }, (_, index) => (
             <Skeleton
               key={index}
-              style={{ width: itemWidth }}
-              className="aspect-[2/1] rounded-2xl"
+              style={{ width: itemWidth, aspectRatio }}
+              className="rounded-2xl"
             />
           ))}
         </View>
@@ -72,8 +75,8 @@ export function ImageRowSection<T extends ImageRowItem>({
               disabled={!onPressItem}
               accessibilityRole={onPressItem ? 'button' : 'image'}
               accessibilityLabel={item.label}
-              style={{ width: itemWidth }}
-              className={`aspect-[2/1] overflow-hidden rounded-2xl bg-surface ${isContain ? 'p-3' : ''}`}>
+              style={{ width: itemWidth, aspectRatio }}
+              className={`overflow-hidden rounded-2xl bg-surface ${isContain ? 'p-3' : ''}`}>
               {item.imageUrl ? (
                 <Image
                   source={item.imageUrl}

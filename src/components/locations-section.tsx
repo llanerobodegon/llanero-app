@@ -1,40 +1,40 @@
-import type { Warehouse } from '@/models/warehouse.model';
+import type { LocationImage } from '@/models/location.model';
 
 import { ImageRowSection } from './image-row-section';
 
-/** Ancho de cada logo; el alto sale de la proporción 2:1 (140 × 70). */
-const LOGO_WIDTH = 140;
+/** Ancho de cada tarjeta; el alto sale de su proporción. */
+const CARD_WIDTH = 260;
 
 type LocationsSectionProps = {
   title?: string;
-  warehouses: Warehouse[];
+  images: LocationImage[];
+  /** Proporción ancho / alto de las tarjetas. */
+  aspectRatio: number;
   isLoading?: boolean;
-  onPressWarehouse?: (warehouse: Warehouse) => void;
 };
 
-/** Fila horizontal de logos 2:1, uno por tienda. */
+/** Fila horizontal con las tarjetas de nuestras ubicaciones (imágenes cargadas desde la web). */
 export function LocationsSection({
   title = 'Nuestras ubicaciones',
-  warehouses,
+  images,
+  aspectRatio,
   isLoading = false,
-  onPressWarehouse,
 }: LocationsSectionProps) {
-  // TODO: confirmar qué imagen usa cada ubicación; por ahora `logoUrl` de la tienda.
-  const items = warehouses.map((warehouse) => ({
-    id: warehouse.id,
-    imageUrl: warehouse.logoUrl,
-    label: warehouse.address ? `${warehouse.name}, ${warehouse.address}` : warehouse.name,
-    warehouse,
+  const items = images.map((image) => ({
+    id: image.id,
+    imageUrl: image.imageUrl,
+    label: `Ubicación: ${image.name.replace(/\.\w+$/, '').replace(/[-_]/g, ' ')}`,
   }));
 
   return (
     <ImageRowSection
       title={title}
       items={items}
-      itemWidth={LOGO_WIDTH}
-      contentFit="contain"
+      itemWidth={CARD_WIDTH}
+      aspectRatio={aspectRatio}
+      // La tarjeta ya trae su diseño: llena el espacio (misma proporción, sin recorte).
+      contentFit="cover"
       isLoading={isLoading}
-      onPressItem={onPressWarehouse ? (item) => onPressWarehouse(item.warehouse) : undefined}
     />
   );
 }

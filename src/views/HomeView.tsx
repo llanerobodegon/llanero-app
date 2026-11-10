@@ -12,6 +12,7 @@ import { LocationsSection } from '@/components/locations-section';
 import { PaymentMethodsBanner } from '@/components/payment-methods-banner';
 import { ProductSection } from '@/components/product/product-section';
 import { WarehouseSelector } from '@/components/warehouse-selector';
+import { PaymentMethodsBannerImage } from '@/constants/links';
 import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useHomeViewModel } from '@/viewmodels/useHomeViewModel';
 
@@ -101,11 +102,19 @@ export function HomeView() {
             onDecrementProduct={vm.decrementProduct}
           />
 
-          <View style={styles.paymentMethods}>
-            <PaymentMethodsBanner />
+          {/* A todo el ancho de la pantalla (la imagen ya trae su propio margen) */}
+          <View>
+            <PaymentMethodsBanner
+              source={{ uri: PaymentMethodsBannerImage.uri }}
+              aspectRatio={PaymentMethodsBannerImage.aspectRatio}
+            />
           </View>
 
-          <LocationsSection warehouses={vm.warehouses} isLoading={vm.isLoadingWarehouses} />
+          <LocationsSection
+            images={vm.locationImages}
+            aspectRatio={vm.locationAspectRatio}
+            isLoading={vm.isLoadingLocations}
+          />
         </View>
       </ScrollView>
 
@@ -136,8 +145,5 @@ const styles = StyleSheet.create({
   sections: {
     gap: Spacing.five,
     paddingTop: Spacing.three,
-  },
-  paymentMethods: {
-    paddingHorizontal: Spacing.three,
   },
 });

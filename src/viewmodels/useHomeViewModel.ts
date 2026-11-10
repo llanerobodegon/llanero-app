@@ -4,9 +4,11 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { useCartContext } from '@/contexts/cart-context';
 import { useWarehouseContext } from '@/contexts/warehouse-context';
+import type { LocationImage } from '@/models/location.model';
 import type { Slider } from '@/models/slider.model';
 import type { Category, Product, Warehouse } from '@/models/warehouse.model';
 import { categoryService } from '@/services/category.service';
+import { LOCATION_IMAGE_ASPECT_RATIO, locationService } from '@/services/location.service';
 import { productService } from '@/services/product.service';
 import { useCartProductActions } from '@/viewmodels/useCartProductActions';
 import { SliderPosition, sliderService } from '@/services/slider.service';
@@ -161,6 +163,21 @@ export function useHomeViewModel() {
     };
   }, []);
 
+  // Imágenes de "Nuestras ubicaciones" (carpeta `locations` del Storage).
+  const [locationImages, setLocationImages] = useState<LocationImage[]>([]);
+  const [isLoadingLocations, setIsLoadingLocations] = useState(true);
+  useEffect(() => {
+    let isActive = true;
+    locationService
+      .getImages()
+      .then((data) => isActive && setLocationImages(data))
+      .catch(() => {})
+      .finally(() => isActive && setIsLoadingLocations(false));
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
   const mainBanners = useSliders(SliderPosition.main);
   const secondaryBanners = useSliders(SliderPosition.secondary);
 
@@ -219,6 +236,10 @@ export function useHomeViewModel() {
     isLoadingCategories,
     categoriesError,
     openCategory,
+
+    locationImages,
+    isLoadingLocations,
+    locationAspectRatio: LOCATION_IMAGE_ASPECT_RATIO,
 
     mainBanners: mainBanners.slides,
     isLoadingMainBanners: mainBanners.isLoading,
