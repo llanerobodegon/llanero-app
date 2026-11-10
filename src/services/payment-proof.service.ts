@@ -1,11 +1,12 @@
 import { supabase } from '@/lib/supabase';
 
 /**
- * Comprobantes de pago: se suben a `admin-app/payment-receipts/<id del usuario>/`, la única
- * carpeta donde las reglas del Storage dejan subir al cliente. La URL pública se guarda en
- * `orders.payment_proof_url`, que es lo que muestra el panel web.
+ * Comprobantes de pago: se suben al bucket privado `payment-receipts`, en la carpeta del
+ * usuario (`<id del usuario>/`), la única donde las reglas del Storage lo dejan subir. Solo el
+ * cliente y admin/gerentes pueden verlos (el panel web abre un enlace firmado temporal).
+ * En `orders.payment_proof_url` se guarda `payment-receipts/<uid>/<archivo>` (bucket + ruta).
  */
-const BUCKET = 'admin-app';
+const BUCKET = 'payment-receipts';
 
 /** Extensión según el tipo de imagen (las fotos del teléfono suelen venir como JPEG o HEIC). */
 function extensionFor(mimeType: string): string {
@@ -16,7 +17,7 @@ function extensionFor(mimeType: string): string {
 }
 
 export const paymentProofService = {
-  /** Sube la imagen local (uri del selector) y devuelve su URL pública. */
+  /** Sube la imagen local (uri del selector) y devuelve su referencia (`bucket/ruta`). */
   async upload(localUri: string, mimeType = 'image/jpeg'): Promise<string> {
     const { data: session } = await supabase.auth.getSession();
     const userId = session.session?.user.id;
@@ -30,12 +31,12 @@ export const paymentProofService = {
     }
 
     const random = Math.random().toString(36).slice(2, 10);
-    const path = `payment-receipts/${userId}/${Date.now()}-${random}.${extensionFor(mimeType)}`;
+    const path = `${userId}/${Date.now()}-${random}.${extensionFor(mimeType)}`;
     const { error } = await supabase.storage
       .from(BUCKET)
       .upload(path, body, { contentType: mimeType, upsert: false });
     if (error) throw new Error('No pudimos subir el comprobante. Inténtalo de nuevo');
 
-    return supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+    return `${BUCKET}/${path}`;
   },
 };
