@@ -8,29 +8,8 @@ import type {
 // reemplazar el mock. `setDefault` debería ser atómico en Supabase (función RPC).
 // Las firmas no deben cambiar.
 
-const MOCK_DATE = '2026-11-01T00:00:00.000Z';
-
-/**
- * Métodos guardados en memoria mientras no hay Supabase (se pierden al cerrar la app).
- * Arranca con uno de ejemplo para ver la lista cargada; deja el arreglo vacío para ver el
- * estado vacío.
- */
-let mockPaymentMethods: SavedPaymentMethod[] = [
-  {
-    id: 'mock-payment-method-1',
-    userId: 'mock-user-1',
-    type: 'pago_movil',
-    alias: 'Mi Pago Móvil',
-    bank: 'Banesco',
-    phoneCode: '0414',
-    phoneNumber: '1234567',
-    documentType: 'V',
-    documentNumber: '12345678',
-    isDefault: true,
-    createdAt: MOCK_DATE,
-    updatedAt: MOCK_DATE,
-  },
-];
+/** Métodos guardados en memoria mientras no hay Supabase (se pierden al cerrar la app). */
+let mockPaymentMethods: SavedPaymentMethod[] = [];
 
 export const paymentMethodService = {
   /** Métodos de pago guardados del usuario; el predeterminado primero. */

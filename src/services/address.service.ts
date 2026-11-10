@@ -11,26 +11,8 @@ import type { Address, CreateAddressData, UpdateAddressData } from '@/models/add
 //     en una función RPC para que sea atómico).
 // Las firmas no deben cambiar.
 
-const MOCK_DATE = '2026-11-01T00:00:00.000Z';
-
-/**
- * Direcciones guardadas en memoria mientras no hay Supabase (se pierden al cerrar la app).
- * Arranca con una de ejemplo para ver la lista cargada; deja el arreglo vacío para ver el
- * estado vacío.
- */
-let mockAddresses: Address[] = [
-  {
-    id: 'mock-address-1',
-    userId: 'mock-user-1',
-    label: 'Casa',
-    addressLine1: 'Av. Lara con calle 5, Urb. del Este',
-    addressLine2: 'Casa 12, frente a la plaza',
-    city: 'Barquisimeto',
-    isDefault: true,
-    createdAt: MOCK_DATE,
-    updatedAt: MOCK_DATE,
-  },
-];
+/** Direcciones guardadas en memoria mientras no hay Supabase (se pierden al cerrar la app). */
+let mockAddresses: Address[] = [];
 
 export const addressService = {
   /** Direcciones del usuario; la predeterminada primero. */
