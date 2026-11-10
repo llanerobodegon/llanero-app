@@ -1,6 +1,7 @@
 import { Image } from 'expo-image';
 import { SymbolView } from 'expo-symbols';
 import { Button } from 'heroui-native';
+import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -22,6 +23,8 @@ export function WelcomeView() {
   const vm = useWelcomeViewModel();
   const insets = useSafeAreaInsets();
   const actionForeground = useActionForeground();
+  // Alto de la tarjeta inferior, para centrar el logo en el espacio que queda arriba.
+  const [cardHeight, setCardHeight] = useState(0);
 
   return (
     <View className="flex-1 bg-accent-secondary">
@@ -34,7 +37,10 @@ export function WelcomeView() {
           accessibilityIgnoresInvertColors
         />
       ) : (
-        <View className="flex-1 items-center justify-center" style={{ paddingTop: insets.top }}>
+        // Centrado en el espacio visible: entre la zona segura de arriba y la tarjeta de abajo.
+        <View
+          className="flex-1 items-center justify-center"
+          style={{ paddingTop: insets.top, paddingBottom: cardHeight }}>
           <Image
             source={require('@/assets/images/llanero-logo.png')}
             contentFit="contain"
@@ -47,6 +53,7 @@ export function WelcomeView() {
 
       {/* Tarjeta inferior */}
       <View
+        onLayout={(event) => setCardHeight(event.nativeEvent.layout.height)}
         style={{ paddingBottom: insets.bottom + 16 }}
         className="absolute bottom-0 left-0 right-0 gap-5 rounded-t-[32px] bg-background px-6 pt-7">
         <View className="gap-1">
