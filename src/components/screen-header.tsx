@@ -1,5 +1,6 @@
 import { SymbolView } from 'expo-symbols';
 import { Button, useThemeColor } from 'heroui-native';
+import type { ReactNode } from 'react';
 import { Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -8,13 +9,15 @@ import { Spacing } from '@/constants/theme';
 type ScreenHeaderProps = {
   title: string;
   onBack: () => void;
+  /** Botón a la derecha (p. ej. el carrito), del mismo tamaño que el de volver (`size-11`). */
+  trailing?: ReactNode;
 };
 
 /**
  * Barra superior de las pantallas internas: botón de volver con el mismo estilo que los
  * botones de la barra del Inicio (círculo `size-11`, `bg-surface` y sombra) y el título centrado.
  */
-export function ScreenHeader({ title, onBack }: ScreenHeaderProps) {
+export function ScreenHeader({ title, onBack, trailing }: ScreenHeaderProps) {
   const insets = useSafeAreaInsets();
   const [foreground] = useThemeColor(['foreground']);
 
@@ -41,8 +44,9 @@ export function ScreenHeader({ title, onBack }: ScreenHeaderProps) {
         accessibilityRole="header">
         {title}
       </Text>
-      {/* Mismo ancho que el botón de volver, para que el título quede centrado en la pantalla */}
-      <View className="size-11" />
+      {/* A la derecha: el botón que se pase o un espacio del mismo ancho que el de volver, para
+          que el título quede centrado en la pantalla */}
+      {trailing ?? <View className="size-11" />}
     </View>
   );
 }

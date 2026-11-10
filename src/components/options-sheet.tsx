@@ -1,10 +1,10 @@
 import { BottomSheet, Column, RNHostView, ScrollView as NativeScrollView } from '@expo/ui';
 import { SymbolView } from 'expo-symbols';
-import { SearchField, Separator, useThemeColor } from 'heroui-native';
+import { Separator, useThemeColor } from 'heroui-native';
 import { Fragment, type ReactNode, useMemo, useState } from 'react';
 import { Pressable, Text, useWindowDimensions, View } from 'react-native';
 
-import { ACTION_FOCUS, NO_SHADOW } from '@/components/form/form-input';
+import { SearchInput } from '@/components/form/search-input';
 import { useActionForeground } from '@/hooks/use-action-foreground';
 
 /** Minúsculas y sin acentos, para buscar "credito" y encontrar "Crédito". */
@@ -97,19 +97,7 @@ export function OptionsSheet<T>({
       </View>
       {/* Buscador a todo el ancho, como la tarjeta de opciones (la forma de píldora viene del tema) */}
       {searchPlaceholder ? (
-        <SearchField value={query} onChange={setQuery} className="w-full">
-          <SearchField.Group>
-            <SearchField.SearchIcon />
-            <SearchField.Input
-              placeholder={searchPlaceholder}
-              className={`${NO_SHADOW} ${ACTION_FOCUS}`}
-              selectionColorClassName="accent-action"
-              autoCorrect={false}
-              returnKeyType="search"
-            />
-            <SearchField.ClearButton />
-          </SearchField.Group>
-        </SearchField>
+        <SearchInput value={query} onChange={setQuery} placeholder={searchPlaceholder} />
       ) : null}
     </View>
   );

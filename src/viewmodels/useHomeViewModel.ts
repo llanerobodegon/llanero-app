@@ -180,8 +180,11 @@ export function useHomeViewModel() {
   const openProduct = useCallback((product: Product) => {
     router.push({ pathname: '/product/[id]', params: { id: product.id } });
   }, []);
-  // TODO: navegar a la pantalla de categoría cuando exista.
-  const openCategory = useCallback((_category: Category) => {}, []);
+  /** Abre la categoría con sus subcategorías. */
+  const openCategory = useCallback((category: Category) => {
+    Haptics.selectionAsync();
+    router.push({ pathname: '/category/[id]', params: { id: category.id } });
+  }, []);
 
   return {
     warehouses,

@@ -56,6 +56,32 @@ export const categoryService = {
   },
 
   /**
+   * Una categoría por id, o `null` si no existe.
+   * TODO: en Supabase, `categories` con `.eq('id', id).maybeSingle()`.
+   */
+  async getById(id: string): Promise<Category | null> {
+    return MOCK_CATEGORIES.find((c) => c.id === id) ?? null;
+  },
+
+  /**
+   * Una subcategoría por id, o `null` si no existe.
+   * TODO: en Supabase, `subcategories` con `.eq('id', id).maybeSingle()`.
+   */
+  async getSubcategoryById(id: string): Promise<Subcategory | null> {
+    return MOCK_SUBCATEGORIES.find((s) => s.id === id) ?? null;
+  },
+
+  /**
+   * Subcategorías activas de una categoría, ordenadas por nombre.
+   * TODO: en Supabase, `subcategories` con category_id = id e is_active = true.
+   */
+  async getSubcategoriesByCategory(categoryId: string): Promise<Subcategory[]> {
+    return MOCK_SUBCATEGORIES.filter((s) => s.isActive && s.categoryId === categoryId).sort(
+      (a, b) => a.name.localeCompare(b.name),
+    );
+  },
+
+  /**
    * Subcategorías activas del catálogo (para los filtros del buscador), ordenadas por nombre.
    * TODO: en Supabase, `subcategories` con is_active = true, ordenadas por name.
    */

@@ -49,6 +49,9 @@ export default function RootLayout() {
                   <Stack.Screen name="product/[id]" options={{ presentation: 'modal' }} />
                   {/* Detalle de pedido: misma hoja modal que el producto */}
                   <Stack.Screen name="order/[id]" options={{ presentation: 'modal' }} />
+                  {/* Categoría: push con su propio encabezado */}
+                  <Stack.Screen name="category/[id]" />
+                  <Stack.Screen name="subcategory/[id]" />
                   {/* Checkout: push a pantalla completa desde el carrito */}
                   <Stack.Screen name="checkout/index" />
                   <Stack.Screen name="checkout/payment" />
