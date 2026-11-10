@@ -180,13 +180,8 @@ export function useHomeViewModel() {
   const openProduct = useCallback((product: Product) => {
     router.push({ pathname: '/product/[id]', params: { id: product.id } });
   }, []);
-  // TODO: navegar a los listados completos ("Ver todo") cuando existan.
-  const seeAllPromotions = useCallback(() => {}, []);
-  const seeAllPopular = useCallback(() => {}, []);
-  const seeAllMarket = useCallback(() => {}, []);
-  // TODO: navegar a la pantalla de categoría / listado de categorías cuando existan.
+  // TODO: navegar a la pantalla de categoría cuando exista.
   const openCategory = useCallback((_category: Category) => {}, []);
-  const seeAllCategories = useCallback(() => {}, []);
 
   return {
     warehouses,
@@ -205,7 +200,6 @@ export function useHomeViewModel() {
     categoriesError,
     openFilters,
     openCategory,
-    seeAllCategories,
 
     mainBanners: mainBanners.slides,
     isLoadingMainBanners: mainBanners.isLoading,
@@ -231,8 +225,5 @@ export function useHomeViewModel() {
     cartCount: cart.itemCount,
     openCart,
     openProduct,
-    seeAllPromotions,
-    seeAllPopular,
-    seeAllMarket,
   };
 }

@@ -52,7 +52,6 @@ export function HomeView() {
           <CategoriesSection
             categories={vm.categories}
             isLoading={vm.isLoadingCategories}
-            onPressSeeAll={vm.seeAllCategories}
             onPressCategory={vm.openCategory}
           />
 
@@ -60,7 +59,6 @@ export function HomeView() {
             title="Promociones"
             products={vm.promotions}
             isLoading={vm.isLoadingPromotions}
-            onPressSeeAll={vm.seeAllPromotions}
             onPressProduct={vm.openProduct}
             onAddProduct={vm.addToCart}
             getCartQuantity={vm.getCartQuantity}
@@ -72,7 +70,6 @@ export function HomeView() {
             title="Populares"
             products={vm.popular}
             isLoading={vm.isLoadingPopular}
-            onPressSeeAll={vm.seeAllPopular}
             onPressProduct={vm.openProduct}
             onAddProduct={vm.addToCart}
             getCartQuantity={vm.getCartQuantity}
@@ -86,7 +83,6 @@ export function HomeView() {
             title="Mercado"
             products={vm.market}
             isLoading={vm.isLoadingMarket}
-            onPressSeeAll={vm.seeAllMarket}
             onPressProduct={vm.openProduct}
             onAddProduct={vm.addToCart}
             getCartQuantity={vm.getCartQuantity}

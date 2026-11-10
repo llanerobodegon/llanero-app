@@ -9,7 +9,6 @@ type CategoriesSectionProps = {
   title?: string;
   categories: Category[];
   isLoading?: boolean;
-  onPressSeeAll?: () => void;
   onPressCategory?: (category: Category) => void;
 };
 
@@ -18,7 +17,6 @@ export function CategoriesSection({
   title = 'Categorías',
   categories,
   isLoading = false,
-  onPressSeeAll,
   onPressCategory,
 }: CategoriesSectionProps) {
   const items = categories.map((category) => ({
@@ -35,7 +33,7 @@ export function CategoriesSection({
       itemWidth={BANNER_WIDTH}
       showLabelInPlaceholder
       isLoading={isLoading}
-      onPressSeeAll={onPressSeeAll}
+
       onPressItem={onPressCategory ? (item) => onPressCategory(item.category) : undefined}
     />
   );

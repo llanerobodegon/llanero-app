@@ -26,7 +26,6 @@ type ImageRowSectionProps<T extends ImageRowItem> = {
   /** Muestra `label` en el placeholder cuando no hay imagen. */
   showLabelInPlaceholder?: boolean;
   isLoading?: boolean;
-  onPressSeeAll?: () => void;
   onPressItem?: (item: T) => void;
 };
 
@@ -38,7 +37,6 @@ export function ImageRowSection<T extends ImageRowItem>({
   contentFit = 'cover',
   showLabelInPlaceholder = false,
   isLoading = false,
-  onPressSeeAll,
   onPressItem,
 }: ImageRowSectionProps<T>) {
   const [muted] = useThemeColor(['muted']);
@@ -48,7 +46,7 @@ export function ImageRowSection<T extends ImageRowItem>({
 
   return (
     <View className="gap-3">
-      <SectionHeader title={title} onPressSeeAll={onPressSeeAll} />
+      <SectionHeader title={title} />
 
       {isLoading ? (
         <View className="flex-row gap-3 px-4">

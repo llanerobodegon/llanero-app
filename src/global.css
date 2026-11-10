@@ -42,7 +42,7 @@
       --focus: var(--brand-orange);
       --link: var(--brand-wine);
 
-      /* Botones de acción (Pagar, Guardar, +…) y enlaces (Ver todo, Leer más): vino en claro */
+      /* Botones de acción (Pagar, Guardar, +…) y enlaces (Leer más, + Nueva): vino en claro */
       --action: var(--brand-wine);
       --action-foreground: var(--white);
 

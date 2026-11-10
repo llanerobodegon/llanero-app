@@ -16,7 +16,6 @@ type ProductSectionProps = {
   title: string;
   products: Product[];
   isLoading?: boolean;
-  onPressSeeAll?: () => void;
   onPressProduct?: (product: Product) => void;
   onAddProduct?: (product: Product) => void;
   /** Unidades de un producto en el carrito (0 si no está). */
@@ -26,14 +25,13 @@ type ProductSectionProps = {
 };
 
 /**
- * Sección reutilizable del Home: título, "Ver todo" y fila horizontal de productos.
+ * Sección reutilizable del Home: título y fila horizontal de productos.
  * Si no hay productos (y no está cargando) no se muestra.
  */
 export function ProductSection({
   title,
   products,
   isLoading = false,
-  onPressSeeAll,
   onPressProduct,
   onAddProduct,
   getCartQuantity,
@@ -47,7 +45,7 @@ export function ProductSection({
 
   return (
     <View className="gap-3">
-      <SectionHeader title={title} onPressSeeAll={onPressSeeAll} />
+      <SectionHeader title={title} />
 
       {isLoading ? (
         <View className="flex-row gap-3 px-4">
