@@ -14,6 +14,7 @@ import { finalPrice } from '@/lib/format';
 import type { Cart, CartItem } from '@/models/cart.model';
 import type { Product } from '@/models/warehouse.model';
 import { cartStorageService } from '@/services/cart-storage.service';
+import { productService } from '@/services/product.service';
 
 interface CartContextType {
   warehouseId: string | null;
@@ -49,7 +50,8 @@ function toCartItem(product: Product, quantity: number): CartItem {
 /**
  * Carrito de la tienda elegida y estado del drawer.
  * Se guarda en el teléfono por usuario y se restaura al abrir la app o iniciar sesión; si la
- * tienda del carrito guardado ya no está disponible, se descarta.
+ * tienda del carrito guardado ya no está disponible, se descarta. Los precios se actualizan al
+ * restaurarlo y al abrir el drawer.
  */
 export function CartProvider({ children }: { children: ReactNode }) {
   const { userId } = useAuthContext();
@@ -163,7 +165,57 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 
   const clear = useCallback(() => setCart(() => EMPTY_CART), [setCart]);
-  const open = useCallback(() => setIsOpen(true), []);
+
+  /**
+   * Trae de la base el precio actual (y nombre, presentación e imagen) de cada producto del
+   * carrito y quita los que la tienda ya no tiene. Así el total que se ve coincide con lo que
+   * cobra `create_order`. Si falla (sin conexión), el carrito queda como estaba.
+   */
+  const refreshPrices = useCallback((forUserId: string, forCart: Cart) => {
+    const warehouseId = forCart.warehouseId;
+    if (!warehouseId || forCart.items.length === 0) return;
+    productService
+      .getByIds(
+        warehouseId,
+        forCart.items.map((item) => item.productId),
+      )
+      .then((products) => {
+        const byId = new Map(products.map((product) => [product.id, product]));
+        setState((current) => {
+          // Si mientras tanto cambió el usuario o la tienda del carrito, no se toca.
+          if (current.userId !== forUserId || current.cart.warehouseId !== warehouseId) {
+            return current;
+          }
+          const items = current.cart.items.flatMap((item) => {
+            const product = byId.get(item.productId);
+            return product ? [{ ...toCartItem(product, item.quantity) }] : [];
+          });
+          return { userId: forUserId, cart: { warehouseId, items } };
+        });
+      })
+      .catch(() => {});
+  }, []);
+
+  // Precios al día al restaurar el carrito guardado (una vez por usuario).
+  const [refreshedFor, setRefreshedFor] = useState<string | null>(null);
+  useEffect(() => {
+    if (!isRestored || !userId || refreshedFor === userId) return;
+    let isActive = true;
+    Promise.resolve().then(() => {
+      if (!isActive) return;
+      setRefreshedFor(userId);
+      refreshPrices(userId, cart);
+    });
+    return () => {
+      isActive = false;
+    };
+  }, [cart, isRestored, refreshPrices, refreshedFor, userId]);
+
+  /** Abre el drawer y actualiza los precios, para que el total antes de pagar esté al día. */
+  const open = useCallback(() => {
+    setIsOpen(true);
+    if (userId) refreshPrices(userId, cart);
+  }, [cart, refreshPrices, userId]);
   const close = useCallback(() => setIsOpen(false), []);
 
   const value = useMemo<CartContextType>(() => {
