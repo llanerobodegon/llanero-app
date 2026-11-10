@@ -126,22 +126,8 @@ export function ProductDetailView({ productId }: { productId: string }) {
                 </Button>
               </View>
 
-              {/* TODO: delivery rápido real (placeholder) */}
-              {vm.isFastDelivery ? (
-                <View className="-mt-2 flex-row items-center gap-1.5">
-                  <View className="size-5 items-center justify-center rounded-full bg-success">
-                    <SymbolView
-                      name={{ ios: 'bolt.fill', android: 'bolt', web: 'bolt' }}
-                      size={11}
-                      tintColor="#ffffff"
-                    />
-                  </View>
-                  <Text className="text-sm text-muted">Disponible en delivery rápido</Text>
-                </View>
-              ) : null}
-
-              {/* Precio, descuento y calificación */}
-              <View className="flex-row items-center justify-between gap-3">
+              {/* Precio y descuento */}
+              <View className="flex-row items-center gap-3">
                 <View className="flex-row items-center gap-2">
                   <Text className="text-2xl font-bold text-foreground">
                     {formatUSD(vm.unitPrice)}
@@ -158,15 +144,6 @@ export function ProductDetailView({ productId }: { productId: string }) {
                       </Text>
                     </View>
                   ) : null}
-                </View>
-                {/* TODO: calificación real (placeholder) */}
-                <View className="flex-row items-center gap-1.5">
-                  <SymbolView
-                    name={{ ios: 'star.fill', android: 'star', web: 'star' }}
-                    size={18}
-                    tintColor="#F5B400"
-                  />
-                  <Text className="text-base text-foreground">{`${vm.rating} Calificación`}</Text>
                 </View>
               </View>
 

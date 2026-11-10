@@ -20,6 +20,11 @@ export default function AppTabs() {
         <NativeTabs.Trigger.Icon sf={{ default: 'safari', selected: 'safari.fill' }} md="explore" />
       </NativeTabs.Trigger>
 
+      <NativeTabs.Trigger name="favorites">
+        <NativeTabs.Trigger.Label>Favoritos</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: 'heart', selected: 'heart.fill' }} md="favorite" />
+      </NativeTabs.Trigger>
+
       <NativeTabs.Trigger name="orders">
         <NativeTabs.Trigger.Label>Pedidos</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf={{ default: 'bag', selected: 'bag.fill' }} md="receipt_long" />
@@ -27,10 +32,7 @@ export default function AppTabs() {
 
       <NativeTabs.Trigger name="account">
         <NativeTabs.Trigger.Label>Cuenta</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon
-          sf={{ default: 'person', selected: 'person.fill' }}
-          md="person"
-        />
+        <NativeTabs.Trigger.Icon sf={{ default: 'person', selected: 'person.fill' }} md="person" />
       </NativeTabs.Trigger>
 
       {/* role="search": en iOS 26+ aparece separado, al final de la barra */}

@@ -131,6 +131,17 @@ export const productService = {
     return data.map(transformProduct);
   },
 
+  /** Productos de la tienda con esos ids (los que la tienda no tiene se omiten), por nombre. */
+  async getByIds(warehouseId: string, productIds: string[]): Promise<Product[]> {
+    if (productIds.length === 0) return [];
+    const { data, error } = await inWarehouse(warehouseId)
+      .in('id', productIds)
+      .order('name')
+      .limit(LIST_LIMIT);
+    if (error) throw new Error('No pudimos cargar tus favoritos');
+    return data.map(transformProduct);
+  },
+
   /** Un producto de la tienda por id, o `null` si no existe o la tienda no lo tiene. */
   async getById(warehouseId: string, productId: string): Promise<Product | null> {
     const { data, error } = await inWarehouse(warehouseId).eq('id', productId).maybeSingle();

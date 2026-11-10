@@ -13,6 +13,7 @@ import { AuthProvider, useAuthContext } from '@/contexts/auth-context';
 import { usePushNotifications } from '@/hooks/use-push-notifications';
 import { notificationSettingsService } from '@/services/notification-settings.service';
 import { CartProvider } from '@/contexts/cart-context';
+import { FavoritesProvider } from '@/contexts/favorites-context';
 import { WarehouseProvider } from '@/contexts/warehouse-context';
 import { CartDrawerView } from '@/views/CartDrawerView';
 
@@ -28,12 +29,14 @@ export default function RootLayout() {
       <HeroUINativeProvider>
         <AuthProvider>
           <WarehouseProvider>
-            <CartProvider>
-              <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-                <AnimatedSplashOverlay />
-                <RootNavigator />
-              </ThemeProvider>
-            </CartProvider>
+            <FavoritesProvider>
+              <CartProvider>
+                <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                  <AnimatedSplashOverlay />
+                  <RootNavigator />
+                </ThemeProvider>
+              </CartProvider>
+            </FavoritesProvider>
           </WarehouseProvider>
         </AuthProvider>
       </HeroUINativeProvider>

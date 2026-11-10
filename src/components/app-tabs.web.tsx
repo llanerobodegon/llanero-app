@@ -22,6 +22,9 @@ export default function AppTabs() {
           <TabTrigger name="home" href="/" asChild>
             <TabButton>Explorar</TabButton>
           </TabTrigger>
+          <TabTrigger name="favorites" href="/favorites" asChild>
+            <TabButton>Favoritos</TabButton>
+          </TabTrigger>
           <TabTrigger name="orders" href="/orders" asChild>
             <TabButton>Pedidos</TabButton>
           </TabTrigger>
@@ -61,7 +64,6 @@ export function CustomTabList(props: TabListProps) {
         </ThemedText>
 
         {props.children}
-
       </ThemedView>
     </View>
   );

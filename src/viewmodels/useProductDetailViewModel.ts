@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 
 import { useCartContext } from '@/contexts/cart-context';
+import { useFavoritesContext } from '@/contexts/favorites-context';
 import { useWarehouseContext } from '@/contexts/warehouse-context';
 import { discountPercent, finalPrice } from '@/lib/format';
 import type { Product } from '@/models/warehouse.model';
@@ -65,12 +66,13 @@ export function useProductDetailViewModel(productId: string) {
     setQuantity((q) => Math.max(q - 1, MIN_QUANTITY));
   }, []);
 
-  // TODO: favoritos reales cuando existan (placeholder en memoria).
-  const [isFavorite, setIsFavorite] = useState(false);
+  // Favoritos (se guardan en el teléfono, por usuario; ver FavoritesProvider).
+  const favorites = useFavoritesContext();
+  const isFavorite = favorites.isFavorite(productId);
   const toggleFavorite = useCallback(() => {
     Haptics.selectionAsync();
-    setIsFavorite((value) => !value);
-  }, []);
+    favorites.toggleFavorite(productId);
+  }, [favorites, productId]);
 
   const close = useCallback(() => router.back(), []);
 
@@ -104,9 +106,6 @@ export function useProductDetailViewModel(productId: string) {
     increment,
     decrement,
 
-    // TODO: placeholders hasta que existan en la base (rating y delivery rápido).
-    rating: 4.5,
-    isFastDelivery: true,
     isFavorite,
     toggleFavorite,
 
