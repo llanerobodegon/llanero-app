@@ -12,7 +12,7 @@ import {
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { CheckoutSteps } from '@/components/checkout/checkout-steps';
+import { StepsIndicator } from '@/components/steps-indicator';
 import { PaymentDetailsCard } from '@/components/checkout/payment-details-card';
 import { EmptyState } from '@/components/empty-state';
 import { FormInput } from '@/components/form/form-input';
@@ -58,7 +58,7 @@ export function CheckoutPaymentView({
     <>
       <ScreenHeader title="Finalizar pedido" onBack={vm.goBack} />
       <View className="pb-3 pt-1">
-        <CheckoutSteps steps={CHECKOUT_STEPS} current={vm.currentStep} />
+        <StepsIndicator steps={CHECKOUT_STEPS} current={vm.currentStep} />
       </View>
     </>
   );

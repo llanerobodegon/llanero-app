@@ -37,6 +37,13 @@ export default function RootLayout() {
                   />
                   {/* Formulario de email: push normal desde la bienvenida */}
                   <Stack.Screen name="auth/login" />
+                  {/* Registro: el gesto de volver sale del registro; "atrás" del encabezado va al paso anterior */}
+                  <Stack.Screen name="auth/register" />
+                  {/* Bienvenida tras registrarse: sin volver (la cuenta ya se creó) */}
+                  <Stack.Screen
+                    name="auth/registered"
+                    options={{ gestureEnabled: false, animation: 'fade' }}
+                  />
                   {/* Detalle de producto: hoja modal por encima de las pestañas */}
                   <Stack.Screen name="product/[id]" options={{ presentation: 'modal' }} />
                   {/* Detalle de pedido: misma hoja modal que el producto */}

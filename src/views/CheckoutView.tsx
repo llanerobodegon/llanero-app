@@ -4,7 +4,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ChoiceCard } from '@/components/checkout/choice-card';
-import { CheckoutSteps } from '@/components/checkout/checkout-steps';
+import { StepsIndicator } from '@/components/steps-indicator';
 import { EmptyState } from '@/components/empty-state';
 import { OptionsSheet } from '@/components/options-sheet';
 import { ScreenHeader } from '@/components/screen-header';
@@ -57,7 +57,7 @@ export function CheckoutView() {
       <ScreenHeader title="Finalizar pedido" onBack={vm.goBack} />
 
       <View className="pb-3 pt-1">
-        <CheckoutSteps steps={CHECKOUT_STEPS} current={vm.currentStep} />
+        <StepsIndicator steps={CHECKOUT_STEPS} current={vm.currentStep} />
       </View>
 
       {/* Resumen del pedido, como ticket (igual que el carrito). Ocupa el espacio que deja el pie. */}

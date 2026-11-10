@@ -4,7 +4,7 @@ import { Button, Skeleton, useThemeColor } from 'heroui-native';
 import { ScrollView, Text, useColorScheme, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { CheckoutSteps } from '@/components/checkout/checkout-steps';
+import { StepsIndicator } from '@/components/steps-indicator';
 import { OrderLines } from '@/components/order/order-lines';
 import { ScreenHeader } from '@/components/screen-header';
 import { TicketPerforation } from '@/components/ticket-perforation';
@@ -45,7 +45,7 @@ export function CheckoutSuccessView({ orderId }: { orderId: string }) {
       {/* "Atrás" aquí cierra el checkout: el pago ya está hecho. */}
       <ScreenHeader title="Finalizar pedido" onBack={vm.keepShopping} />
       <View className="pb-3 pt-1">
-        <CheckoutSteps steps={CHECKOUT_STEPS} current={2} />
+        <StepsIndicator steps={CHECKOUT_STEPS} current={2} />
       </View>
 
       <ScrollView

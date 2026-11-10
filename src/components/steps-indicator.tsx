@@ -4,18 +4,18 @@ import { Text, View } from 'react-native';
 
 import { useActionForeground } from '@/hooks/use-action-foreground';
 
-type CheckoutStepsProps = {
+type StepsIndicatorProps = {
   steps: readonly string[];
   /** Índice del paso actual (0 = primero). */
   current: number;
 };
 
 /**
- * Indicador de pasos del checkout: solo los números (unidos por una línea) y, debajo, el
+ * Indicador de pasos (checkout, registro): solo los números (unidos por una línea) y, debajo, el
  * nombre del paso actual en grande. El actual y los completados van en el color de acción; los
  * completados muestran un check.
  */
-export function CheckoutSteps({ steps, current }: CheckoutStepsProps) {
+export function StepsIndicator({ steps, current }: StepsIndicatorProps) {
   const actionForeground = useActionForeground();
 
   return (
