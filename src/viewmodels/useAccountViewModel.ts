@@ -1,14 +1,13 @@
 import Constants from 'expo-constants';
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
-import * as WebBrowser from 'expo-web-browser';
 import { useCallback, useEffect, useState } from 'react';
-import { Platform } from 'react-native';
 
 import { LegalLinks } from '@/constants/links';
-import { useActionColor } from '@/hooks/use-action-foreground';
+import { useInAppBrowser } from '@/hooks/use-in-app-browser';
 import { initials, maskEmail } from '@/lib/format';
 import type { User } from '@/models/user.model';
+import { authService } from '@/services/auth.service';
 import { userService } from '@/services/user.service';
 
 type PendingAction = 'logout' | 'delete' | null;
@@ -60,38 +59,46 @@ export function useAccountViewModel() {
     () => tap(() => router.push('/account/notifications')),
     [tap],
   );
-  // Páginas legales en el navegador dentro de la app (Safari en iOS, Custom Tabs en Android).
-  const actionColor = useActionColor();
-  const openInAppBrowser = useCallback(
-    (url: string) =>
-      tap(() => {
-        WebBrowser.openBrowserAsync(url, {
-          // iOS: botones del color de acción sobre la barra del sistema.
-          controlsColor: actionColor,
-          // Android: barra del color de acción (Custom Tabs pone los íconos en blanco).
-          toolbarColor: Platform.OS === 'android' ? actionColor : undefined,
-          dismissButtonStyle: 'close',
-          presentationStyle: WebBrowser.WebBrowserPresentationStyle.PAGE_SHEET,
-        }).catch(() => {});
-      }),
-    [actionColor, tap],
+  // Páginas legales en el navegador dentro de la app.
+  const openInAppBrowser = useInAppBrowser();
+  const openTerms = useCallback(
+    () => tap(() => openInAppBrowser(LegalLinks.terms)),
+    [openInAppBrowser, tap],
   );
-  const openTerms = useCallback(() => openInAppBrowser(LegalLinks.terms), [openInAppBrowser]);
-  const openPrivacy = useCallback(() => openInAppBrowser(LegalLinks.privacy), [openInAppBrowser]);
+  const openPrivacy = useCallback(
+    () => tap(() => openInAppBrowser(LegalLinks.privacy)),
+    [openInAppBrowser, tap],
+  );
 
   // Cerrar sesión y eliminar cuenta piden confirmación.
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
   const requestLogout = useCallback(() => tap(() => setPendingAction('logout')), [tap]);
   const requestDeleteAccount = useCallback(() => tap(() => setPendingAction('delete')), [tap]);
   const cancelPendingAction = useCallback(() => setPendingAction(null), []);
-  const confirmPendingAction = useCallback(() => {
-    Haptics.notificationAsync(
-      pendingAction === 'delete'
-        ? Haptics.NotificationFeedbackType.Warning
-        : Haptics.NotificationFeedbackType.Success,
-    );
-    // TODO: cerrar sesión (supabase.auth.signOut) / eliminar la cuenta cuando exista la sesión.
+  /** Cierra sesión (o elimina la cuenta) y deja solo el inicio de sesión en la navegación. */
+  const confirmPendingAction = useCallback(async () => {
+    const action = pendingAction;
     setPendingAction(null);
+    try {
+      if (action === 'delete') {
+        await authService.deleteAccount();
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      } else {
+        await authService.signOut();
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+      // `dismissAll` + `replace`: sin pantallas debajo, "atrás" no vuelve a la cuenta.
+      if (router.canDismiss()) router.dismissAll();
+      router.replace('/auth');
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : action === 'delete'
+            ? 'No pudimos eliminar tu cuenta'
+            : 'No pudimos cerrar tu sesión',
+      );
+    }
   }, [pendingAction]);
 
   const appVersion = Constants.expoConfig?.version ?? '';
