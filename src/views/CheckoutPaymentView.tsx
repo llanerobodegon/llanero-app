@@ -16,6 +16,7 @@ import { CheckoutSteps } from '@/components/checkout/checkout-steps';
 import { PaymentDetailsCard } from '@/components/checkout/payment-details-card';
 import { EmptyState } from '@/components/empty-state';
 import { FormInput } from '@/components/form/form-input';
+import { KeypadField } from '@/components/form/keypad-field';
 import { SelectField } from '@/components/form/select-field';
 import { OptionsSheet } from '@/components/options-sheet';
 import { ScreenHeader } from '@/components/screen-header';
@@ -204,16 +205,29 @@ export function CheckoutPaymentView({
         {/* Referencia del pago */}
         <TextField isRequired>
           <Label>Referencia del pago</Label>
-          <FormInput
-            value={vm.reference}
-            onChangeText={vm.changeReference}
-            placeholder={vm.isBolivares ? 'Ej. 123456' : 'Ej. código de confirmación'}
-            keyboardType={vm.isBolivares ? 'number-pad' : 'default'}
-            autoCapitalize="characters"
-            autoCorrect={false}
-            maxLength={vm.referenceMaxLength}
-            returnKeyType="done"
-          />
+          {vm.isBolivares ? (
+            // Referencias en bolívares: solo números, con teclado propio en una hoja.
+            <KeypadField
+              value={vm.reference}
+              onChange={vm.changeReference}
+              maxLength={vm.referenceMaxLength}
+              placeholder="Ej. 123456"
+              title="Referencia del pago"
+              description="Escribe los últimos dígitos del número de referencia."
+              accessibilityLabel="Referencia del pago"
+            />
+          ) : (
+            // En dólares (Zelle, Banesco Panamá) el código puede tener letras: teclado normal.
+            <FormInput
+              value={vm.reference}
+              onChangeText={vm.changeReference}
+              placeholder="Ej. código de confirmación"
+              autoCapitalize="characters"
+              autoCorrect={false}
+              maxLength={vm.referenceMaxLength}
+              returnKeyType="done"
+            />
+          )}
           <Description>
             {vm.isBolivares
               ? 'Los últimos dígitos del número de referencia de tu pago.'
