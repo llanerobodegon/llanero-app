@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { Address } from '@/models/address.model';
-import { addressService } from '@/services/address.service';
+import { ADDRESS_LABEL_MAX_LENGTH, addressService } from '@/services/address.service';
 
 /** Ciudades donde hay delivery. */
 export const CITIES = ['Barquisimeto', 'Cabudare', 'Acarigua'] as const;
@@ -167,6 +167,7 @@ export function useAddressFormViewModel(addressId?: string) {
     isNotFound: isEditing && !isLoading && !address,
 
     form,
+    labelMaxLength: ADDRESS_LABEL_MAX_LENGTH,
     errors: hasSubmitted ? errors : {},
     isLoading,
     isSaving,

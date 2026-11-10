@@ -77,6 +77,7 @@ export function AddressFormView({ addressId }: { addressId?: string }) {
           <FormInput
             value={vm.form.label}
             onChangeText={vm.setLabel}
+            maxLength={vm.labelMaxLength}
             placeholder="Ej. Casa, Oficina, Casa de mamá"
             autoCapitalize="sentences"
             returnKeyType="next"
