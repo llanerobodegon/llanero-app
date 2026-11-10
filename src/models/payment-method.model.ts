@@ -2,9 +2,8 @@ import type { PaymentMethodType } from '@/models/order.model';
 import type { IdType, PhoneCode } from '@/models/user.model';
 
 /**
- * Método de pago guardado por el cliente para no reescribir sus datos al pagar.
- * OJO: aún no existe en Supabase. `payment_methods` de llanero-web son las cuentas de la
- * tienda (a dónde paga el cliente), no las del cliente. Los campos siguen esa tabla.
+ * Método de pago guardado por el cliente para no reescribir sus datos al pagar (tabla
+ * `customer_payment_methods`). No confundir con `bank_accounts`: las cuentas de las tiendas.
  */
 export interface SavedPaymentMethod {
   id: string;

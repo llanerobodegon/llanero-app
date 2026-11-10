@@ -101,6 +101,8 @@ export function PaymentMethodFormView({ methodId }: { methodId?: string }) {
           <FormInput
             value={vm.form.alias}
             onChangeText={vm.setAlias}
+            // `customer_payment_methods.alias` es VARCHAR(50).
+            maxLength={50}
             placeholder="Ej. Mi Pago Móvil, Banesco personal"
             autoCapitalize="sentences"
             returnKeyType="next"

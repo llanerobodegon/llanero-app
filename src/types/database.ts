@@ -162,6 +162,59 @@ export type Database = {
           },
         ]
       }
+      customer_payment_methods: {
+        Row: {
+          alias: string
+          bank: string | null
+          created_at: string
+          document_number: string | null
+          document_type: string | null
+          id: string
+          is_default: boolean
+          phone_code: string | null
+          phone_number: string | null
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alias: string
+          bank?: string | null
+          created_at?: string
+          document_number?: string | null
+          document_type?: string | null
+          id?: string
+          is_default?: boolean
+          phone_code?: string | null
+          phone_number?: string | null
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          alias?: string
+          bank?: string | null
+          created_at?: string
+          document_number?: string | null
+          document_type?: string | null
+          id?: string
+          is_default?: boolean
+          phone_code?: string | null
+          phone_number?: string | null
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_payment_methods_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           created_at: string
