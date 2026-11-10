@@ -1007,6 +1007,13 @@ export type Database = {
           phone_code: string
         }[]
       }
+      get_popular_product_ids: {
+        Args: { p_limit?: number; p_warehouse_id: string }
+        Returns: {
+          product_id: string
+          units_sold: number
+        }[]
+      }
       is_address_of_manager_warehouse: {
         Args: { addr_id: string }
         Returns: boolean
@@ -1026,6 +1033,38 @@ export type Database = {
       is_warehouse_manager: {
         Args: { warehouse_uuid: string }
         Returns: boolean
+      }
+      search_products: {
+        Args: {
+          p_limit?: number
+          p_query?: string
+          p_subcategory_id?: string
+          p_warehouse_id: string
+        }
+        Returns: {
+          barcode: string | null
+          category_id: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          discount_price: number | null
+          id: string
+          image_urls: string[] | null
+          is_active: boolean | null
+          is_on_discount: boolean | null
+          is_promo: boolean | null
+          name: string
+          price: number
+          sku: string | null
+          subcategory_id: string | null
+          updated_at: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "products"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
     }
     Enums: {

@@ -26,6 +26,9 @@ interface CartContextType {
   increment: (productId: string) => void;
   decrement: (productId: string) => void;
   clear: () => void;
+  /** Productos quitados en la última actualización porque la tienda ya no los tiene. */
+  removedUnavailableCount: number;
+  dismissRemovedNotice: () => void;
   /** Drawer del carrito. */
   isOpen: boolean;
   open: () => void;
@@ -166,6 +169,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clear = useCallback(() => setCart(() => EMPTY_CART), [setCart]);
 
+  // Aviso de productos quitados por no estar disponibles (se muestra en el carrito).
+  const [removedUnavailableCount, setRemovedUnavailableCount] = useState(0);
+  const dismissRemovedNotice = useCallback(() => setRemovedUnavailableCount(0), []);
+
   /**
    * Trae de la base el precio actual (y nombre, presentación e imagen) de cada producto del
    * carrito y quita los que la tienda ya no tiene. Así el total que se ve coincide con lo que
@@ -181,6 +188,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       )
       .then((products) => {
         const byId = new Map(products.map((product) => [product.id, product]));
+        // Se cuenta fuera de setState (React puede ejecutar el actualizador dos veces).
+        const removed = forCart.items.filter((item) => !byId.has(item.productId)).length;
+        if (removed > 0) setRemovedUnavailableCount(removed);
         setState((current) => {
           // Si mientras tanto cambió el usuario o la tienda del carrito, no se toca.
           if (current.userId !== forUserId || current.cart.warehouseId !== warehouseId) {
@@ -230,11 +240,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
       increment,
       decrement,
       clear,
+      removedUnavailableCount,
+      dismissRemovedNotice,
       isOpen,
       open,
       close,
     };
-  }, [cart, isOpen, addProduct, increment, decrement, clear, open, close]);
+  }, [
+    cart,
+    isOpen,
+    addProduct,
+    increment,
+    decrement,
+    clear,
+    open,
+    close,
+    removedUnavailableCount,
+    dismissRemovedNotice,
+  ]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

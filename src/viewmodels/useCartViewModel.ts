@@ -78,6 +78,8 @@ export function useCartViewModel() {
     increment,
     decrement,
     checkout,
+    removedUnavailableCount: cart.removedUnavailableCount,
+    dismissRemovedNotice: cart.dismissRemovedNotice,
     isClosedNoticeOpen,
     closeClosedNotice,
     closedWarehouseName: cartWarehouse?.name ?? 'La tienda',

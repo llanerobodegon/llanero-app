@@ -71,6 +71,22 @@ function CartContent({ background }: { background: string }) {
         />
       </View>
 
+      {/* Productos quitados al actualizar precios porque la tienda ya no los tiene */}
+      {vm.removedUnavailableCount > 0 ? (
+        <View className="flex-row items-center gap-3 rounded-2xl bg-warning/15 px-3 py-2.5">
+          <Text className="flex-1 text-sm text-foreground" accessibilityLiveRegion="polite">
+            {vm.removedUnavailableCount === 1
+              ? 'Quitamos 1 producto que ya no está disponible en esta tienda.'
+              : `Quitamos ${vm.removedUnavailableCount} productos que ya no están disponibles en esta tienda.`}
+          </Text>
+          <CloseButton
+            onPress={vm.dismissRemovedNotice}
+            accessibilityLabel="Cerrar aviso"
+            className="size-7"
+          />
+        </View>
+      ) : null}
+
       <CartTicket
         items={vm.items}
         itemCount={vm.itemCount}

@@ -85,11 +85,27 @@ export const productService = {
   },
 
   /**
-   * "Populares": por ahora, los Licores agregados más recientemente en la tienda.
-   * TODO: los más vendidos necesitan una vista o función en la base (las reglas de acceso no
-   * dejan al cliente leer los pedidos de otros); crearla en las migraciones de llanero-web.
+   * "Populares": los más vendidos (función `get_popular_product_ids`, que cuenta las ventas de
+   * todas las tiendas y devuelve solo lo que tiene esta), en orden de ventas. Si todavía no hay
+   * ventas, los Licores agregados más recientemente.
    */
   async getPopular(warehouseId: string): Promise<Product[]> {
+    const { data: ranking, error: rankingError } = await supabase.rpc('get_popular_product_ids', {
+      p_warehouse_id: warehouseId,
+      p_limit: SECTION_LIMIT,
+    });
+    if (rankingError) throw new Error('No pudimos cargar los productos populares');
+    if (ranking.length > 0) {
+      const { data, error } = await inWarehouse(warehouseId).in(
+        'id',
+        ranking.map((row) => row.product_id),
+      );
+      if (error) throw new Error('No pudimos cargar los productos populares');
+      const rank = new Map(ranking.map((row, index) => [row.product_id, index]));
+      return data
+        .sort((a, b) => (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0))
+        .map(transformProduct);
+    }
     const categoryId = await categoryIdByName(POPULAR_CATEGORY_NAME);
     if (!categoryId) return [];
     const { data, error } = await inWarehouse(warehouseId)
@@ -115,18 +131,20 @@ export const productService = {
   /**
    * Productos de la tienda que coinciden con el texto (en el nombre) y la subcategoría.
    * Sin texto ni subcategoría devuelve el catálogo de la tienda (hasta `LIST_LIMIT`).
-   * Nota: la búsqueda distingue acentos ("cafe" no encuentra "Café") hasta tener una función
-   * con `unaccent` en la base.
+   * Usa la función `search_products`, que no distingue mayúsculas ni acentos ("cafe" encuentra
+   * "Café").
    */
   async search(
     warehouseId: string,
     { query, subcategoryId }: { query: string; subcategoryId: string | null },
   ): Promise<Product[]> {
-    let request = inWarehouse(warehouseId);
     const text = query.trim();
-    if (text) request = request.ilike('name', `%${escapeLike(text)}%`);
-    if (subcategoryId) request = request.eq('subcategory_id', subcategoryId);
-    const { data, error } = await request.order('name').limit(LIST_LIMIT);
+    const { data, error } = await supabase.rpc('search_products', {
+      p_warehouse_id: warehouseId,
+      p_limit: LIST_LIMIT,
+      ...(text ? { p_query: escapeLike(text) } : {}),
+      ...(subcategoryId ? { p_subcategory_id: subcategoryId } : {}),
+    });
     if (error) throw new Error('No pudimos buscar productos');
     return data.map(transformProduct);
   },
