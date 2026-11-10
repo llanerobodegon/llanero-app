@@ -1,9 +1,10 @@
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Image } from 'expo-image';
+import { useThemeColor } from 'heroui-native';
+import { ScrollView, StyleSheet, useColorScheme, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BannerCarousel } from '@/components/banner-carousel';
 import { CategoriesSection } from '@/components/categories-section';
-import { CategoryFilterBar } from '@/components/category-filter-bar';
 import { ChangeWarehouseDialog } from '@/components/change-warehouse-dialog';
 import { HomeTopBar } from '@/components/home-top-bar';
 import { LocationsSection } from '@/components/locations-section';
@@ -13,19 +14,28 @@ import { WarehouseSelector } from '@/components/warehouse-selector';
 import { BottomTabInset, Spacing } from '@/constants/theme';
 import { useHomeViewModel } from '@/viewmodels/useHomeViewModel';
 
+/** Proporción de `assets/images/llanero-logo.png` (3245 × 1046). */
+const LOGO_ASPECT_RATIO = 3245 / 1046;
+const LOGO_HEIGHT = 30;
+
 export function HomeView() {
   const vm = useHomeViewModel();
   const insets = useSafeAreaInsets();
+  const scheme = useColorScheme();
+  const [foreground] = useThemeColor(['foreground']);
 
   return (
     <View className="bg-background" style={styles.container}>
+      {/* Logo a la izquierda y carrito a la derecha */}
       <HomeTopBar
         leading={
-          <WarehouseSelector
-            warehouses={vm.warehouses}
-            selectedWarehouse={vm.selectedWarehouse}
-            onSelect={vm.selectWarehouse}
-            isLoading={vm.isLoadingWarehouses}
+          <Image
+            source={require('@/assets/images/llanero-logo.png')}
+            contentFit="contain"
+            // El vino del logo no contrasta con el fondo oscuro: ahí va en monocromo.
+            tintColor={scheme === 'dark' ? foreground : undefined}
+            style={{ width: LOGO_HEIGHT * LOGO_ASPECT_RATIO, height: LOGO_HEIGHT }}
+            accessibilityLabel="Llanero"
           />
         }
         cartCount={vm.cartCount}
@@ -36,13 +46,13 @@ export function HomeView() {
         showsVerticalScrollIndicator={false}
         // Zona segura inferior + alto de la tabbar + aire, para que el contenido no quede bajo la barra.
         contentContainerStyle={{ paddingBottom: insets.bottom + BottomTabInset + Spacing.five }}>
-        <View style={styles.filters}>
-          <CategoryFilterBar
-            categories={vm.categories}
-            selectedCategoryId={vm.selectedCategoryId}
-            onSelectCategory={vm.selectCategory}
-            onPressFilters={vm.openFilters}
-            isLoading={vm.isLoadingCategories}
+        {/* Tienda elegida: centrada, al inicio del contenido (se desplaza con él) */}
+        <View className="items-center px-4 pt-3">
+          <WarehouseSelector
+            warehouses={vm.warehouses}
+            selectedWarehouse={vm.selectedWarehouse}
+            onSelect={vm.selectWarehouse}
+            isLoading={vm.isLoadingWarehouses}
           />
         </View>
 
@@ -100,7 +110,6 @@ export function HomeView() {
 
       <ChangeWarehouseDialog
         isOpen={vm.pendingWarehouse !== null}
-        currentName={vm.selectedWarehouse?.name ?? ''}
         nextName={vm.pendingWarehouse?.name ?? ''}
         onConfirm={vm.confirmWarehouseChange}
         onCancel={vm.cancelWarehouseChange}
@@ -115,12 +124,9 @@ const styles = StyleSheet.create({
   },
   sections: {
     gap: Spacing.five,
+    paddingTop: Spacing.three,
   },
   paymentMethods: {
     paddingHorizontal: Spacing.three,
-  },
-  filters: {
-    paddingTop: Spacing.three,
-    paddingBottom: Spacing.three,
   },
 });

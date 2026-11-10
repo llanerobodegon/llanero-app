@@ -48,7 +48,8 @@ export function WarehouseSelector({
         onPress={handleOpen}
         accessibilityRole="button"
         accessibilityLabel={`Tienda: ${label}. Toca para cambiarla`}
-        className="h-11 gap-1.5 bg-surface px-4 shadow-surface">
+        // self-center: el Chip de HeroUI trae `align-self: flex-start`, que anula el centrado del padre.
+        className="h-11 gap-1.5 self-center bg-surface px-4 shadow-surface">
         <SymbolView
           name={{ ios: 'storefront', android: 'storefront', web: 'storefront' }}
           size={16}

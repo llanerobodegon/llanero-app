@@ -6,7 +6,7 @@ import { CartButton } from '@/components/cart/cart-button';
 import { Spacing } from '@/constants/theme';
 
 type HomeTopBarProps = {
-  /** Contenido alineado a la izquierda (p. ej. el selector de tienda). */
+  /** Contenido alineado a la izquierda (el logo). */
   leading?: ReactNode;
   /** Unidades en el carrito; se muestra como badge sobre el ícono. */
   cartCount?: number;
@@ -23,7 +23,6 @@ export function HomeTopBar({ leading, cartCount = 0, onPressCart }: HomeTopBarPr
       style={[styles.container, { paddingTop: insets.top + Spacing.two }]}>
       <View style={styles.leading}>{leading}</View>
 
-      {/* Mismo alto (h-11), fondo y sombra que el pill de la tienda */}
       <CartButton count={cartCount} onPress={() => onPressCart?.()} />
     </View>
   );

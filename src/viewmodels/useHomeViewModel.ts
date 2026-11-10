@@ -115,7 +115,6 @@ export function useHomeViewModel() {
   const cancelWarehouseChange = useCallback(() => setPendingWarehouse(null), []);
 
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   const [categoriesError, setCategoriesError] = useState<string | null>(null);
 
@@ -160,13 +159,6 @@ export function useHomeViewModel() {
     'Error al cargar los productos de mercado',
   );
 
-  /** Elige una categoría; tocar la que ya está elegida la quita. */
-  const selectCategory = useCallback((categoryId: string) => {
-    setSelectedCategoryId((current) => (current === categoryId ? null : categoryId));
-  }, []);
-
-  // TODO: abrir la hoja de filtros cuando exista.
-  const openFilters = useCallback(() => {}, []);
   /** Botón del carrito en la barra superior. */
   const openCart = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -197,11 +189,8 @@ export function useHomeViewModel() {
     warehousesError: error,
 
     categories,
-    selectedCategoryId,
-    selectCategory,
     isLoadingCategories,
     categoriesError,
-    openFilters,
     openCategory,
 
     mainBanners: mainBanners.slides,

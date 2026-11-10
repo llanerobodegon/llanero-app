@@ -2,7 +2,6 @@ import { ConfirmDialog } from './confirm-dialog';
 
 type ChangeWarehouseDialogProps = {
   isOpen: boolean;
-  currentName: string;
   nextName: string;
   onConfirm: () => void;
   onCancel: () => void;
@@ -11,7 +10,6 @@ type ChangeWarehouseDialogProps = {
 /** Confirma cambiar de tienda cuando el carrito tiene productos (se vaciará). */
 export function ChangeWarehouseDialog({
   isOpen,
-  currentName,
   nextName,
   onConfirm,
   onCancel,
@@ -20,8 +18,8 @@ export function ChangeWarehouseDialog({
     <ConfirmDialog
       isOpen={isOpen}
       title={`¿Cambiar a ${nextName}?`}
-      description={`Tu carrito tiene productos de ${currentName} y se vaciará, porque los precios y la disponibilidad cambian según la tienda.`}
-      confirmLabel="Cambiar y vaciar"
+      description="Se vaciará tu carrito."
+      confirmLabel="Cambiar"
       tone="danger"
       onConfirm={onConfirm}
       onCancel={onCancel}
