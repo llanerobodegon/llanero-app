@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useCartContext } from '@/contexts/cart-context';
 import { useWarehouseContext } from '@/contexts/warehouse-context';
@@ -8,6 +8,7 @@ import type { Slider } from '@/models/slider.model';
 import type { Category, Product, Warehouse } from '@/models/warehouse.model';
 import { categoryService } from '@/services/category.service';
 import { productService } from '@/services/product.service';
+import { useCartProductActions } from '@/viewmodels/useCartProductActions';
 import { SliderPosition, sliderService } from '@/services/slider.service';
 
 const errorMessage = (err: unknown, fallback: string) =>
@@ -172,42 +173,8 @@ export function useHomeViewModel() {
     cart.open();
   }, [cart]);
 
-  /** "+" de una tarjeta: agrega sin abrir el carrito. */
-  const addToCart = useCallback(
-    (product: Product) => {
-      if (!selectedWarehouseId) return;
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      cart.addProduct(product, selectedWarehouseId);
-    },
-    [cart, selectedWarehouseId],
-  );
-  // Cantidades del carrito por producto, para que las tarjetas muestren el selector.
-  // Solo cuentan si el carrito es de la tienda elegida.
-  const cartQuantities = useMemo(() => {
-    const map = new Map<string, number>();
-    if (cart.warehouseId === selectedWarehouseId) {
-      for (const item of cart.items) map.set(item.productId, item.quantity);
-    }
-    return map;
-  }, [cart.items, cart.warehouseId, selectedWarehouseId]);
-  const getCartQuantity = useCallback(
-    (productId: string) => cartQuantities.get(productId) ?? 0,
-    [cartQuantities],
-  );
-  const incrementProduct = useCallback(
-    (product: Product) => {
-      Haptics.selectionAsync();
-      cart.increment(product.id);
-    },
-    [cart],
-  );
-  const decrementProduct = useCallback(
-    (product: Product) => {
-      Haptics.selectionAsync();
-      cart.decrement(product.id);
-    },
-    [cart],
-  );
+  const { getCartQuantity, addToCart, incrementProduct, decrementProduct } =
+    useCartProductActions(selectedWarehouseId);
 
   /** Abre el detalle del producto (modal). */
   const openProduct = useCallback((product: Product) => {

@@ -1,10 +1,8 @@
-import { SymbolView } from 'expo-symbols';
-import { Button, useThemeColor } from 'heroui-native';
 import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { CartBadge } from '@/components/cart/cart-badge';
+import { CartButton } from '@/components/cart/cart-button';
 import { Spacing } from '@/constants/theme';
 
 type HomeTopBarProps = {
@@ -18,7 +16,6 @@ type HomeTopBarProps = {
 /** Barra superior del Inicio: contenido a la izquierda y acceso al carrito a la derecha. */
 export function HomeTopBar({ leading, cartCount = 0, onPressCart }: HomeTopBarProps) {
   const insets = useSafeAreaInsets();
-  const [foreground] = useThemeColor(['foreground']);
 
   return (
     <View
@@ -27,21 +24,7 @@ export function HomeTopBar({ leading, cartCount = 0, onPressCart }: HomeTopBarPr
       <View style={styles.leading}>{leading}</View>
 
       {/* Mismo alto (h-11), fondo y sombra que el pill de la tienda */}
-      <View>
-        <Button
-          isIconOnly
-          variant="tertiary"
-          onPress={onPressCart}
-          accessibilityLabel={cartCount > 0 ? `Carrito, ${cartCount} productos` : 'Carrito'}
-          className="size-11 rounded-full bg-surface shadow-surface">
-          <SymbolView
-            name={{ ios: 'cart', android: 'shopping_cart', web: 'shopping_cart' }}
-            size={22}
-            tintColor={foreground}
-          />
-        </Button>
-        <CartBadge count={cartCount} />
-      </View>
+      <CartButton count={cartCount} onPress={() => onPressCart?.()} />
     </View>
   );
 }

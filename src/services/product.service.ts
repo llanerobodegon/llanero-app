@@ -1,4 +1,5 @@
 import type { Product } from '@/models/warehouse.model';
+import { MOCK_SUBCATEGORIES } from '@/services/category.service';
 
 // TODO: reemplazar los mocks por consultas a Supabase cuando se conecte el cliente. Todas parten
 // de `warehouse_products` filtrado por warehouse_id = tienda elegida e is_available = true, con
@@ -157,12 +158,44 @@ const MOCK_MARKET: MockProduct[] = [
   },
 ];
 
+/** Subcategoría de cada producto de prueba, por nombre. */
+const MOCK_SUBCATEGORY_BY_PRODUCT: Record<string, string> = {
+  'Harina PAN Blanca': 'Harinas y granos',
+  'Café Fama de América': 'Café',
+  'Queso Blanco Llanero': 'Quesos',
+  'Malta Polar': 'Refrescos',
+  'Ron Santa Teresa 1796': 'Rones',
+  'Pepito Original': 'Papitas y galletas',
+  'Cerveza Polar Pilsen': 'Cervezas',
+  'Coca-Cola': 'Refrescos',
+  Hielo: 'Hielo',
+  'Doritos Mega Queso': 'Papitas y galletas',
+  'Whisky Buchanan’s 12': 'Whiskys',
+  'Arroz Mary Tradicional': 'Harinas y granos',
+  'Aceite Diana': 'Aceites y azúcar',
+  'Pasta Capri Larga': 'Harinas y granos',
+  'Azúcar Montalbán': 'Aceites y azúcar',
+  Huevos: 'Leche y huevos',
+  'Leche Completa Campestre': 'Leche y huevos',
+};
+
+const subcategoryIdFor = (name: string) =>
+  MOCK_SUBCATEGORIES.find((s) => s.name === MOCK_SUBCATEGORY_BY_PRODUCT[name])?.id ?? null;
+
+/** Minúsculas y sin acentos, para buscar "cafe" y encontrar "Café". */
+const normalize = (text: string) =>
+  text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+
 function toMockProducts(warehouseId: string, prefix: string, rows: MockProduct[]): Product[] {
   return rows.map((row, index) => ({
     ...row,
     id: `${warehouseId}-${prefix}-${index + 1}`,
     categoryId: 'mock-category-1',
-    subcategoryId: null,
+    subcategoryId: subcategoryIdFor(row.name),
     imageUrls: [],
     barcode: null,
     sku: null,
@@ -199,6 +232,25 @@ export const productService = {
    * Un producto de la tienda por id, o `null` si no existe ahí.
    * TODO: en Supabase, `warehouse_products` (warehouse_id, product_id) con join a `products`.
    */
+  /** Productos de la tienda que coinciden con el texto y la subcategoría (vacíos = todos). */
+  async search(
+    warehouseId: string,
+    { query, subcategoryId }: { query: string; subcategoryId: string | null },
+  ): Promise<Product[]> {
+    // TODO: en Supabase, `warehouse_products` de la tienda con join a `products`, filtrando
+    // por `products.name ilike %query%` y `products.subcategory_id`.
+    const q = normalize(query);
+    return [
+      ...toMockProducts(warehouseId, 'promo', MOCK_PROMOS),
+      ...toMockProducts(warehouseId, 'popular', MOCK_POPULAR),
+      ...toMockProducts(warehouseId, 'market', MOCK_MARKET),
+    ].filter(
+      (product) =>
+        (!subcategoryId || product.subcategoryId === subcategoryId) &&
+        (!q || normalize(`${product.name} ${product.description ?? ''}`).includes(q)),
+    );
+  },
+
   async getById(warehouseId: string, productId: string): Promise<Product | null> {
     const all = [
       ...toMockProducts(warehouseId, 'promo', MOCK_PROMOS),
