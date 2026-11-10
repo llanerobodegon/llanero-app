@@ -106,7 +106,7 @@ export function ProductDetailView({ productId }: { productId: string }) {
                 <Text className="flex-1 text-2xl font-semibold text-foreground">
                   {product.name}
                 </Text>
-                {/* TODO: favoritos reales (placeholder) */}
+                {/* Favorito: se guarda en Supabase (tabla `favorites`) */}
                 <Button
                   isIconOnly
                   variant="tertiary"
