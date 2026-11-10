@@ -18,6 +18,8 @@ export function useOrderDetailViewModel(orderId: string) {
   // Resultado guardado junto a su id (y al intento) para saber si está al día sin `setState` síncrono.
   const [attempt, setAttempt] = useState(0);
   const requestKey = `${orderId}:${attempt}`;
+  // Recargas en silencio por cambios en tiempo real: no cambian la clave, así no hay esqueletos.
+  const [liveVersion, setLiveVersion] = useState(0);
   const [state, setState] = useState<{
     key: string | null;
     order: Order | null;
@@ -49,7 +51,17 @@ export function useOrderDetailViewModel(orderId: string) {
     return () => {
       isActive = false;
     };
-  }, [orderId, requestKey]);
+  }, [liveVersion, orderId, requestKey]);
+
+  // Tiempo real: el detalle se actualiza solo cuando la tienda cambia el pedido.
+  useEffect(
+    () =>
+      orderService.subscribeToOrder(orderId, () => {
+        Haptics.selectionAsync();
+        setLiveVersion((value) => value + 1);
+      }),
+    [orderId],
+  );
 
   const isCurrent = state.key === requestKey;
   const order = isCurrent ? state.order : null;

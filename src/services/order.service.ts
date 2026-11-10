@@ -107,6 +107,38 @@ async function currentUserId(): Promise<string> {
   return id;
 }
 
+/**
+ * Escucha en tiempo real los cambios de una tabla y avisa con `onChange`. Usa la sesión actual
+ * (Realtime respeta las reglas de acceso: el cliente solo recibe sus filas). Devuelve cómo dejar
+ * de escuchar.
+ */
+function subscribe(
+  table: 'orders',
+  buildFilter: (userId: string) => string,
+  onChange: () => void,
+): () => void {
+  let isCancelled = false;
+  let channel: ReturnType<typeof supabase.channel> | null = null;
+
+  supabase.auth.getSession().then(({ data }) => {
+    const userId = data.session?.user.id;
+    if (isCancelled || !userId) return;
+    channel = supabase
+      .channel(`${table}-${userId}-${Date.now()}-${Math.random().toString(36).slice(2)}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table, filter: buildFilter(userId) },
+        () => onChange(),
+      )
+      .subscribe();
+  });
+
+  return () => {
+    isCancelled = true;
+    if (channel) supabase.removeChannel(channel);
+  };
+}
+
 export const orderService = {
   /** Pedidos del usuario con sus líneas, del más reciente al más antiguo. */
   async getMine(): Promise<Order[]> {
@@ -134,6 +166,16 @@ export const orderService = {
       .maybeSingle();
     if (error) throw new Error('No pudimos cargar el pedido');
     return data ? transformOrder(data) : null;
+  },
+
+  /** Avisa cuando se crea o cambia cualquier pedido del usuario (estado, pago, repartidor…). */
+  subscribeToMine(onChange: () => void): () => void {
+    return subscribe('orders', (userId) => `user_id=eq.${userId}`, onChange);
+  },
+
+  /** Avisa cuando cambia un pedido concreto del usuario. */
+  subscribeToOrder(orderId: string, onChange: () => void): () => void {
+    return subscribe('orders', () => `id=eq.${orderId}`, onChange);
   },
 
   /**

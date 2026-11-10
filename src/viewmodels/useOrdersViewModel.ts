@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { isActiveOrder } from '@/lib/order-status';
 import type { Order } from '@/models/order.model';
@@ -35,12 +35,22 @@ export function useOrdersViewModel() {
     }
   }, []);
 
-  // Recarga cada vez que se entra a la pestaña: los estados cambian desde el panel.
-  // TODO: suscribirse a Realtime de `orders` cuando se conecte Supabase.
+  // Recarga al entrar a la pestaña (por si algo cambió mientras la app estaba cerrada).
   useFocusEffect(
     useCallback(() => {
       fetchOrders();
     }, [fetchOrders]),
+  );
+
+  // Tiempo real: cuando la tienda cambia el estado o el pago de un pedido, la lista se
+  // actualiza sola (sin esqueletos) y el teléfono vibra suave.
+  useEffect(
+    () =>
+      orderService.subscribeToMine(() => {
+        Haptics.selectionAsync();
+        fetchOrders();
+      }),
+    [fetchOrders],
   );
 
   const refresh = useCallback(() => {

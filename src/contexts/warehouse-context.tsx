@@ -94,6 +94,20 @@ export function WarehouseProvider({ children }: { children: ReactNode }) {
     };
   }, [fetchFor, userId]);
 
+  // Tiempo real: si una tienda abre, cierra o cambia desde la web, se recarga la lista (la
+  // tienda elegida se conserva). Así el aviso de "tienda cerrada" usa el estado al día.
+  useEffect(() => {
+    if (!userId) return;
+    let isActive = true;
+    const unsubscribe = warehouseService.subscribeToChanges(() => {
+      fetchFor(userId, () => isActive);
+    });
+    return () => {
+      isActive = false;
+      unsubscribe();
+    };
+  }, [fetchFor, userId]);
+
   const refreshWarehouses = useCallback(async () => {
     if (userId) await fetchFor(userId, () => true);
   }, [fetchFor, userId]);

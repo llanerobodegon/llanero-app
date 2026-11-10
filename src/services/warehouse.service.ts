@@ -31,6 +31,22 @@ export const warehouseService = {
       .sort((a, b) => Number(b.isOpen) - Number(a.isOpen) || a.name.localeCompare(b.name, 'es'));
   },
 
+  /**
+   * Avisa cuando una tienda cambia (p. ej. abre o cierra desde la web), en tiempo real.
+   * Devuelve cómo dejar de escuchar.
+   */
+  subscribeToChanges(onChange: () => void): () => void {
+    const channel = supabase
+      .channel(`warehouses-${Date.now()}-${Math.random().toString(36).slice(2)}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'warehouses' }, () =>
+        onChange(),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  },
+
   /** Tienda que el cliente eligió la última vez (`users.preferred_warehouse_id`), si hay. */
   async getPreferredId(): Promise<string | null> {
     const { data: session } = await supabase.auth.getSession();
