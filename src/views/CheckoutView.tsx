@@ -3,7 +3,7 @@ import { Button, PressableFeedback, Skeleton, useThemeColor } from 'heroui-nativ
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { DeliveryTypeOption } from '@/components/checkout/delivery-type-option';
+import { ChoiceCard } from '@/components/checkout/choice-card';
 import { CheckoutSteps } from '@/components/checkout/checkout-steps';
 import { EmptyState } from '@/components/empty-state';
 import { OptionsSheet } from '@/components/options-sheet';
@@ -119,7 +119,7 @@ export function CheckoutView() {
         <View className="gap-2">
           <SectionTitle>Entrega</SectionTitle>
           <View className="flex-row gap-3" accessibilityRole="radiogroup">
-            <DeliveryTypeOption
+            <ChoiceCard
               title="Delivery"
               detail={
                 vm.warehouseDeliveryFee > 0 ? `+${formatUSD(vm.warehouseDeliveryFee)}` : 'Gratis'
@@ -128,7 +128,7 @@ export function CheckoutView() {
               isSelected={vm.isDelivery}
               onPress={() => vm.selectDeliveryType('delivery')}
             />
-            <DeliveryTypeOption
+            <ChoiceCard
               title="Retiro en tienda"
               detail="Gratis"
               icon={{ ios: 'storefront', android: 'storefront' }}

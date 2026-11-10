@@ -5,23 +5,20 @@ import { Text, View } from 'react-native';
 
 import { useActionForeground } from '@/hooks/use-action-foreground';
 
-type DeliveryTypeOptionProps = {
+type ChoiceCardProps = {
   title: string;
-  /** Costo o detalle: "+$2.00", "Gratis". */
+  /** Costo o detalle: "+$2.00", "Gratis", "En bolívares". */
   detail: string;
   icon: { ios: SFSymbol; android: AndroidSymbol };
   isSelected: boolean;
   onPress: () => void;
 };
 
-/** Opción de tipo de entrega: tarjeta con ícono, título y costo; la elegida lleva borde y check. */
-export function DeliveryTypeOption({
-  title,
-  detail,
-  icon,
-  isSelected,
-  onPress,
-}: DeliveryTypeOptionProps) {
+/**
+ * Opción elegible del checkout (tipo de entrega, método de pago): tarjeta con ícono, título y
+ * detalle; la elegida lleva borde y check del color de acción.
+ */
+export function ChoiceCard({ title, detail, icon, isSelected, onPress }: ChoiceCardProps) {
   const [foreground] = useThemeColor(['foreground']);
   const actionForeground = useActionForeground();
 

@@ -79,3 +79,28 @@ export interface Order {
   updatedAt: string;
   items: OrderItem[];
 }
+
+/** Línea del pedido al crearlo: lo que había en el carrito. */
+export interface CreateOrderItemData {
+  productId: string;
+  productName: string;
+  productImageUrl: string | null;
+  quantity: number;
+  unitPriceUsd: number;
+}
+
+/** Datos para crear un pedido desde el checkout. */
+export interface CreateOrderData {
+  warehouse: OrderWarehouse;
+  address: OrderAddress | null;
+  deliveryType: DeliveryType;
+  paymentMethodType: PaymentMethodType;
+  /** Cuenta de la tienda a la que se pagó (`orders.bank_account_id`). */
+  bankAccountId: string;
+  /** Banco desde donde pagó el cliente. */
+  paymentBank: string | null;
+  paymentReference: string;
+  deliveryFeeUsd: number;
+  exchangeRate: number;
+  items: CreateOrderItemData[];
+}

@@ -1,4 +1,5 @@
 import type {
+  CreateOrderData,
   DeliveryType,
   Order,
   OrderDeliveryPerson,
@@ -203,13 +204,75 @@ function toMockOrder(mock: MockOrder, now: number): Order {
   };
 }
 
+/** Pedidos creados desde el checkout mientras no hay Supabase (se pierden al cerrar la app). */
+let createdOrders: Order[] = [];
+let nextOrderNumber = 129;
+
 export const orderService = {
   /** Pedidos del usuario con sus líneas, del más reciente al más antiguo. */
   async getMine(): Promise<Order[]> {
     const now = Date.now();
-    return MOCK_ORDERS.map((mock) => toMockOrder(mock, now)).sort((a, b) =>
+    return [...createdOrders, ...MOCK_ORDERS.map((mock) => toMockOrder(mock, now))].sort((a, b) =>
       b.createdAt.localeCompare(a.createdAt),
     );
+  },
+
+  /**
+   * Crea el pedido: queda pendiente hasta que la tienda verifique el pago.
+   * TODO: en Supabase, insertar en `orders` (el número y el código de entrega los generan los
+   * triggers) y luego sus `order_items`, idealmente en una función RPC para que sea atómico.
+   */
+  async create(data: CreateOrderData): Promise<Order> {
+    const now = new Date().toISOString();
+    const number = nextOrderNumber++;
+    const id = `mock-order-${number}`;
+    const items = data.items.map((item, index) => {
+      const totalUsd = round2(item.unitPriceUsd * item.quantity);
+      return {
+        id: `${id}-item-${index + 1}`,
+        productId: item.productId,
+        productName: item.productName,
+        productImageUrl: item.productImageUrl,
+        quantity: item.quantity,
+        unitPriceUsd: item.unitPriceUsd,
+        unitPriceBs: round2(item.unitPriceUsd * data.exchangeRate),
+        totalUsd,
+        totalBs: round2(totalUsd * data.exchangeRate),
+      };
+    });
+    const subtotalUsd = round2(items.reduce((sum, item) => sum + item.totalUsd, 0));
+    const totalUsd = round2(subtotalUsd + data.deliveryFeeUsd);
+    const order: Order = {
+      id,
+      orderNumber: `ORD-${String(number).padStart(5, '0')}`,
+      warehouse: data.warehouse,
+      address: data.address,
+      deliveryPerson: null,
+      deliveryType: data.deliveryType,
+      deliveryCode: String(1000 + ((number * 37) % 9000)),
+      status: 'pending',
+      paymentStatus: 'pending',
+      paymentMethodType: data.paymentMethodType,
+      paymentBank: data.paymentBank,
+      paymentReference: data.paymentReference,
+      subtotalUsd,
+      subtotalBs: round2(subtotalUsd * data.exchangeRate),
+      deliveryFeeUsd: data.deliveryFeeUsd,
+      deliveryFeeBs: round2(data.deliveryFeeUsd * data.exchangeRate),
+      totalUsd,
+      totalBs: round2(totalUsd * data.exchangeRate),
+      exchangeRate: data.exchangeRate,
+      customerNotes: null,
+      confirmedAt: null,
+      deliveredAt: null,
+      cancelledAt: null,
+      cancellationReason: null,
+      createdAt: now,
+      updatedAt: now,
+      items,
+    };
+    createdOrders = [order, ...createdOrders];
+    return order;
   },
 
   /**

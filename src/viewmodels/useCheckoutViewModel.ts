@@ -9,7 +9,11 @@ import type { DeliveryType } from '@/models/order.model';
 import { addressService } from '@/services/address.service';
 
 /** Pasos del checkout, en orden. */
-export const CHECKOUT_STEPS = ['Detalles del pedido', 'Detalles de pago'] as const;
+export const CHECKOUT_STEPS = [
+  'Detalles del pedido',
+  'Detalles de pago',
+  'Pedido realizado',
+] as const;
 
 /**
  * Paso 1 del checkout: resumen del carrito, tipo de entrega (delivery o retiro) y, según el
@@ -90,14 +94,21 @@ export function useCheckoutViewModel() {
   /** Delivery necesita una dirección; el retiro solo la tienda del carrito. */
   const canContinue = cart.items.length > 0 && !!warehouse && (!isDelivery || !!selectedAddress);
 
-  // TODO: ir al paso 2 (detalles de pago) cuando exista.
+  /** Paso 2 (detalles de pago), con el tipo de entrega y la dirección elegidos. */
   const continueToPayment = useCallback(() => {
     if (!canContinue) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       return;
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  }, [canContinue]);
+    router.push({
+      pathname: '/checkout/payment',
+      params: {
+        deliveryType,
+        addressId: deliveryType === 'delivery' ? (selectedAddressId ?? '') : '',
+      },
+    });
+  }, [canContinue, deliveryType, selectedAddressId]);
 
   const goBack = useCallback(() => router.back(), []);
 
