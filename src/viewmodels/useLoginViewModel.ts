@@ -59,8 +59,14 @@ export function useLoginViewModel() {
     }
   }, [errors, form]);
 
-  // TODO: recuperar contraseña (supabase.auth.resetPasswordForEmail).
-  const forgotPassword = useCallback(() => Haptics.selectionAsync(), []);
+  /** Recuperar contraseña, con el correo ya escrito (si hay). */
+  const forgotPassword = useCallback(() => {
+    Haptics.selectionAsync();
+    router.push({
+      pathname: '/auth/forgot-password',
+      params: { email: form.email.trim().toLowerCase() },
+    });
+  }, [form.email]);
   const goToRegister = useCallback(() => {
     Haptics.selectionAsync();
     router.push('/auth/register');

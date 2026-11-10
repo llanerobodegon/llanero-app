@@ -39,6 +39,7 @@ export default function RootLayout() {
                   <Stack.Screen name="auth/login" />
                   {/* Registro: el gesto de volver sale del registro; "atrás" del encabezado va al paso anterior */}
                   <Stack.Screen name="auth/register" />
+                  <Stack.Screen name="auth/forgot-password" />
                   {/* Bienvenida tras registrarse: sin volver (la cuenta ya se creó) */}
                   <Stack.Screen
                     name="auth/registered"

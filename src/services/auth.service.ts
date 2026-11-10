@@ -4,6 +4,10 @@
 //            (con "Confirm email" activo y la plantilla con {{ .Token }}, envía el código de 6
 //            dígitos por correo); verifySignUpCode: supabase.auth.verifyOtp({ email, token,
 //            type: 'signup' }); resendSignUpCode: supabase.auth.resend({ type: 'signup', email })
+//   requestPasswordReset: supabase.auth.resetPasswordForEmail(email) (con la plantilla
+//            "Reset password" usando {{ .Token }} para enviar el código de 6 dígitos);
+//   verifyPasswordResetCode: supabase.auth.verifyOtp({ email, token, type: 'recovery' })
+//            (deja una sesión temporal); resetPassword: supabase.auth.updateUser({ password })
 //   signOut: supabase.auth.signOut()
 //   deleteAccount: una Edge Function (borrar usuarios requiere la service role key).
 //   changePassword: Supabase no pide la contraseña actual, así que primero se comprueba con
@@ -12,7 +16,7 @@
 
 /** Contraseña del usuario de prueba (para probar los errores de contraseña). */
 const MOCK_PASSWORD = 'Llanero123';
-/** Código de verificación de prueba que "llega" por correo. */
+/** Código de prueba que "llega" por correo (registro y recuperar contraseña). */
 const MOCK_SIGN_UP_CODE = '123456';
 /** Correo de prueba que ya tiene cuenta, para probar ese error. */
 const MOCK_TAKEN_EMAIL = 'existe@llanero.com';
@@ -52,6 +56,27 @@ export const authService = {
   /** Vuelve a enviar el código de verificación. */
   async resendSignUpCode(email: string): Promise<void> {
     void email;
+  },
+
+  /**
+   * Envía un código para restablecer la contraseña. Por seguridad no dice si el correo tiene
+   * cuenta: la app siempre muestra "si existe, te enviamos un código".
+   */
+  async requestPasswordReset(email: string): Promise<void> {
+    void email;
+  },
+
+  /** Verifica el código de recuperación que llegó al correo. */
+  async verifyPasswordResetCode(email: string, code: string): Promise<void> {
+    void email;
+    if (code !== MOCK_SIGN_UP_CODE) {
+      throw new Error('El código no es correcto');
+    }
+  },
+
+  /** Guarda la contraseña nueva (después de verificar el código). */
+  async resetPassword(newPassword: string): Promise<void> {
+    void newPassword;
   },
 
   /** Cierra la sesión en este dispositivo. */

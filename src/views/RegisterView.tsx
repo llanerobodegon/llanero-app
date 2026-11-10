@@ -1,10 +1,11 @@
-import { Button, FieldError, InputOTP, Label, Spinner, TextField } from 'heroui-native';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { Button, FieldError, Label, Spinner, TextField } from 'heroui-native';
+import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FormInput } from '@/components/form/form-input';
 import { PasswordInput } from '@/components/form/password-input';
 import { PasswordStrength } from '@/components/form/password-strength';
+import { VerificationCode } from '@/components/form/verification-code';
 import { ScreenHeader } from '@/components/screen-header';
 import { StepsIndicator } from '@/components/steps-indicator';
 import { useActionForeground } from '@/hooks/use-action-foreground';
@@ -111,54 +112,17 @@ export function RegisterView() {
             </TextField>
           </>
         ) : (
-          <View className="items-center gap-6 pt-2">
-            <View className="items-center gap-1">
-              <Text className="text-center text-sm text-muted">
-                Enviamos un código de 6 dígitos a
-              </Text>
-              <Text className="text-center text-base font-semibold text-foreground">
-                {vm.email}
-              </Text>
-            </View>
-
-            <InputOTP
-              value={vm.form.code}
-              onChange={vm.setCode}
-              onComplete={vm.verifyCode}
-              maxLength={CODE_LENGTH}
-              isInvalid={!!vm.error}
-              isDisabled={vm.isSubmitting}
-              // Teclado numérico y autocompletar el código que llega por correo/SMS.
-              textInputProps={{
-                autoFocus: true,
-                keyboardType: 'number-pad',
-                textContentType: 'oneTimeCode',
-                autoComplete: 'one-time-code',
-              }}>
-              <InputOTP.Group>
-                {Array.from({ length: CODE_LENGTH }, (_, index) => (
-                  <InputOTP.Slot
-                    key={index}
-                    index={index}
-                    // Cuadros redondeados (no píldora) y foco del color de acción; rojo si hay error.
-                    className={`rounded-2xl ${vm.error ? '' : 'outline-action'}`}
-                  />
-                ))}
-              </InputOTP.Group>
-            </InputOTP>
-
-            {vm.resendIn > 0 ? (
-              <Text className="text-sm text-muted">{`Reenviar código en ${vm.resendIn} s`}</Text>
-            ) : (
-              <Pressable
-                onPress={vm.resendCode}
-                hitSlop={8}
-                accessibilityRole="button"
-                className="active:opacity-60">
-                <Text className="text-sm font-semibold text-action">Reenviar código</Text>
-              </Pressable>
-            )}
-          </View>
+          <VerificationCode
+            email={vm.email}
+            value={vm.form.code}
+            onChange={vm.setCode}
+            onComplete={vm.verifyCode}
+            length={CODE_LENGTH}
+            isInvalid={!!vm.error}
+            isDisabled={vm.isSubmitting}
+            resendIn={vm.resendIn}
+            onResend={vm.resendCode}
+          />
         )}
 
         {vm.error ? (
