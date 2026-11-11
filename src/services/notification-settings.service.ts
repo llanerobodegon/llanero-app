@@ -47,7 +47,42 @@ async function isPermissionGranted(): Promise<boolean> {
   return granted;
 }
 
+/** "No volver a mostrar" del aviso para activar notificaciones, por usuario y en este teléfono. */
+const promptDismissedKey = (userId: string) => `llanero.notifications-prompt.dismissed.${userId}`;
+
+/**
+ * Qué hacer con el aviso "Activa las notificaciones" al entrar a la app:
+ * - `hidden`: no mostrarlo (ya hay permiso, el usuario pidió no verlo más, o no es un teléfono).
+ * - `ask`: el sistema todavía puede preguntar; "Activar" abre su diálogo de permiso.
+ * - `settings`: el permiso ya se negó; solo se puede activar desde los Ajustes del teléfono.
+ */
+export type NotificationsPromptState = 'hidden' | 'ask' | 'settings';
+
 export const notificationSettingsService = {
+  /** Estado del aviso para activar notificaciones (ver `NotificationsPromptState`). */
+  async getPromptState(): Promise<NotificationsPromptState> {
+    try {
+      if (Platform.OS === 'web' || !Device.isDevice) return 'hidden';
+      const id = await currentUserId();
+      if (localStorage.getItem(promptDismissedKey(id)) === '1') return 'hidden';
+      const permission = await Notifications.getPermissionsAsync();
+      if (permission.granted) return 'hidden';
+      return permission.canAskAgain ? 'ask' : 'settings';
+    } catch {
+      return 'hidden';
+    }
+  },
+
+  /** "No volver a mostrar": el aviso no vuelve a salir para este usuario en este teléfono. */
+  async dismissPromptForever(): Promise<void> {
+    try {
+      const id = await currentUserId();
+      localStorage.setItem(promptDismissedKey(id), '1');
+    } catch {
+      // Sin almacenamiento, el aviso volverá a salir en la próxima apertura.
+    }
+  },
+
   /** Activas si el cliente las quiere (`app_notification`) y el teléfono da permiso. */
   async get(): Promise<NotificationSettings> {
     const id = await currentUserId();

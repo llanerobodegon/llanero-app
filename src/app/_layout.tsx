@@ -16,6 +16,7 @@ import { CartProvider } from '@/contexts/cart-context';
 import { FavoritesProvider } from '@/contexts/favorites-context';
 import { WarehouseProvider } from '@/contexts/warehouse-context';
 import { CartDrawerView } from '@/views/CartDrawerView';
+import { NotificationsPromptView } from '@/views/NotificationsPromptView';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -68,70 +69,74 @@ function RootNavigator() {
   if (isLoading) return null;
 
   return (
-    // El carrito empuja toda la app (pestañas incluidas) hacia la izquierda; sin sesión o en
-    // modo repartidor no se abre.
-    <CartDrawerView isEnabled={isSignedIn && !isDelivery}>
-      <Stack screenOptions={{ headerShown: false }}>
-        {/* ---------- Con sesión: tienda (cualquier rol menos repartidor) ---------- */}
-        <Stack.Protected guard={isSignedIn && !isDelivery} redirectTo={deliveryHome}>
-          <Stack.Screen name="(tabs)" />
-          {/* Detalle de producto: hoja modal por encima de las pestañas */}
-          <Stack.Screen name="product/[id]" options={{ presentation: 'modal' }} />
-          {/* Detalle de pedido: misma hoja modal que el producto */}
-          <Stack.Screen name="order/[id]" options={{ presentation: 'modal' }} />
-          {/* Categoría: push con su propio encabezado */}
-          <Stack.Screen name="category/[id]" />
-          <Stack.Screen name="subcategory/[id]" />
-          {/* Checkout: push a pantalla completa desde el carrito */}
-          <Stack.Screen name="checkout/index" />
-          <Stack.Screen name="checkout/payment" />
-          {/* Resultado: sin gesto de volver (el pedido ya se hizo) */}
-          <Stack.Screen name="checkout/success" options={{ gestureEnabled: false }} />
-          {/* Cuenta: pantallas propias de la tienda */}
-          <Stack.Screen name="account/addresses/index" />
-          <Stack.Screen name="account/addresses/new" />
-          <Stack.Screen name="account/addresses/[id]" />
-          <Stack.Screen name="account/payment-methods/index" />
-          <Stack.Screen name="account/payment-methods/new" />
-          <Stack.Screen name="account/payment-methods/[id]" />
-          {/* Teléfono de contacto: lo pide el checkout de un delivery si falta */}
-          <Stack.Screen name="account/phone" />
-          {/* Bienvenida tras registrarse: ya hay sesión; sin volver */}
-          <Stack.Screen
-            name="auth/registered"
-            options={{ gestureEnabled: false, animation: 'fade' }}
-          />
-        </Stack.Protected>
+    <>
+      {/* El carrito empuja toda la app (pestañas incluidas) hacia la izquierda; sin sesión o en
+          modo repartidor no se abre. */}
+      <CartDrawerView isEnabled={isSignedIn && !isDelivery}>
+        <Stack screenOptions={{ headerShown: false }}>
+          {/* ---------- Con sesión: tienda (cualquier rol menos repartidor) ---------- */}
+          <Stack.Protected guard={isSignedIn && !isDelivery} redirectTo={deliveryHome}>
+            <Stack.Screen name="(tabs)" />
+            {/* Detalle de producto: hoja modal por encima de las pestañas */}
+            <Stack.Screen name="product/[id]" options={{ presentation: 'modal' }} />
+            {/* Detalle de pedido: misma hoja modal que el producto */}
+            <Stack.Screen name="order/[id]" options={{ presentation: 'modal' }} />
+            {/* Categoría: push con su propio encabezado */}
+            <Stack.Screen name="category/[id]" />
+            <Stack.Screen name="subcategory/[id]" />
+            {/* Checkout: push a pantalla completa desde el carrito */}
+            <Stack.Screen name="checkout/index" />
+            <Stack.Screen name="checkout/payment" />
+            {/* Resultado: sin gesto de volver (el pedido ya se hizo) */}
+            <Stack.Screen name="checkout/success" options={{ gestureEnabled: false }} />
+            {/* Cuenta: pantallas propias de la tienda */}
+            <Stack.Screen name="account/addresses/index" />
+            <Stack.Screen name="account/addresses/new" />
+            <Stack.Screen name="account/addresses/[id]" />
+            <Stack.Screen name="account/payment-methods/index" />
+            <Stack.Screen name="account/payment-methods/new" />
+            <Stack.Screen name="account/payment-methods/[id]" />
+            {/* Teléfono de contacto: lo pide el checkout de un delivery si falta */}
+            <Stack.Screen name="account/phone" />
+            {/* Bienvenida tras registrarse: ya hay sesión; sin volver */}
+            <Stack.Screen
+              name="auth/registered"
+              options={{ gestureEnabled: false, animation: 'fade' }}
+            />
+          </Stack.Protected>
 
-        {/* ---------- Con sesión: modo repartidor ---------- */}
-        <Stack.Protected guard={isSignedIn && isDelivery}>
-          <Stack.Screen name="(delivery)" />
-          {/* Detalle de una entrega: misma hoja modal que el pedido del cliente */}
-          <Stack.Screen name="delivery/[id]" options={{ presentation: 'modal' }} />
-        </Stack.Protected>
+          {/* ---------- Con sesión: modo repartidor ---------- */}
+          <Stack.Protected guard={isSignedIn && isDelivery}>
+            <Stack.Screen name="(delivery)" />
+            {/* Detalle de una entrega: misma hoja modal que el pedido del cliente */}
+            <Stack.Screen name="delivery/[id]" options={{ presentation: 'modal' }} />
+          </Stack.Protected>
 
-        {/* ---------- Con sesión: cuenta, igual para los dos modos ---------- */}
-        <Stack.Protected guard={isSignedIn}>
-          {/* Pantallas internas de la cuenta: push con su propio encabezado (ScreenHeader) */}
-          <Stack.Screen name="account/personal-info" />
-          <Stack.Screen name="account/change-password" />
-          <Stack.Screen name="account/notifications" />
-        </Stack.Protected>
+          {/* ---------- Con sesión: cuenta, igual para los dos modos ---------- */}
+          <Stack.Protected guard={isSignedIn}>
+            {/* Pantallas internas de la cuenta: push con su propio encabezado (ScreenHeader) */}
+            <Stack.Screen name="account/personal-info" />
+            <Stack.Screen name="account/change-password" />
+            <Stack.Screen name="account/notifications" />
+          </Stack.Protected>
 
-        {/* ---------- Sin sesión ---------- */}
-        <Stack.Protected guard={!isSignedIn} redirectTo={deliveryHome}>
-          {/* Bienvenida: sin gesto de volver */}
-          <Stack.Screen name="auth/index" options={{ gestureEnabled: false, animation: 'fade' }} />
-          <Stack.Screen name="auth/login" />
-        </Stack.Protected>
+          {/* ---------- Sin sesión ---------- */}
+          <Stack.Protected guard={!isSignedIn} redirectTo={deliveryHome}>
+            {/* Bienvenida: sin gesto de volver */}
+            <Stack.Screen name="auth/index" options={{ gestureEnabled: false, animation: 'fade' }} />
+            <Stack.Screen name="auth/login" />
+          </Stack.Protected>
 
-        {/* ---------- Siempre disponibles ----------
-            Registro y recuperar contraseña inician la sesión a mitad del flujo (al verificar el
-            código), así que no pueden depender de la sesión o se cerrarían antes de terminar. */}
-        {/* Registro: el gesto de volver sale del registro; "atrás" del encabezado va al paso anterior */}
-        <Stack.Screen name="auth/register" />
-        <Stack.Screen name="auth/forgot-password" />
-      </Stack>
-    </CartDrawerView>
+          {/* ---------- Siempre disponibles ----------
+              Registro y recuperar contraseña inician la sesión a mitad del flujo (al verificar el
+              código), así que no pueden depender de la sesión o se cerrarían antes de terminar. */}
+          {/* Registro: el gesto de volver sale del registro; "atrás" del encabezado va al paso anterior */}
+          <Stack.Screen name="auth/register" />
+          <Stack.Screen name="auth/forgot-password" />
+        </Stack>
+      </CartDrawerView>
+      {/* Con sesión y sin permiso de notificaciones: aviso para activarlas */}
+      <NotificationsPromptView />
+    </>
   );
 }
