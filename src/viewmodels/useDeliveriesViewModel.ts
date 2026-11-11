@@ -27,8 +27,17 @@ export function useDeliveriesViewModel() {
       ]);
       if (id !== requestId.current) return;
       setDeliveries(list);
-      setAvailability(status);
       setError(null);
+      // "En entrega" sin ningún pedido en camino es un estado atascado (p. ej. el bodegón
+      // borró el pedido): se le pide al servidor recalcularlo para que pueda recibir pedidos.
+      const isStuck =
+        status === 'on_delivery' && !list.some((delivery) => delivery.status === 'on_delivery');
+      if (!isStuck) {
+        setAvailability(status);
+        return;
+      }
+      const fixed = await deliveryService.setAvailability(true).catch(() => status);
+      if (id === requestId.current) setAvailability(fixed);
     } catch (err) {
       if (id !== requestId.current) return;
       setError(err instanceof Error ? err.message : 'Error al cargar tus entregas');

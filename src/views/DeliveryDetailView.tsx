@@ -226,6 +226,8 @@ export function DeliveryDetailView({ orderId }: { orderId: string }) {
                 </Text>
               ) : vm.isCodeSheetOpen ? (
                 <DeliveryCodeSheet
+                  // Tras un código incorrecto el campo vuelve vacío (no se reenvía el mismo).
+                  key={vm.attemptsLeft}
                   attemptsLeft={vm.attemptsLeft}
                   error={vm.codeError}
                   isSubmitting={vm.isSubmitting}
@@ -237,6 +239,7 @@ export function DeliveryDetailView({ orderId }: { orderId: string }) {
                   size="lg"
                   feedbackVariant="scale"
                   onPress={vm.openCodeSheet}
+                  isDisabled={vm.isSubmitting}
                   className="rounded-full bg-action">
                   <Button.Label className="text-action-foreground">Entregar</Button.Label>
                 </Button>

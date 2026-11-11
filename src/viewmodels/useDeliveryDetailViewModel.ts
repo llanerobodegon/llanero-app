@@ -36,6 +36,8 @@ export function useDeliveryDetailViewModel(orderId: string) {
   const requestId = useRef(0);
   // Evita dos envíos por doble toque antes de que React repinte el botón desactivado.
   const isBusy = useRef(false);
+  // Un envío del código falló por red y no se pudo releer el pedido: su estado real es incierto.
+  const isUnverified = useRef(false);
 
   /** Carga el pedido. Devuelve lo que quedó, para decidir después de una acción. */
   const load = useCallback(async (): Promise<DeliveryOrder | null> => {
@@ -109,6 +111,10 @@ export function useDeliveryDetailViewModel(orderId: string) {
       await deliveryService.markPickedUp(orderId);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setIsPickUpDialogOpen(false);
+      // El servidor ya lo aplicó: se refleja de una vez, aunque la recarga falle.
+      setDelivery((current) =>
+        current && current.status === 'confirmed' ? { ...current, status: 'on_delivery' } : current,
+      );
       await load().catch(() => {});
     } catch (err) {
       setPickUpError(handleActionError(err));
@@ -122,12 +128,33 @@ export function useDeliveryDetailViewModel(orderId: string) {
 
   // ---------- Entregar con el código ----------
 
-  const openCodeSheet = useCallback(() => {
+  const openCodeSheet = useCallback(async () => {
+    if (isBusy.current) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setCodeError(null);
+    // Tras un fallo de red no se sabe si el último código se aplicó: antes de pedir otro se
+    // relee el pedido (si ya quedó entregado, la pantalla lo muestra y no hay nada que hacer).
+    if (isUnverified.current) {
+      isBusy.current = true;
+      setIsSubmitting(true);
+      try {
+        const latest = await load();
+        isUnverified.current = false;
+        if (latest?.status !== 'on_delivery') {
+          setNotice(null);
+          return;
+        }
+      } catch {
+        setNotice('Sin conexión. Cuando tengas señal, toca "Entregar" para continuar');
+        return;
+      } finally {
+        isBusy.current = false;
+        setIsSubmitting(false);
+      }
+    }
     setNotice(null);
     setIsCodeSheetOpen(true);
-  }, []);
+  }, [load]);
 
   const closeCodeSheet = useCallback(() => {
     if (isBusy.current) return;
@@ -147,6 +174,12 @@ export function useDeliveryDetailViewModel(orderId: string) {
         if (result.isCompleted) {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           setIsCodeSheetOpen(false);
+          // El servidor ya lo completó: se refleja de una vez, aunque la recarga falle.
+          setDelivery((current) =>
+            current
+              ? { ...current, status: 'completed', deliveredAt: new Date().toISOString() }
+              : current,
+          );
           await load().catch(() => {});
           return;
         }
@@ -183,7 +216,11 @@ export function useDeliveryDetailViewModel(orderId: string) {
           }
           setCodeError('No pudimos confirmar. Revisa tu conexión e inténtalo de nuevo');
         } catch {
-          setCodeError('Sin conexión. Inténtalo de nuevo cuando tengas señal');
+          // Tampoco se pudo releer: no se deja reintentar a ciegas. Se cierra el panel y, al
+          // volver a tocar "Entregar", primero se comprueba cómo quedó el pedido.
+          isUnverified.current = true;
+          setIsCodeSheetOpen(false);
+          setNotice('Sin conexión. Cuando tengas señal, toca "Entregar" para continuar');
         }
       } finally {
         isBusy.current = false;
