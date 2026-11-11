@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 import { LogBox, useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
+import { SplashOverlay } from '@/components/splash-overlay';
 import { AuthProvider, useAuthContext } from '@/contexts/auth-context';
 import { usePushNotifications } from '@/hooks/use-push-notifications';
 import { notificationSettingsService } from '@/services/notification-settings.service';
@@ -32,7 +32,7 @@ export default function RootLayout() {
             <FavoritesProvider>
               <CartProvider>
                 <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-                  <AnimatedSplashOverlay />
+                  <SplashOverlay />
                   <RootNavigator />
                 </ThemeProvider>
               </CartProvider>
