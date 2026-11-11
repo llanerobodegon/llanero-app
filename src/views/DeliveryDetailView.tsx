@@ -234,7 +234,7 @@ export function DeliveryDetailView({ orderId }: { orderId: string }) {
                   onPress={vm.openCodeSheet}
                   isDisabled={vm.isSubmitting}
                   className="rounded-full bg-action">
-                  <Button.Label className="text-action-foreground">Entregar</Button.Label>
+                  <Button.Label className="text-action-foreground">Entregado</Button.Label>
                 </Button>
               )}
             </View>

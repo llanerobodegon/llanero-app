@@ -147,7 +147,7 @@ export function useDeliveryDetailViewModel(orderId: string) {
           return;
         }
       } catch {
-        setNotice('Sin conexión. Cuando tengas señal, toca "Entregar" para continuar');
+        setNotice('Sin conexión. Cuando tengas señal, toca "Entregado" para continuar');
         return;
       } finally {
         isBusy.current = false;
@@ -220,10 +220,10 @@ export function useDeliveryDetailViewModel(orderId: string) {
           setCodeError('No pudimos confirmar. Revisa tu conexión e inténtalo de nuevo');
         } catch {
           // Tampoco se pudo releer: no se deja reintentar a ciegas. Se cierra el panel y, al
-          // volver a tocar "Entregar", primero se comprueba cómo quedó el pedido.
+          // volver a tocar "Entregado", primero se comprueba cómo quedó el pedido.
           isUnverified.current = true;
           setIsCodeSheetOpen(false);
-          setNotice('Sin conexión. Cuando tengas señal, toca "Entregar" para continuar');
+          setNotice('Sin conexión. Cuando tengas señal, toca "Entregado" para continuar');
         }
       } finally {
         isBusy.current = false;
