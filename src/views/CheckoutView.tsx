@@ -208,6 +208,48 @@ export function CheckoutView() {
                 </View>
               </PressableFeedback>
             )}
+            {/* Teléfono de contacto: el repartidor lo usa para ubicar al cliente al llegar. */}
+            {vm.isLoadingPhone ? (
+              <Skeleton className="h-16 w-full rounded-3xl" />
+            ) : (
+              <PressableFeedback
+                onPress={vm.editPhone}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  vm.contactPhone
+                    ? `Teléfono de contacto: ${vm.contactPhone}`
+                    : 'Agregar un teléfono de contacto'
+                }
+                accessibilityHint={vm.contactPhone ? 'Toca para cambiarlo' : undefined}
+                className={`flex-row items-center gap-3 rounded-3xl bg-surface p-3 ${
+                  vm.contactPhone ? '' : 'border-2 border-dashed border-default'
+                }`}>
+                <View className="size-10 items-center justify-center rounded-full bg-default">
+                  <SymbolView
+                    name={
+                      vm.contactPhone
+                        ? { ios: 'phone', android: 'call', web: 'call' }
+                        : { ios: 'plus', android: 'add', web: 'add' }
+                    }
+                    size={18}
+                    tintColor={foreground}
+                  />
+                </View>
+                <View className="flex-1 gap-0.5">
+                  <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
+                    {vm.contactPhone ?? 'Agrega tu teléfono'}
+                  </Text>
+                  <Text className="text-xs text-muted" numberOfLines={1}>
+                    {vm.contactPhone
+                      ? 'El repartidor te contactará a este número'
+                      : 'El repartidor lo necesita para ubicarte.'}
+                  </Text>
+                </View>
+                {vm.contactPhone ? (
+                  <Text className="text-sm font-semibold text-action">Cambiar</Text>
+                ) : null}
+              </PressableFeedback>
+            )}
           </View>
         ) : (
           // Retiro: la tienda del carrito, fija.

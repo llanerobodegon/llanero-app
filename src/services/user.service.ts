@@ -84,6 +84,19 @@ export const userService = {
     return transformUser(data);
   },
 
+  /** Guarda solo el teléfono de contacto (lo pide el checkout de un delivery si falta). */
+  async updatePhone(phoneCode: PhoneCode, phone: string): Promise<User> {
+    const id = await currentUserId();
+    const { data: row, error } = await supabase
+      .from('users')
+      .update({ phone_code: phoneCode, phone })
+      .eq('id', id)
+      .select('*')
+      .single();
+    if (error) throw new Error('No pudimos guardar tu teléfono');
+    return transformUser(row);
+  },
+
   /** Actualiza el perfil del usuario con sesión y devuelve el resultado. */
   async update(data: UpdateUserData): Promise<User> {
     const id = await currentUserId();

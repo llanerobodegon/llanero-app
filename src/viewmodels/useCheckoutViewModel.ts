@@ -7,6 +7,7 @@ import { useWarehouseContext } from '@/contexts/warehouse-context';
 import type { Address } from '@/models/address.model';
 import type { DeliveryType } from '@/models/order.model';
 import { addressService } from '@/services/address.service';
+import { userService } from '@/services/user.service';
 
 /** Pasos del checkout, en orden. */
 export const CHECKOUT_STEPS = [
@@ -66,6 +67,36 @@ export function useCheckoutViewModel() {
 
   const selectedAddress = addresses.find((a) => a.id === selectedAddressId) ?? null;
 
+  // Teléfono de contacto del cliente: un delivery lo necesita para que el repartidor pueda
+  // ubicarlo. Se recarga al volver (p. ej. después de agregarlo).
+  const [contactPhone, setContactPhone] = useState<string | null>(null);
+  const [isLoadingPhone, setIsLoadingPhone] = useState(true);
+
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+      userService
+        .getCurrent()
+        .then((user) => {
+          if (!isActive) return;
+          setContactPhone(user.phoneCode && user.phone ? `${user.phoneCode}-${user.phone}` : null);
+        })
+        .catch(() => {
+          // Sin poder leer el perfil no se sabe si hay teléfono: se pedirá agregarlo.
+        })
+        .finally(() => isActive && setIsLoadingPhone(false));
+      return () => {
+        isActive = false;
+      };
+    }, []),
+  );
+
+  /** Agregar o cambiar el teléfono de contacto. */
+  const editPhone = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push('/account/phone');
+  }, []);
+
   const isDelivery = deliveryType === 'delivery';
   const deliveryFee = isDelivery ? (warehouse?.deliveryFee ?? 0) : 0;
   const total = cart.subtotal + deliveryFee;
@@ -91,8 +122,9 @@ export function useCheckoutViewModel() {
     router.push('/account/addresses/new');
   }, []);
 
-  /** Delivery necesita una dirección; el retiro solo la tienda del carrito. */
-  const canContinue = cart.items.length > 0 && !!warehouse && (!isDelivery || !!selectedAddress);
+  /** Delivery necesita una dirección y un teléfono; el retiro solo la tienda del carrito. */
+  const canContinue =
+    cart.items.length > 0 && !!warehouse && (!isDelivery || (!!selectedAddress && !!contactPhone));
 
   /** Paso 2 (detalles de pago), con el tipo de entrega y la dirección elegidos. */
   const continueToPayment = useCallback(() => {
@@ -144,6 +176,10 @@ export function useCheckoutViewModel() {
     closeAddressSheet,
     selectAddress,
     addAddress,
+
+    contactPhone,
+    isLoadingPhone,
+    editPhone,
 
     canContinue,
     continueToPayment,

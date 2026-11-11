@@ -94,6 +94,8 @@ function RootNavigator() {
           <Stack.Screen name="account/payment-methods/index" />
           <Stack.Screen name="account/payment-methods/new" />
           <Stack.Screen name="account/payment-methods/[id]" />
+          {/* Teléfono de contacto: lo pide el checkout de un delivery si falta */}
+          <Stack.Screen name="account/phone" />
           {/* Bienvenida tras registrarse: ya hay sesión; sin volver */}
           <Stack.Screen
             name="auth/registered"
