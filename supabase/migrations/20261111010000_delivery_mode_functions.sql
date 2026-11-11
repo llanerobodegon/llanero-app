@@ -337,10 +337,9 @@ set search_path = public
 as $$
 declare
   v_user_id uuid := assert_active_delivery();
-  v_current text;
   v_has_active boolean;
 begin
-  select u.delivery_status::text into v_current from users u where u.id = v_user_id for update;
+  perform 1 from users u where u.id = v_user_id for update;
 
   select exists (
     select 1 from orders o
@@ -350,9 +349,11 @@ begin
   ) into v_has_active;
 
   if coalesce(p_available, false) then
-    -- Con un pedido en camino sigue "en entrega".
-    if v_has_active or v_current = 'on_delivery' then
-      return coalesce(v_current, 'on_delivery');
+    -- Con un pedido en camino sigue "en entrega"; sin ninguno, queda disponible.
+    if v_has_active then
+      update users set delivery_status = 'on_delivery'
+      where id = v_user_id and delivery_status is distinct from 'on_delivery';
+      return 'on_delivery';
     end if;
     update users set delivery_status = 'available' where id = v_user_id;
     return 'available';
