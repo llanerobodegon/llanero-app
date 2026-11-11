@@ -39,7 +39,8 @@ function pickWarehouse(
  * vacían al cerrarla. La elección se guarda en `users.preferred_warehouse_id`.
  */
 export function WarehouseProvider({ children }: { children: ReactNode }) {
-  const { userId } = useAuthContext();
+  // Solo para quien usa la tienda: con una cuenta de repartidor no se carga nada.
+  const { shopUserId: userId } = useAuthContext();
 
   // Resultado guardado junto al usuario al que pertenece: así, al cambiar de cuenta o cerrar
   // sesión, lo anterior deja de valer sin limpiar el estado a mano.

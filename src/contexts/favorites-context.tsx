@@ -26,7 +26,8 @@ const FavoritesContext = createContext<FavoritesContextType | undefined>(undefin
  * detalle de producto y la pestaña Favoritos.
  */
 export function FavoritesProvider({ children }: { children: ReactNode }) {
-  const { userId } = useAuthContext();
+  // Solo para quien usa la tienda: con una cuenta de repartidor no se carga nada.
+  const { shopUserId: userId } = useAuthContext();
   // Lista guardada junto a su usuario: al cambiar de cuenta, la anterior deja de valer.
   const [state, setState] = useState<{ userId: string | null; ids: string[] }>({
     userId: null,

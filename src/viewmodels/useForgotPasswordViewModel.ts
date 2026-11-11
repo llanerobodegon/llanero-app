@@ -2,6 +2,7 @@ import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { useAuthContext } from '@/contexts/auth-context';
 import { isPasswordValid } from '@/lib/password';
 import { authService } from '@/services/auth.service';
 
@@ -20,6 +21,7 @@ type FormErrors = Partial<Record<keyof Form, string>>;
  * de verificación (inicia sesión) y contraseña nueva. Al terminar muestra la confirmación.
  */
 export function useForgotPasswordViewModel(initialEmail = '') {
+  const { isDelivery } = useAuthContext();
   const [step, setStep] = useState(0);
   const [isDone, setIsDone] = useState(false);
   const [form, setForm] = useState<Form>({
@@ -162,8 +164,8 @@ export function useForgotPasswordViewModel(initialEmail = '') {
    */
   const goToApp = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.replace('/');
-  }, []);
+    router.replace(isDelivery ? '/deliveries' : '/');
+  }, [isDelivery]);
 
   const canContinue =
     !isSubmitting &&

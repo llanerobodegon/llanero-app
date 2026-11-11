@@ -49,23 +49,25 @@ export default function RootLayout() {
  * Expo Router lleva solo a la primera pantalla disponible (no hace falta navegar a mano).
  */
 function RootNavigator() {
-  const { isLoading, isSignedIn } = useAuthContext();
-  usePushNotifications(isSignedIn);
+  const { isLoading, isSignedIn, isDelivery } = useAuthContext();
+  // Con el rol ya resuelto: el aviso tocado abre la entrega (repartidor) o el pedido (cliente).
+  usePushNotifications(isSignedIn, isDelivery);
 
   // Con sesión, refresca el token de notificaciones si el cliente las tiene activas.
   useEffect(() => {
     if (isSignedIn) notificationSettingsService.syncPushToken();
   }, [isSignedIn]);
 
-  // Mientras se lee la sesión guardada se mantiene el splash (no se muestra ni la app ni el ingreso).
+  // Mientras se lee la sesión guardada y su rol se mantiene el splash (no se muestra nada).
   if (isLoading) return null;
 
   return (
-    // El carrito empuja toda la app (pestañas incluidas) hacia la izquierda; sin sesión no se abre.
-    <CartDrawerView isEnabled={isSignedIn}>
+    // El carrito empuja toda la app (pestañas incluidas) hacia la izquierda; sin sesión o en
+    // modo repartidor no se abre.
+    <CartDrawerView isEnabled={isSignedIn && !isDelivery}>
       <Stack screenOptions={{ headerShown: false }}>
-        {/* ---------- Con sesión ---------- */}
-        <Stack.Protected guard={isSignedIn}>
+        {/* ---------- Con sesión: tienda (cualquier rol menos repartidor) ---------- */}
+        <Stack.Protected guard={isSignedIn && !isDelivery}>
           <Stack.Screen name="(tabs)" />
           {/* Detalle de producto: hoja modal por encima de las pestañas */}
           <Stack.Screen name="product/[id]" options={{ presentation: 'modal' }} />
@@ -79,10 +81,7 @@ function RootNavigator() {
           <Stack.Screen name="checkout/payment" />
           {/* Resultado: sin gesto de volver (el pedido ya se hizo) */}
           <Stack.Screen name="checkout/success" options={{ gestureEnabled: false }} />
-          {/* Pantallas internas de la cuenta: push con su propio encabezado (ScreenHeader) */}
-          <Stack.Screen name="account/personal-info" />
-          <Stack.Screen name="account/change-password" />
-          <Stack.Screen name="account/notifications" />
+          {/* Cuenta: pantallas propias de la tienda */}
           <Stack.Screen name="account/addresses/index" />
           <Stack.Screen name="account/addresses/new" />
           <Stack.Screen name="account/addresses/[id]" />
@@ -94,6 +93,21 @@ function RootNavigator() {
             name="auth/registered"
             options={{ gestureEnabled: false, animation: 'fade' }}
           />
+        </Stack.Protected>
+
+        {/* ---------- Con sesión: modo repartidor ---------- */}
+        <Stack.Protected guard={isSignedIn && isDelivery}>
+          <Stack.Screen name="(delivery)" />
+          {/* Detalle de una entrega: misma hoja modal que el pedido del cliente */}
+          <Stack.Screen name="delivery/[id]" options={{ presentation: 'modal' }} />
+        </Stack.Protected>
+
+        {/* ---------- Con sesión: cuenta, igual para los dos modos ---------- */}
+        <Stack.Protected guard={isSignedIn}>
+          {/* Pantallas internas de la cuenta: push con su propio encabezado (ScreenHeader) */}
+          <Stack.Screen name="account/personal-info" />
+          <Stack.Screen name="account/change-password" />
+          <Stack.Screen name="account/notifications" />
         </Stack.Protected>
 
         {/* ---------- Sin sesión ---------- */}

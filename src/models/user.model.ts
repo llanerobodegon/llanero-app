@@ -2,6 +2,12 @@
 
 export type RoleName = 'customer' | 'admin' | 'manager' | 'delivery';
 
+/** Rol y estado de la cuenta: deciden qué modo muestra la app (tienda o repartidor). */
+export interface UserAccess {
+  role: RoleName;
+  isActive: boolean;
+}
+
 /** Códigos de operadora en Venezuela (`users.phone_code`). */
 export type PhoneCode = '0412' | '0414' | '0416' | '0422' | '0424' | '0426';
 

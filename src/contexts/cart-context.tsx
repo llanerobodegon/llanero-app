@@ -57,7 +57,8 @@ function toCartItem(product: Product, quantity: number): CartItem {
  * restaurarlo y al abrir el drawer.
  */
 export function CartProvider({ children }: { children: ReactNode }) {
-  const { userId } = useAuthContext();
+  // Solo para quien usa la tienda: con una cuenta de repartidor no se carga nada.
+  const { shopUserId: userId } = useAuthContext();
   const { warehouses, isLoading: isLoadingWarehouses } = useWarehouseContext();
   // Carrito guardado junto a su usuario: al cambiar de cuenta, el anterior deja de valer.
   const [state, setState] = useState<{ userId: string | null; cart: Cart }>({
