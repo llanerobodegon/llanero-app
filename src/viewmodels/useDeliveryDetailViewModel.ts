@@ -158,8 +158,9 @@ export function useDeliveryDetailViewModel(orderId: string) {
     setIsCodeSheetOpen(true);
   }, [load]);
 
+  // También cuando el repartidor desliza la hoja para cerrarla. Si había un envío en curso,
+  // sigue su camino y el resultado se refleja en la pantalla.
   const closeCodeSheet = useCallback(() => {
-    if (isBusy.current) return;
     setIsCodeSheetOpen(false);
     setCodeError(null);
   }, []);

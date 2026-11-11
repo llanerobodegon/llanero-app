@@ -7,10 +7,10 @@ import { Pressable, Text, useWindowDimensions, View } from 'react-native';
 
 import { useActionForeground } from '@/hooks/use-action-foreground';
 
+import { NumberKeypad } from './number-keypad';
+
 /** Margen lateral de la hoja; se fija igual en iOS y Android para calcular el ancho. */
 const SHEET_PADDING = 16;
-const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'clear', '0', 'delete'] as const;
-type Key = (typeof KEYS)[number];
 
 type KeypadFieldProps = {
   value: string;
@@ -37,7 +37,7 @@ export function KeypadField({
   accessibilityLabel,
 }: KeypadFieldProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [foreground, muted, background] = useThemeColor(['foreground', 'muted', 'background']);
+  const [muted, background] = useThemeColor(['muted', 'background']);
   const actionForeground = useActionForeground();
   // La hoja nativa no le impone ancho al contenido de React Native (ver OptionsSheet).
   const { width: windowWidth } = useWindowDimensions();
@@ -48,25 +48,6 @@ export function KeypadField({
     setIsOpen(true);
   };
   const close = () => setIsOpen(false);
-
-  const press = (key: Key) => {
-    if (key === 'delete') {
-      if (!value) return;
-      Haptics.selectionAsync();
-      onChange(value.slice(0, -1));
-    } else if (key === 'clear') {
-      if (!value) return;
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      onChange('');
-    } else {
-      if (value.length >= maxLength) {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-        return;
-      }
-      Haptics.selectionAsync();
-      onChange(value + key);
-    }
-  };
 
   return (
     <>
@@ -120,33 +101,12 @@ export function KeypadField({
               <Text className="text-xs text-muted">{`${value.length}/${maxLength}`}</Text>
             </View>
 
-            {/* Teclado: 1-9, borrar todo, 0 y borrar */}
-            <View className="flex-row flex-wrap justify-between gap-y-2">
-              {KEYS.map((key) => (
-                <Pressable
-                  key={key}
-                  onPress={() => press(key)}
-                  onLongPress={key === 'delete' ? () => press('clear') : undefined}
-                  accessibilityRole="button"
-                  accessibilityLabel={
-                    key === 'delete' ? 'Borrar' : key === 'clear' ? 'Borrar todo' : key
-                  }
-                  style={{ width: (contentWidth - 16) / 3 }}
-                  className="h-14 items-center justify-center rounded-2xl bg-surface active:opacity-50">
-                  {key === 'delete' ? (
-                    <SymbolView
-                      name={{ ios: 'delete.left', android: 'backspace', web: 'backspace' }}
-                      size={22}
-                      tintColor={foreground}
-                    />
-                  ) : key === 'clear' ? (
-                    <Text className="text-sm font-semibold text-muted">Borrar</Text>
-                  ) : (
-                    <Text className="text-2xl font-semibold text-foreground">{key}</Text>
-                  )}
-                </Pressable>
-              ))}
-            </View>
+            <NumberKeypad
+              value={value}
+              onChange={onChange}
+              maxLength={maxLength}
+              width={contentWidth}
+            />
 
             <Button
               size="lg"

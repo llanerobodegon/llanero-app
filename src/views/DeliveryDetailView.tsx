@@ -1,6 +1,6 @@
 import { SymbolView } from 'expo-symbols';
 import { Button, CloseButton, Skeleton, useThemeColor } from 'heroui-native';
-import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
+import { Platform, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ConfirmDialog } from '@/components/confirm-dialog';
@@ -25,9 +25,7 @@ export function DeliveryDetailView({ orderId }: { orderId: string }) {
   const hasAction = status === 'confirmed' || status === 'on_delivery' || status === 'pending';
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-background"
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <View className="flex-1 bg-background">
       {/* Encabezado: número y fecha a la izquierda, cerrar a la derecha (igual que el pedido) */}
       <View style={{ paddingTop: headerTop }} className="flex-row items-center gap-3 px-4 pb-2">
         <View className="flex-1 gap-0.5 pl-1">
@@ -81,7 +79,6 @@ export function DeliveryDetailView({ orderId }: { orderId: string }) {
         <>
           <ScrollView
             showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
             contentContainerClassName="gap-5 px-4 pt-3"
             contentContainerStyle={{ paddingBottom: hasAction ? 24 : insets.bottom + 24 }}>
             {/* Estado actual y qué toca hacer */}
@@ -230,16 +227,6 @@ export function DeliveryDetailView({ orderId }: { orderId: string }) {
                 <Text className="py-2 text-center text-sm text-danger">
                   Se agotaron los intentos. Contacta al bodegón para completar la entrega
                 </Text>
-              ) : vm.isCodeSheetOpen ? (
-                <DeliveryCodeSheet
-                  // Tras un código incorrecto el campo vuelve vacío (no se reenvía el mismo).
-                  key={vm.attemptsLeft}
-                  attemptsLeft={vm.attemptsLeft}
-                  error={vm.codeError}
-                  isSubmitting={vm.isSubmitting}
-                  onSubmit={vm.submitCode}
-                  onClose={vm.closeCodeSheet}
-                />
               ) : (
                 <Button
                   size="lg"
@@ -255,6 +242,15 @@ export function DeliveryDetailView({ orderId }: { orderId: string }) {
         </>
       )}
 
+      <DeliveryCodeSheet
+        isOpen={vm.isCodeSheetOpen}
+        attemptsLeft={vm.attemptsLeft}
+        error={vm.codeError}
+        isSubmitting={vm.isSubmitting}
+        onSubmit={vm.submitCode}
+        onClose={vm.closeCodeSheet}
+      />
+
       <ConfirmDialog
         isOpen={vm.isPickUpDialogOpen}
         title="¿Retiraste el pedido?"
@@ -266,6 +262,6 @@ export function DeliveryDetailView({ orderId }: { orderId: string }) {
         onConfirm={vm.confirmPickUp}
         onCancel={vm.cancelPickUp}
       />
-    </KeyboardAvoidingView>
+    </View>
   );
 }
