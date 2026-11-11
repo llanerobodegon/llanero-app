@@ -1,0 +1,88 @@
+import * as Haptics from 'expo-haptics';
+import { router } from 'expo-router';
+import { useCallback, useMemo, useState } from 'react';
+
+import { authService } from '@/services/auth.service';
+
+type Form = { email: string; password: string };
+type FormErrors = Partial<Record<keyof Form, string>>;
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Mensajes en español por campo; vacío si el formulario es válido. */
+function validate(form: Form): FormErrors {
+  const errors: FormErrors = {};
+  if (!form.email.trim()) errors.email = 'Ingresa tu correo';
+  else if (!EMAIL_PATTERN.test(form.email.trim())) errors.email = 'Revisa el formato del correo';
+  if (!form.password) errors.password = 'Ingresa tu contraseña';
+  return errors;
+}
+
+export function useLoginViewModel() {
+  const [form, setForm] = useState<Form>({ email: '', password: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  // Los errores por campo se muestran solo después del primer intento.
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+
+  const setEmail = useCallback((value: string) => {
+    setError(null);
+    setForm((f) => ({ ...f, email: value }));
+  }, []);
+  const setPassword = useCallback((value: string) => {
+    setError(null);
+    setForm((f) => ({ ...f, password: value }));
+  }, []);
+
+  const errors = useMemo(() => validate(form), [form]);
+
+  /** Inicia sesión; el layout raíz cambia a la app al detectar la sesión. */
+  const signIn = useCallback(async () => {
+    setHasSubmitted(true);
+    if (Object.keys(errors).length > 0) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      return;
+    }
+    try {
+      setIsSubmitting(true);
+      setError(null);
+      await authService.signIn(form.email.trim().toLowerCase(), form.password);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      // Al haber sesión, las rutas protegidas del layout raíz llevan solas a la app.
+    } catch (err) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      setError(err instanceof Error ? err.message : 'No pudimos iniciar tu sesión');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [errors, form]);
+
+  /** Recuperar contraseña, con el correo ya escrito (si hay). */
+  const forgotPassword = useCallback(() => {
+    Haptics.selectionAsync();
+    router.push({
+      pathname: '/auth/forgot-password',
+      params: { email: form.email.trim().toLowerCase() },
+    });
+  }, [form.email]);
+  const goToRegister = useCallback(() => {
+    Haptics.selectionAsync();
+    router.push('/auth/register');
+  }, []);
+
+  const goBack = useCallback(() => router.back(), []);
+
+  return {
+    form,
+    errors: hasSubmitted ? errors : {},
+    error,
+    isSubmitting,
+    canSubmit: !!form.email && !!form.password && !isSubmitting,
+    setEmail,
+    setPassword,
+    signIn,
+    forgotPassword,
+    goToRegister,
+    goBack,
+  };
+}

@@ -46,4 +46,4 @@ Follow `docs/architecture.md`. Flow: route (`src/app`) â†’ View (`src/views`) â†
 
 ## Git workflow (Gitflow)
 
-Follow `docs/gitflow.md`. Never commit directly to `main` or `develop`: start work with `git flow feature start <name>` from `develop`, and ship with `release/*` (bumps `app.json` version, tags `vX.Y.Z` on `main`). Hotfixes branch from `main`.
+Follow `docs/gitflow.md`. Day-to-day work is committed directly on `develop`; only create a `feature/*` branch when the user asks for one. Never commit directly to `main`: ship with `release/*` (bumps `app.json` version, tags `vX.Y.Z` on `main`). Hotfixes branch from `main`.

@@ -10,12 +10,14 @@ El proyecto usa [git-flow](https://github.com/nvie/gitflow) con su configuració
 | `release/<X.Y.Z>` | Preparar una versión: subir versión, últimos arreglos | `develop` | `main` y `develop` |
 | `hotfix/<X.Y.Z>` | Arreglo urgente en producción | `main` | `main` y `develop` |
 
-Nunca se hace commit directo en `main` ni en `develop`.
+El trabajo del día a día se hace directo en `develop`. Las ramas `feature/*` se crean solo
+cuando se pide explícitamente (por ejemplo, para un cambio grande o un PR). Nunca se hace commit
+directo en `main`: solo cambia mediante `release/*` o `hotfix/*`.
 
 ## Comandos
 
 ```bash
-# Funcionalidad nueva
+# Funcionalidad nueva (solo cuando se pida una rama)
 git flow feature start carrito
 # ...commits...
 git flow feature finish carrito          # merge a develop y borra la rama
