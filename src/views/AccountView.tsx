@@ -49,16 +49,22 @@ export function AccountView() {
             icon={{ ios: 'person', android: 'person' }}
             onPress={vm.openPersonalInfo}
           />
-          <AccountMenuItem
-            title="Administrar direcciones"
-            icon={{ ios: 'mappin.and.ellipse', android: 'location_on' }}
-            onPress={vm.openAddresses}
-          />
-          <AccountMenuItem
-            title="Métodos de pago"
-            icon={{ ios: 'creditcard', android: 'credit_card' }}
-            onPress={vm.openPaymentMethods}
-          />
+          {/* Propias de la tienda: un repartidor no las ve. Van por separado (sin fragmento)
+              para que el grupo ponga bien los separadores. */}
+          {vm.isDelivery ? null : (
+            <AccountMenuItem
+              title="Administrar direcciones"
+              icon={{ ios: 'mappin.and.ellipse', android: 'location_on' }}
+              onPress={vm.openAddresses}
+            />
+          )}
+          {vm.isDelivery ? null : (
+            <AccountMenuItem
+              title="Métodos de pago"
+              icon={{ ios: 'creditcard', android: 'credit_card' }}
+              onPress={vm.openPaymentMethods}
+            />
+          )}
           <AccountMenuItem
             title="Cambiar contraseña"
             icon={{ ios: 'lock', android: 'lock' }}
@@ -94,13 +100,16 @@ export function AccountView() {
             showChevron={false}
             onPress={vm.requestLogout}
           />
-          <AccountMenuItem
-            title="Eliminar cuenta"
-            icon={{ ios: 'trash', android: 'delete' }}
-            tone="danger"
-            showChevron={false}
-            onPress={vm.requestDeleteAccount}
-          />
+          {/* La cuenta de un repartidor la crea y la da de baja el bodegón desde la web. */}
+          {vm.isDelivery ? null : (
+            <AccountMenuItem
+              title="Eliminar cuenta"
+              icon={{ ios: 'trash', android: 'delete' }}
+              tone="danger"
+              showChevron={false}
+              onPress={vm.requestDeleteAccount}
+            />
+          )}
         </AccountMenuSection>
 
         {/* Pie: logo pequeño y versión */}
@@ -120,7 +129,11 @@ export function AccountView() {
       <ConfirmDialog
         isOpen={vm.pendingAction === 'logout'}
         title="¿Cerrar sesión?"
-        description="Tendrás que volver a iniciar sesión para hacer pedidos."
+        description={
+          vm.isDelivery
+            ? 'Tendrás que volver a iniciar sesión para ver tus entregas.'
+            : 'Tendrás que volver a iniciar sesión para hacer pedidos.'
+        }
         confirmLabel="Cerrar sesión"
         isLoading={vm.isProcessing}
         loadingLabel="Cerrando…"

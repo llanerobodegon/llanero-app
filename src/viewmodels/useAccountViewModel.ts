@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 
 import { LegalLinks } from '@/constants/links';
+import { useAuthContext } from '@/contexts/auth-context';
 import { useInAppBrowser } from '@/hooks/use-in-app-browser';
 import { initials, maskEmail } from '@/lib/format';
 import type { User } from '@/models/user.model';
@@ -14,6 +15,8 @@ import { userService } from '@/services/user.service';
 type PendingAction = 'logout' | 'delete' | null;
 
 export function useAccountViewModel() {
+  // En modo repartidor la cuenta no muestra lo propio de la tienda (direcciones, pagos).
+  const { isDelivery } = useAuthContext();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -140,6 +143,7 @@ export function useAccountViewModel() {
     maskedEmail: user ? maskEmail(user.email) : '',
     initials: user ? initials(user.firstName, user.lastName) : '',
     appVersion,
+    isDelivery,
 
     openPersonalInfo,
     openAddresses,
