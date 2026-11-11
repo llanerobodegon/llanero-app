@@ -55,3 +55,19 @@ Cada carpeta tiene un `README.md` con su regla y un ejemplo.
 3. `src/viewmodels/useCategoriesViewModel.ts`: `categories`, `isLoading`, `error`, `refetch`.
 4. `src/views/CategoriesView.tsx`: usa el ViewModel y pinta con HeroUI Native.
 5. `src/app/categories.tsx`: `export default CategoriesView`.
+
+## Modo repartidor
+
+La misma app sirve a clientes y repartidores. Al iniciar sesión, `AuthProvider` resuelve el rol
+de la cuenta (`users.role_id`) y el layout raíz monta la tienda (`(tabs)`) o el modo repartidor
+(`(delivery)`: Entregas, Historial y Cuenta, más el detalle en `delivery/[id]`). Un repartidor
+nunca llega a las rutas de la tienda, y los datos de la tienda (bodega, carrito, favoritos) no
+se cargan para él.
+
+El modo repartidor **no consulta tablas**: `delivery.service.ts` solo llama funciones del
+servidor (`get_delivery_orders`, `get_delivery_order`, `delivery_mark_picked_up`,
+`delivery_complete_order`, …). Así el código de entrega, los montos y los datos de pago nunca
+llegan a su teléfono, y el código se valida en el servidor (máximo 5 intentos). No usa tiempo
+real: se actualiza al entrar a la pantalla, al deslizar y al recibir un aviso.
+
+Diseño completo: `docs/superpowers/specs/2026-11-10-modo-repartidor-design.md`.
