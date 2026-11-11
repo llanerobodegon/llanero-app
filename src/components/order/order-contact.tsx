@@ -14,10 +14,18 @@ type OrderContactProps = {
   initials?: string;
   /** Si no se pasa (no hay teléfono válido), no se muestra el botón de WhatsApp. */
   onPressWhatsApp?: () => void;
+  /** Si se pasa, se muestra además un botón para llamar por teléfono. */
+  onPressCall?: () => void;
 };
 
 /** Contacto del pedido (repartidor o tienda): avatar, nombre y botón de WhatsApp. */
-export function OrderContact({ name, subtitle, initials, onPressWhatsApp }: OrderContactProps) {
+export function OrderContact({
+  name,
+  subtitle,
+  initials,
+  onPressWhatsApp,
+  onPressCall,
+}: OrderContactProps) {
   const [foreground] = useThemeColor(['foreground']);
 
   return (
@@ -41,6 +49,21 @@ export function OrderContact({ name, subtitle, initials, onPressWhatsApp }: Orde
         </Text>
         <Text className="text-xs text-muted">{subtitle}</Text>
       </View>
+      {onPressCall ? (
+        <Button
+          isIconOnly
+          variant="secondary"
+          feedbackVariant="scale"
+          onPress={onPressCall}
+          accessibilityLabel={`Llamar a ${name}`}
+          className="size-11 rounded-full">
+          <SymbolView
+            name={{ ios: 'phone.fill', android: 'call', web: 'call' }}
+            size={18}
+            tintColor={foreground}
+          />
+        </Button>
+      ) : null}
       {onPressWhatsApp ? (
         <Button
           isIconOnly
