@@ -10,6 +10,7 @@ import {
   getPaymentStatusInfo,
   isActiveOrder,
 } from '@/lib/order-status';
+import { telUrl, telUrlFromText } from '@/lib/contact';
 import { whatsAppUrl } from '@/lib/whatsapp';
 import type { Order } from '@/models/order.model';
 import { orderService } from '@/services/order.service';
@@ -85,20 +86,32 @@ export function useOrderDetailViewModel(orderId: string) {
     ? whatsAppUrl(order.warehouse.phone, `Hola, te escribo por mi pedido ${order.orderNumber}.`)
     : null;
 
-  /** Abre WhatsApp (o wa.me en el navegador si no está instalado) con un mensaje listo. */
-  const openWhatsApp = useCallback((url: string | null) => {
+  // Llamada normal, por si el número no tiene WhatsApp.
+  const deliveryPersonTel = deliveryPerson
+    ? telUrl(deliveryPerson.phoneCode, deliveryPerson.phone)
+    : null;
+  const storeTel = order ? telUrlFromText(order.warehouse.phone) : null;
+
+  /** Abre WhatsApp (o wa.me en el navegador si no está instalado) con un mensaje listo, o la llamada. */
+  const openLink = useCallback((url: string | null) => {
     if (!url) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     Linking.openURL(url).catch(() => {});
   }, []);
   const contactDeliveryPerson = useCallback(
-    () => openWhatsApp(deliveryPersonWhatsApp),
-    [openWhatsApp, deliveryPersonWhatsApp],
+    () => openLink(deliveryPersonWhatsApp),
+    [openLink, deliveryPersonWhatsApp],
   );
   const contactStore = useCallback(
-    () => openWhatsApp(storeWhatsApp),
-    [openWhatsApp, storeWhatsApp],
+    () => openLink(storeWhatsApp),
+    [openLink, storeWhatsApp],
   );
+
+  const callDeliveryPerson = useCallback(
+    () => openLink(deliveryPersonTel),
+    [openLink, deliveryPersonTel],
+  );
+  const callStore = useCallback(() => openLink(storeTel), [openLink, storeTel]);
 
   return {
     order,
@@ -112,6 +125,8 @@ export function useOrderDetailViewModel(orderId: string) {
       : '',
     contactDeliveryPerson: deliveryPersonWhatsApp ? contactDeliveryPerson : undefined,
     contactStore: storeWhatsApp ? contactStore : undefined,
+    callDeliveryPerson: deliveryPersonTel ? callDeliveryPerson : undefined,
+    callStore: storeTel ? callStore : undefined,
 
     isActive: order ? isActiveOrder(order.status) : false,
     isDelivery: order?.deliveryType === 'delivery',

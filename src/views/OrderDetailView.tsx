@@ -97,6 +97,7 @@ export function OrderDetailView({ orderId }: { orderId: string }) {
                   name={`${vm.deliveryPerson.firstName} ${vm.deliveryPerson.lastName}`.trim()}
                   subtitle="Tu repartidor"
                   initials={vm.deliveryPersonInitials}
+                  onPressCall={vm.callDeliveryPerson}
                   onPressWhatsApp={vm.contactDeliveryPerson}
                 />
                 <View className="h-px bg-border" />
@@ -106,9 +107,10 @@ export function OrderDetailView({ orderId }: { orderId: string }) {
               name={order.warehouse.name}
               subtitle={
                 vm.deliveryPerson
-                  ? '¿Tu repartidor no responde? Escríbenos'
-                  : '¿Dudas con tu pedido? Escríbenos'
+                  ? '¿Tu repartidor no responde? Contáctanos'
+                  : '¿Dudas con tu pedido? Contáctanos'
               }
+              onPressCall={vm.callStore}
               onPressWhatsApp={vm.contactStore}
             />
           </OrderDetailSection>

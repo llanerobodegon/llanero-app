@@ -138,6 +138,12 @@ export function DeliveryDetailView({ orderId }: { orderId: string }) {
                 onPressCall={vm.callCustomer}
                 onPressWhatsApp={vm.whatsAppCustomer}
               />
+              {vm.hasNoCustomerPhone ? (
+                <Text className="text-sm text-muted">
+                  Este cliente no tiene un teléfono registrado. Si necesitas ubicarlo, contacta al
+                  bodegón.
+                </Text>
+              ) : null}
               {delivery.isContactHidden ? (
                 <Text className="text-sm text-muted">
                   Los datos de contacto ya no están disponibles.

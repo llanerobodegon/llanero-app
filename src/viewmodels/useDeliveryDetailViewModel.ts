@@ -274,6 +274,8 @@ export function useDeliveryDetailViewModel(orderId: string) {
     notice,
     customerName: customerName || 'Cliente',
     customerInitials: customer ? initials(customer.firstName, customer.lastName) : '',
+    /** El cliente no tiene teléfono en su perfil: no hay botones de contacto que mostrar. */
+    hasNoCustomerPhone: canContactCustomer && !customerTel && !customerWhatsApp,
     units: delivery?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0,
     attemptsLeft: delivery?.attemptsLeft ?? 0,
     isLocked: status === 'on_delivery' && (delivery?.attemptsLeft ?? 0) <= 0,
