@@ -169,7 +169,13 @@ git commit -m "Add server functions for delivery-person mode"
 
 ### Task 4: Migración — cerrar el acceso directo del repartidor
 
-> Reglas reales encontradas en la Tarea 1: _(completar en Task 1, Step 2)_
+> Reglas reales encontradas en la Tarea 1 (producción, 2026-11-10):
+> - `orders`: "Delivery members can view and update assigned orders" (ALL; asignados o sin asignar).
+> - `users`: "Delivery users can view customers of their assigned orders" (SELECT, usa `get_customer_ids_for_delivery()`).
+> - `addresses`: "Delivery users can view addresses of their assigned orders" (SELECT, usa `get_address_ids_for_delivery()`).
+> - `order_items`: "Users can view items of their orders" (SELECT; cliente o repartidor asignado).
+> - `orders` no tiene columna de intentos.
+> - Confirmado: `users` tiene "Users can update own profile" y "Users can update their own notification settings", ambas sin restringir columnas.
 
 **Files:**
 - Create: `supabase/migrations/20261111020000_close_delivery_direct_access.sql`
