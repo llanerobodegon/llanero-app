@@ -67,7 +67,9 @@ se cargan para él.
 El modo repartidor **no consulta tablas**: `delivery.service.ts` solo llama funciones del
 servidor (`get_delivery_orders`, `get_delivery_order`, `delivery_mark_picked_up`,
 `delivery_complete_order`, …). Así el código de entrega, los montos y los datos de pago nunca
-llegan a su teléfono, y el código se valida en el servidor (máximo 5 intentos). No usa tiempo
-real: se actualiza al entrar a la pantalla, al deslizar y al recibir un aviso.
+llegan a su teléfono, y el código se valida en el servidor (máximo 5 intentos). Su tiempo real
+no lee la tabla: el servidor envía una señal "algo cambió" a un canal privado del repartidor
+(`delivery:<id>`) y la app vuelve a pedir sus entregas. También se actualiza al entrar a la
+pantalla, al deslizar y al recibir un aviso.
 
 Diseño completo: `docs/superpowers/specs/2026-11-10-modo-repartidor-design.md`.

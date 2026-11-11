@@ -12,6 +12,7 @@ import type { Database } from '@/types/database';
 
 // Modo repartidor: todo pasa por funciones del servidor (`security definer`). El repartidor no
 // tiene acceso directo a `orders`; así nunca recibe el código de entrega ni datos de pago.
+// El tiempo real es una señal aparte (`subscribeToChanges`), no la lectura de la tabla.
 
 type DeliveryRow = Database['public']['Functions']['get_delivery_orders']['Returns'][number];
 
@@ -206,6 +207,37 @@ export const deliveryService = {
     return {
       isCompleted: !!result?.completed,
       attemptsLeft: Number(result?.attempts_left ?? 0),
+    };
+  },
+
+  /**
+   * Avisa cuando el servidor cambia alguna entrega del repartidor (asignada, reasignada,
+   * cancelada, cambio de estado). Es solo una señal por un canal privado suyo, sin datos del
+   * pedido: quien la recibe vuelve a cargar con las funciones de arriba. Devuelve cómo dejar
+   * de escuchar.
+   */
+  subscribeToChanges(onChange: () => void): () => void {
+    let isCancelled = false;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      const userId = data.session?.user.id;
+      if (isCancelled || !userId) return;
+      // Los canales privados validan el token de la sesión.
+      await supabase.realtime.setAuth();
+      if (isCancelled) return;
+      channel = supabase
+        .channel(`delivery:${userId}`, { config: { private: true } })
+        .on('broadcast', { event: 'changed' }, () => onChange())
+        .subscribe();
+    })().catch(() => {
+      // Sin tiempo real la app sigue funcionando: se actualiza al entrar y al deslizar.
+    });
+
+    return () => {
+      isCancelled = true;
+      if (channel) supabase.removeChannel(channel);
     };
   },
 

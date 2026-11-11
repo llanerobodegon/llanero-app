@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Linking } from 'react-native';
 
 import { useNotificationReceived } from '@/hooks/use-notification-received';
@@ -68,9 +68,11 @@ export function useDeliveryDetailViewModel(orderId: string) {
     load().catch(() => {});
   }, [load]);
 
-  // Sin tiempo real: se recarga al entrar y cuando llega un aviso con la app abierta.
+  // Se recarga al entrar y cuando llega un aviso con la app abierta.
   useFocusEffect(refresh);
   useNotificationReceived(refresh);
+  // Tiempo real: si el bodegón cancela o reasigna este pedido, la pantalla lo refleja sola.
+  useEffect(() => deliveryService.subscribeToChanges(refresh), [refresh]);
 
   const retry = useCallback(() => {
     setIsLoading(true);
