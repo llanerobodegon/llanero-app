@@ -44,3 +44,6 @@ example
 
 # Estado local del CLI de Supabase
 supabase/.temp/
+
+# Espacio de trabajo local de superpowers
+.superpowers/
