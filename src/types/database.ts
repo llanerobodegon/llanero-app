@@ -391,6 +391,7 @@ export type Database = {
           customer_notes: string | null
           delivered_at: string | null
           delivery_code: string
+          delivery_code_attempts: number
           delivery_fee_bs: number | null
           delivery_fee_usd: number | null
           delivery_person_id: string | null
@@ -423,6 +424,7 @@ export type Database = {
           customer_notes?: string | null
           delivered_at?: string | null
           delivery_code: string
+          delivery_code_attempts?: number
           delivery_fee_bs?: number | null
           delivery_fee_usd?: number | null
           delivery_person_id?: string | null
@@ -455,6 +457,7 @@ export type Database = {
           customer_notes?: string | null
           delivered_at?: string | null
           delivery_code?: string
+          delivery_code_attempts?: number
           delivery_fee_bs?: number | null
           delivery_fee_usd?: number | null
           delivery_person_id?: string | null
@@ -968,6 +971,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assert_active_delivery: { Args: never; Returns: string }
       check_user_exists_by_email: {
         Args: { user_email: string }
         Returns: boolean
@@ -989,14 +993,43 @@ export type Database = {
         Returns: string
       }
       delete_current_user: { Args: never; Returns: undefined }
-      get_address_ids_for_delivery: { Args: never; Returns: string[] }
+      delivery_complete_order: {
+        Args: { p_code: string; p_order_id: string }
+        Returns: Json
+      }
+      delivery_mark_picked_up: {
+        Args: { p_order_id: string }
+        Returns: undefined
+      }
       get_admin_push_tokens: {
         Args: never
         Returns: {
           push_token: string
         }[]
       }
-      get_customer_ids_for_delivery: { Args: never; Returns: string[] }
+      get_delivery_order: { Args: { p_order_id: string }; Returns: Json }
+      get_delivery_orders: {
+        Args: { p_limit?: number; p_offset?: number; p_scope: string }
+        Returns: {
+          address_line_1: string
+          city: string
+          created_at: string
+          customer_name: string
+          delivered_at: string
+          id: string
+          item_count: number
+          order_number: string
+          status: string
+          warehouse_name: string
+        }[]
+      }
+      get_delivery_summary: {
+        Args: never
+        Returns: {
+          last_7_days: number
+          today: number
+        }[]
+      }
       get_order_delivery_person: {
         Args: { p_order_id: string }
         Returns: {
@@ -1065,6 +1098,10 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      set_delivery_availability: {
+        Args: { p_available: boolean }
+        Returns: string
       }
     }
     Enums: {
