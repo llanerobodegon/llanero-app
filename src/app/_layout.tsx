@@ -58,6 +58,12 @@ function RootNavigator() {
     if (isSignedIn) notificationSettingsService.syncPushToken();
   }, [isSignedIn]);
 
+  // A dónde va un repartidor cuando la pantalla en la que está deja de estar disponible (al
+  // iniciar sesión, o si la app abre en "/"). Hay que decirlo porque, por defecto, Expo Router
+  // redirige al grupo "/(delivery)", que no tiene pantalla `index` y daría "Unmatched Route".
+  // Para clientes y sin sesión se deja el destino por defecto.
+  const deliveryHome = isDelivery ? '/deliveries' : undefined;
+
   // Mientras se lee la sesión guardada y su rol se mantiene el splash (no se muestra nada).
   if (isLoading) return null;
 
@@ -67,7 +73,7 @@ function RootNavigator() {
     <CartDrawerView isEnabled={isSignedIn && !isDelivery}>
       <Stack screenOptions={{ headerShown: false }}>
         {/* ---------- Con sesión: tienda (cualquier rol menos repartidor) ---------- */}
-        <Stack.Protected guard={isSignedIn && !isDelivery}>
+        <Stack.Protected guard={isSignedIn && !isDelivery} redirectTo={deliveryHome}>
           <Stack.Screen name="(tabs)" />
           {/* Detalle de producto: hoja modal por encima de las pestañas */}
           <Stack.Screen name="product/[id]" options={{ presentation: 'modal' }} />
@@ -111,7 +117,7 @@ function RootNavigator() {
         </Stack.Protected>
 
         {/* ---------- Sin sesión ---------- */}
-        <Stack.Protected guard={!isSignedIn}>
+        <Stack.Protected guard={!isSignedIn} redirectTo={deliveryHome}>
           {/* Bienvenida: sin gesto de volver */}
           <Stack.Screen name="auth/index" options={{ gestureEnabled: false, animation: 'fade' }} />
           <Stack.Screen name="auth/login" />
